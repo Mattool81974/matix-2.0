@@ -1,0 +1,101 @@
+#include <iostream>
+#include <map>
+#include "scene.h"
+#include <string>
+#include <vector>
+
+// Graphic_Scene constructor
+Graphic_Scene::Graphic_Scene()
+{
+
+}
+
+// Graphic_Scene destructor
+Graphic_Scene::~Graphic_Scene()
+{
+
+}
+
+// Physic_Scene constructor
+Physic_Scene::Physic_Scene()
+{
+
+}
+
+// Physic_Scene destructor
+Physic_Scene::~Physic_Scene()
+{
+
+}
+
+// Scene constructor
+Scene::Scene(std::string a_name, bool a_graphic, bool a_physic): name(a_name), graphic(a_graphic), physic(a_physic)
+{
+	if (use_graphic())
+	{
+		graphic_scene = new Graphic_Scene();
+	}
+
+	if (use_physic())
+	{
+		physic_scene = new Physic_Scene();
+	}
+}
+
+// Add an existing object into the scene
+void Scene::add_object(std::string name, Transform_Object *object)
+{
+	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to add already exist." << std::endl; return; }
+	(*get_objects())[name] = object;
+}
+
+// Returns if the scene contains an object
+bool Scene::contains_object(std::string name)
+{
+	std::map<std::string, Transform_Object*> *objects = get_objects();
+	for (std::map<std::string, Transform_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		if (it->first == name) { return true; } // Verify each scene name (first element of map)
+	}
+	return false;
+}
+
+// Create a new object into the scene and return it
+Transform_Object* Scene::new_object(std::string name)
+{
+	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
+	Transform_Object* object = new Transform_Object();
+	add_object(name, object);
+	return object;
+}
+
+// Update the scene
+void Scene::update()
+{
+	std::map<std::string, Transform_Object *> *objects_to_update = get_objects();
+	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->update(); // Update every objects
+	}
+
+	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->soft_reset(); // Reset every objects
+	}
+}
+
+// Scene destructor
+Scene::~Scene()
+{
+	// Delete the scene
+	if (get_graphic_scene() != 0) { delete graphic_scene; graphic_scene = 0; }
+	if (get_physic_scene() != 0) { delete physic_scene; physic_scene = 0; }
+
+	// Delete all objects into the scene
+	std::map<std::string, Transform_Object*>* objects_to_update = get_objects();
+	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		delete it->second;
+		it->second = 0;
+	}
+}
