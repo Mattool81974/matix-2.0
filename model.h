@@ -68,7 +68,7 @@ private:
 class VAO
 {
 public:
-	VAO(std::string shader_path);
+	VAO(std::string shader_path, std::string type);
 	void bind();
 	Shader_Program *load_shader_program(std::string shader_path);
 	void render();

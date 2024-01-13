@@ -4,8 +4,13 @@
 // Advanced_Struct constructor
 Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base_struct)
 {
+	// Create types
+	types["cube"] = "cube";
+	types["square"] = "triangle";
+
 	// Create VAOs
-	all_vaos["cube"] = new VAO("shaders/default");
+	all_vaos["cube"] = new VAO("shaders/default", "cube");
+	all_vaos["triangle"] = new VAO("shaders/default", "triangle");
 }
 
 // Advanced_Struct destructor

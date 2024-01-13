@@ -29,12 +29,12 @@ bool Graphic_Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform)
+Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
 	// Create and add the object
-	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, (*get_advanced_struct()->get_all_vaos())["cube"]);
+	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())[type]]);
 	add_object(name, object);
 
 	return object;
@@ -116,7 +116,7 @@ bool Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Transform_Object* Scene::new_object(std::string name, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
@@ -127,7 +127,7 @@ Transform_Object* Scene::new_object(std::string name, Transform_Object *parent, 
 	// Create the object in graphic scene
 	if (use_graphic())
 	{
-		get_graphic_scene()->new_object(name, *object);
+		get_graphic_scene()->new_object(name, *object, type);
 	}
 
 	return object;

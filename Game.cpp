@@ -5,8 +5,8 @@
 #include <iostream>
 #include "matix/stb_image.h"
 
-double mouse_x = 0;
-double mouse_y = 0;
+double mouse_x = 500;
+double mouse_y = 500;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {

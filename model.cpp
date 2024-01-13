@@ -9,7 +9,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include "stb_image.h"
+#include "matix/stb_image.h"
 
 // Shader_Program constructor
 Shader_Program::Shader_Program(std::string a_vertex_shader, std::string a_fragment_shader): fragment_shader(a_fragment_shader), vertex_shader(a_vertex_shader)
@@ -303,12 +303,19 @@ Cube_VBO::~Cube_VBO()
 }
 
 // VAO constructor
-VAO::VAO(std::string shader_path)
+VAO::VAO(std::string shader_path, std::string type)
 {
 	shader_program = load_shader_program(shader_path);
 
 	glGenVertexArrays(1, &vao);
-	vbo = new Cube_VBO();
+	if (type == "cube")
+	{
+		vbo = new Cube_VBO();
+	}
+	else
+	{
+		vbo = new VBO();
+	}
 
 	glBindVertexArray(vao);
 	vbo->bind_buffer();
