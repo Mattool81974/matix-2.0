@@ -5,19 +5,74 @@
 #include <vector>
 
 // Graphic_Scene constructor
-Graphic_Scene::Graphic_Scene()
+Graphic_Scene::Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name): advanced_struct(a_advanced_struct), name(a_name)
 {
 
+}
+
+// Add an existing object into the scene
+void Graphic_Scene::add_object(std::string name, Graphic_Object* object)
+{
+	if (contains_object(name)) { std::cout << "Graphic scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to add already exist." << std::endl; return; }
+	(*get_objects())[name] = object;
+}
+
+// Returns if the scene contains an object
+bool Graphic_Scene::contains_object(std::string name)
+{
+	std::map<std::string, Graphic_Object*>* objects = get_objects();
+	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		if (it->first == name) { return true; } // Verify each scene name (first element of map)
+	}
+	return false;
+}
+
+// Create a new object into the scene and return it
+Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform)
+{
+	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
+	
+	// Create and add the object
+	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, (*get_advanced_struct()->get_all_vaos())["cube"]);
+	add_object(name, object);
+
+	return object;
+}
+
+// Render the objects in the scene
+void Graphic_Scene::render()
+{
+	std::map<std::string, Graphic_Object*>* objects = get_objects();
+	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		it->second->render();
+	}
+}
+
+// Update the objects in the scene
+void Graphic_Scene::update()
+{
+	std::map<std::string, Graphic_Object*>* objects = get_objects();
+	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		it->second->update();
+	}
 }
 
 // Graphic_Scene destructor
 Graphic_Scene::~Graphic_Scene()
 {
-
+	std::map<std::string, Graphic_Object*>* objects = get_objects();
+	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		delete it->second;
+		it->second = 0;
+	}
 }
 
 // Physic_Scene constructor
-Physic_Scene::Physic_Scene()
+Physic_Scene::Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name): advanced_struct(a_advanced_struct), name(a_name)
 {
 
 }
@@ -29,16 +84,16 @@ Physic_Scene::~Physic_Scene()
 }
 
 // Scene constructor
-Scene::Scene(std::string a_name, bool a_graphic, bool a_physic): name(a_name), graphic(a_graphic), physic(a_physic)
+Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic, bool a_physic): advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
 {
 	if (use_graphic())
 	{
-		graphic_scene = new Graphic_Scene();
+		graphic_scene = new Graphic_Scene(get_advanced_struct(), get_name());
 	}
 
 	if (use_physic())
 	{
-		physic_scene = new Physic_Scene();
+		physic_scene = new Physic_Scene(get_advanced_struct(), get_name());
 	}
 }
 
@@ -61,11 +116,20 @@ bool Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Transform_Object* Scene::new_object(std::string name)
+Transform_Object* Scene::new_object(std::string name, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
-	Transform_Object* object = new Transform_Object();
+	
+	// Create and add the object
+	Transform_Object* object = new Transform_Object(parent, position, rotation, scale);
 	add_object(name, object);
+
+	// Create the object in graphic scene
+	if (use_graphic())
+	{
+		get_graphic_scene()->new_object(name, *object);
+	}
+
 	return object;
 }
 
@@ -76,6 +140,12 @@ void Scene::update()
 	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
 		it->second->update(); // Update every objects
+	}
+
+	if (use_graphic()) // Update graphic scene
+	{
+		get_graphic_scene()->update();
+		get_graphic_scene()->render();
 	}
 
 	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)

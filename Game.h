@@ -1,5 +1,6 @@
 #pragma once
 
+#include "advanced_struct.h"
 #include "base_struct.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -23,7 +24,8 @@ public:
 	void update();
 	~Game();
 
-	inline Base_Struct* get_base_struct() { return base_struct; };
+	inline Advanced_Struct* get_advanced_struct() { return advanced_struct; };
+	inline Base_Struct* get_base_struct() { return get_advanced_struct()->get_base_struct(); };
 	inline Scene* get_current_scene() { return (*get_scenes())[get_current_scene_name()]; };
 	inline std::string get_current_scene_name() { return current_scene; };
 	inline std::map<std::string, Scene*> *get_scenes() { return &scenes; };
@@ -31,7 +33,7 @@ public:
 	inline int get_window_width() { return window_width; };
 	inline void set_current_scene(std::string a_name) { current_scene = a_name; };
 private:
-	Base_Struct *base_struct = 0;
+	Advanced_Struct *advanced_struct = 0;
 
 	std::string current_scene = "";
 	float last_frame_time = 0;

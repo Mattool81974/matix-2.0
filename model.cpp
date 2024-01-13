@@ -364,7 +364,8 @@ Shader_Program* VAO::load_shader_program(std::string shader_path)
 	const char* vertex_code = vertex_content.c_str();
 	const char* fragment_code = fragment_content.c_str();
 
-	return new Shader_Program(vertex_code, fragment_code);
+	Shader_Program* shader = new Shader_Program(vertex_code, fragment_code);
+	return shader;
 }
 
 // Render the VAO
@@ -414,28 +415,6 @@ void Texture::bind()
 
 // Texture destructor
 Texture::~Texture()
-{
-
-}
-
-// Graphic_Object contructor
-Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, VAO *a_vao): base_struct(a_base_struct), attached_transform(a_attached_transform), vao(a_vao)
-{
-	
-}
-
-// Render the graphic object
-void Graphic_Object::render()
-{
-	texture.bind();
-	vao->get_shader_program()->set_uniform4fv_value("model", attached_transform.get_model_matrix());
-	vao->get_shader_program()->set_uniform4fv_value("projection", get_base_struct()->get_projection());
-	vao->get_shader_program()->set_uniform4fv_value("view", get_base_struct()->get_camera()->get_view());
-	vao->render();
-}
-
-// Graphic_Object destructor
-Graphic_Object::~Graphic_Object()
 {
 
 }

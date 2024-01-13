@@ -23,8 +23,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 Game::Game(int a_window_width, int a_window_height): window_height(a_window_height), window_width(a_window_width)
 {
     // Configurate base_struct
-    base_struct = new Base_Struct(mouse_x, mouse_y);
-    base_struct->get_camera()->set_position(glm::vec3(-3.0, 0.0, 0.0));
+    Base_Struct *base_struct = new Base_Struct(mouse_x, mouse_y);
+    base_struct->get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
     base_struct->get_camera()->set_rotation(glm::vec3(0.0, 0.0, 0.0));
     base_struct->set_window_height(window_height);
     base_struct->set_window_width(window_width);
@@ -63,6 +63,8 @@ Game::Game(int a_window_width, int a_window_height): window_height(a_window_heig
 
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    advanced_struct = new Advanced_Struct(base_struct);
 }
 
 // Add a scene to the game
@@ -88,7 +90,7 @@ Scene* Game::new_scene(std::string name)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to create already exists." << std::endl; return 0; }
 
-    Scene* new_scene = new Scene(name);
+    Scene* new_scene = new Scene(get_advanced_struct(), name);
     add_scene(name, new_scene);
     return new_scene;
 }
@@ -169,6 +171,6 @@ Game::~Game()
         delete it->second;
         it->second = 0;
     }
-    delete base_struct;
-    base_struct = 0;
+    delete advanced_struct;
+    advanced_struct = 0;
 }
