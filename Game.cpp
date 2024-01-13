@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "stb_image.h"
+#include "matix/stb_image.h"
 
 double mouse_x = 0;
 double mouse_y = 0;
