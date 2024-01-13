@@ -47,13 +47,13 @@ private:
 	std::map<std::string, Physic_Object*> objects = std::map<std::string, Physic_Object*>();
 };
 
-class Scene
+class Scene: public Transform_Object
 {
 public:
 	Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic = true, bool a_physic = true);
 	void add_object(std::string name, Transform_Object* object);
 	bool contains_object(std::string name);
-	Transform_Object *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1));
+	Transform_Object *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "");
 	void update();
 	~Scene();
 

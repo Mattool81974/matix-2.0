@@ -84,7 +84,7 @@ Physic_Scene::~Physic_Scene()
 }
 
 // Scene constructor
-Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic, bool a_physic): advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
+Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic, bool a_physic): Transform_Object(), advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
 {
 	if (use_graphic())
 	{
@@ -119,6 +119,9 @@ bool Scene::contains_object(std::string name)
 Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
+
+	// Configure object
+	if (parent == 0) { parent = this; }
 	
 	// Create and add the object
 	Transform_Object* object = new Transform_Object(parent, position, rotation, scale);

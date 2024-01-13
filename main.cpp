@@ -19,7 +19,7 @@ int main()
     Scene* scene = game.new_scene("level0");
     game.set_current_scene("level0");
 
-    scene->new_object("sol", "square");
+    scene->new_object("sol", "square", 0, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "textures/unknow.png");
 
     game.run();
 
