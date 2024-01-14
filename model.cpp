@@ -94,7 +94,7 @@ void Shader_Program::pass_variable(std::vector<Shader_Program_Variable> *variabl
 		unsigned int type_size = 0;
 		if (it->type == 0) { type_size = sizeof(float); }
 
-		glVertexAttribPointer(variable_number, 3, GL_FLOAT, GL_FALSE, total_size, (void*)current_size);
+		glVertexAttribPointer(variable_number, it->vector_size, GL_FLOAT, GL_FALSE, total_size, (void*)current_size);
 		glEnableVertexAttribArray(variable_number);
 		current_size += it->vector_size * type_size;
 		variable_number++;
@@ -158,33 +158,33 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 {
 	if(fill_datas)
 	{
-		vertices.push_back(0.5f);
-		vertices.push_back(0.5f);
-		vertices.push_back(0.0f);
+		datas.push_back(0.5f);
+		datas.push_back(0.5f);
+		datas.push_back(0.0f);
 
-		vertices_texture.push_back(1.0f);
-		vertices_texture.push_back(1.0f);
+		datas.push_back(1.0f);
+		datas.push_back(1.0f);
 
-		vertices.push_back(0.5f);
-		vertices.push_back(-0.5f);
-		vertices.push_back(0.0f);
+		datas.push_back(0.5f);
+		datas.push_back(-0.5f);
+		datas.push_back(0.0f);
 
-		vertices_texture.push_back(1.0f);
-		vertices_texture.push_back(0.0f);
+		datas.push_back(1.0f);
+		datas.push_back(0.0f);
 
-		vertices.push_back(-0.5f);
-		vertices.push_back(-0.5f);
-		vertices.push_back(0.0f);
+		datas.push_back(-0.5f);
+		datas.push_back(-0.5f);
+		datas.push_back(0.0f);
 
-		vertices_texture.push_back(0.0f);
-		vertices_texture.push_back(0.0f);
+		datas.push_back(0.0f);
+		datas.push_back(0.0f);
 
-		vertices.push_back(-0.5f);
-		vertices.push_back(0.5f);
-		vertices.push_back(0.0f);
+		datas.push_back(-0.5f);
+		datas.push_back(0.5f);
+		datas.push_back(0.0f);
 
-		vertices_texture.push_back(0.0f);
-		vertices_texture.push_back(1.0f);
+		datas.push_back(0.0f);
+		datas.push_back(1.0f);
 
 		indices.push_back(0);
 		indices.push_back(1);
@@ -197,10 +197,16 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 
 	Shader_Program_Variable v1 = Shader_Program_Variable();
 	Shader_Program_Variable v2 = Shader_Program_Variable();
+	Shader_Program_Variable v3 = Shader_Program_Variable();
+	Shader_Program_Variable v4 = Shader_Program_Variable();
 	v1.vector_size = 3;
 	v2.vector_size = 2;
+	v3.vector_size = 4;
+	v4.vector_size = 3;
 	attributes.push_back(v1);
 	attributes.push_back(v2);
+	attributes.push_back(v3);
+	attributes.push_back(v4);
 
 	glGenBuffers(1, &vbo);
 	if(use_ebo)
@@ -233,21 +239,18 @@ void VBO::bind_buffer()
 	}
 }
 
-// Return all the data into the VBO
-std::vector<float> VBO::get_datas()
+// Returns the number of vertices into the VBO
+unsigned int VBO::get_vertice_number()
 {
-	std::vector<float> datas;
-
-	for (int i = 0; i < get_vertices().size() / 3; i++)
+	std::vector<float> datas = get_datas();
+	unsigned int attribute_size = 0;
+	for(int i = 0;i<get_attributes()->size();i++)
 	{
-		datas.push_back(get_vertices()[i * 3]);
-		datas.push_back(get_vertices()[i * 3 + 1]);
-		datas.push_back(get_vertices()[i * 3 + 2]);
-		datas.push_back(get_vertices_texture()[i * 2]);
-		datas.push_back(get_vertices_texture()[i * 2 + 1]);
+		unsigned int type_size = 0;
+		if ((*get_attributes())[i].type == 0) { type_size = sizeof(float); }
+		attribute_size += (*get_attributes())[i].vector_size * type_size;
 	}
-
-	return datas;
+	return (datas.size() * sizeof(float)) / attribute_size;
 }
 
 // Unbind the VBO from the GPU memory
@@ -267,65 +270,60 @@ Cube_VBO::Cube_VBO(): VBO(false, false)
 {
 	float vertices_array[] = {
 	// Face 1
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 0.25f,
-	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,
-	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,
-	-0.5f,  0.5f, -0.5f,  0.33333f, 0.5f,
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f,
+	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f, 0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 0.25f,     0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,      0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,      0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.33333f, 0.5f,  0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f, 0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
 
 	// Face 3
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.25f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.5f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f,
+	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.25f,     0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,      0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,      0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	-0.5f,  0.5f,  0.5f,  0.66666f, 0.5f,  0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
+	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
 
 
 	// Face 2
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f,
-	-0.5f,  0.5f, -0.5f,  0.33333f, 0.25f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f,
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	-0.5f,  0.5f, -0.5f,  0.33333f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	-0.5f, -0.5f,  0.5f,  0.66666f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
 
 
 	// Face 4
-	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f,
-	 0.5f,  0.5f, -0.5f,  0.66666f, 0.75f,
-	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,
-	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.5f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f,
+	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	 0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	 0.5f, -0.5f,  0.5f,  0.33333f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
+	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
 
 
 	 // Face 6
-	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,
-	 0.5f, -0.5f, -0.5f,  0.33333f, 0.5f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f,
-	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,
+	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f, -0.5f, -0.5f,  0.33333f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
 
 	// Face 5
-	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f,
-	 0.5f,  0.5f, -0.5f,  0.33333f, 0.75f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f
+	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f,  0.5f, -0.5f,  0.33333f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.66666f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f
 	};
 
-	for (int i = 0; i < 36; i++)
+	for (int i = 0; i < sizeof(vertices_array) / sizeof(float); i++)
 	{
-		vertices.push_back(vertices_array[i * 5]);
-		vertices.push_back(vertices_array[i * 5 + 1]);
-		vertices.push_back(vertices_array[i * 5 + 2]);
-
-		vertices_texture.push_back(vertices_array[i * 5 + 3]);
-		vertices_texture.push_back(vertices_array[i * 5 + 4]);
+		datas.push_back(vertices_array[i]);
 	}
 }
 
@@ -360,10 +358,10 @@ VAO::VAO(std::string shader_path, std::string type)
 }
 
 // Bind the VAO into the GPU memory
-void VAO::bind()
+void VAO::bind(glm::vec3 scale)
 {
 	shader_program->use();
-	shader_program->set_uniform4f_value("ourColor", 0, 0, (1.0 - 1.0 * sin(glfwGetTime())) / 2.0, 0);
+	shader_program->set_uniform3f_value("scale", scale.x, scale.y, scale.z);
 	glBindVertexArray(vao);
 }
 
@@ -409,17 +407,23 @@ Shader_Program* VAO::load_shader_program(std::string shader_path)
 }
 
 // Render the VAO
-void VAO::render()
+void VAO::render(glm::vec3 scale)
 {
-	bind();
+	bind(scale);
 	if (get_vbo()->is_using_vbo())
 	{
 		glDrawElements(GL_TRIANGLES, vbo->get_indices().size(), GL_UNSIGNED_INT, 0);
 	}
 	else
 	{
-		glDrawArrays(GL_TRIANGLES, 0, get_vbo()->get_vertices().size() / 3.0);
+		glDrawArrays(GL_TRIANGLES, 0, triangle_number() * 3.0);
 	}
+}
+
+// Returns the number of triangle to draw
+unsigned int VAO::triangle_number()
+{
+	return get_vbo()->get_vertice_number() / 3.0;
 }
 
 // VAO destructor
@@ -443,6 +447,12 @@ Texture::Texture(std::string a_texture_path): texture_path(a_texture_path)
 	glBindTexture(GL_TEXTURE_2D, texture_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
 	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	stbi_image_free(texture);
 }

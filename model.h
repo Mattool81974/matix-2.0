@@ -42,17 +42,15 @@ public:
 	VBO(bool fill_datas = true, bool a_use_ebo = true);
 	void bind();
 	void bind_buffer();
-	std::vector<float> get_datas();
+	unsigned int get_vertice_number();
 	void unbind();
 	~VBO();
 
 	inline std::vector<Shader_Program_Variable> *get_attributes() { return &attributes; };
+	inline std::vector<float> get_datas() { return datas; };
 	inline std::vector<unsigned int> get_indices() { return indices; };
 	inline unsigned int* get_indices_in_array() { return indices.data(); };
 	inline unsigned int& get_vbo() { return vbo; };
-	inline std::vector<float> get_vertices() { return vertices; };
-	inline float* get_vertices_in_array() { return vertices.data(); };
-	inline std::vector<float> get_vertices_texture() { return vertices_texture; };
 	inline bool is_using_vbo() { return use_ebo; };
 private:
 	unsigned int ebo = 0;
@@ -62,8 +60,7 @@ private:
 	std::vector<Shader_Program_Variable> attributes = std::vector<Shader_Program_Variable>();
 protected:
 	std::vector<unsigned int> indices = std::vector<unsigned int>();
-	std::vector<float> vertices = std::vector<float>();
-	std::vector<float> vertices_texture = std::vector<float>();
+	std::vector<float> datas = std::vector<float>();
 };
 
 class Cube_VBO : public VBO
@@ -78,9 +75,10 @@ class VAO
 {
 public:
 	VAO(std::string shader_path, std::string type);
-	void bind();
+	void bind(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0));
 	Shader_Program *load_shader_program(std::string shader_path);
-	void render();
+	void render(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0));
+	unsigned int triangle_number();
 	~VAO();
 
 	inline Shader_Program* get_shader_program() { return shader_program; };

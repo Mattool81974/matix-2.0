@@ -15,7 +15,7 @@ void Graphic_Object::render()
 	vao->get_shader_program()->set_uniform4fv_value("model", attached_transform.get_model_matrix());
 	vao->get_shader_program()->set_uniform4fv_value("projection", get_base_struct()->get_projection());
 	vao->get_shader_program()->set_uniform4fv_value("view", get_base_struct()->get_camera()->get_view());
-	vao->render();
+	vao->render(attached_transform.get_scale());
 }
 
 // Update the graphic object
