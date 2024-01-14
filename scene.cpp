@@ -29,12 +29,16 @@ bool Graphic_Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type)
+Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type, std::string texture_path)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
+	// Configure variables for creation
+	if (texture_path == "") { texture_path = "textures/unknow.png"; }
+
 	// Create and add the object
-	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())[type]]);
+	VAO* vao = (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())[type]];
+	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, texture_path, vao);
 	add_object(name, object);
 
 	return object;
@@ -116,7 +120,7 @@ bool Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 
@@ -130,7 +134,7 @@ Transform_Object* Scene::new_object(std::string name, std::string type, Transfor
 	// Create the object in graphic scene
 	if (use_graphic())
 	{
-		get_graphic_scene()->new_object(name, *object, type);
+		get_graphic_scene()->new_object(name, *object, type, texture_path);
 	}
 
 	return object;

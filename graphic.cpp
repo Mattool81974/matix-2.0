@@ -3,7 +3,7 @@
 #include "model.h"
 
 // Graphic_Object contructor
-Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, VAO* a_vao) : base_struct(a_base_struct), attached_transform(a_attached_transform), vao(a_vao)
+Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, std::string a_texture_path, VAO* a_vao) : base_struct(a_base_struct), attached_transform(a_attached_transform), texture(a_texture_path), vao(a_vao)
 {
 
 }

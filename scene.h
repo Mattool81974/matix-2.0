@@ -14,7 +14,7 @@ public:
 	Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name);
 	void add_object(std::string name, Graphic_Object* object);
 	bool contains_object(std::string name);
-	Graphic_Object* new_object(std::string name, Transform_Object& transform, std::string type);
+	Graphic_Object* new_object(std::string name, Transform_Object& transform, std::string type, std::string texture_path = "");
 	void render();
 	void update();
 	~Graphic_Scene();

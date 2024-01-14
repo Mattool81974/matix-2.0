@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <cmath>
+#include <map>
 #include <string>
 #include <vector>
 #include "matix/stb_image.h"
@@ -74,14 +75,30 @@ Shader_Program::Shader_Program(std::string a_vertex_shader, std::string a_fragme
 }
 
 // Pass variable to the shader program
-void Shader_Program::pass_variable()
+void Shader_Program::pass_variable(std::vector<Shader_Program_Variable> *variables)
 {
-	use();
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	// Define necessary variable for binding
+	unsigned int total_size = 0;
+	for (std::vector<Shader_Program_Variable>::iterator it = variables->begin(); it != variables->end(); it++)
+	{
+		unsigned int type_size = 0;
+		if (it->type == 0) { type_size = sizeof(float); }
+		total_size += it->vector_size * type_size;
+	}
+	unsigned int current_size = 0;
+	unsigned short variable_number = 0;
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	use();
+	for (std::vector<Shader_Program_Variable>::iterator it = variables->begin(); it != variables->end(); it++)
+	{
+		unsigned int type_size = 0;
+		if (it->type == 0) { type_size = sizeof(float); }
+
+		glVertexAttribPointer(variable_number, 3, GL_FLOAT, GL_FALSE, total_size, (void*)current_size);
+		glEnableVertexAttribArray(variable_number);
+		current_size += it->vector_size * type_size;
+		variable_number++;
+	}
 }
 
 // Change the value of a uniform float value
@@ -178,6 +195,13 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		indices.push_back(3);
 	}
 
+	Shader_Program_Variable v1 = Shader_Program_Variable();
+	Shader_Program_Variable v2 = Shader_Program_Variable();
+	v1.vector_size = 3;
+	v2.vector_size = 2;
+	attributes.push_back(v1);
+	attributes.push_back(v2);
+
 	glGenBuffers(1, &vbo);
 	if(use_ebo)
 	{
@@ -242,47 +266,56 @@ VBO::~VBO()
 Cube_VBO::Cube_VBO(): VBO(false, false)
 {
 	float vertices_array[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	// Face 1
+	-0.5f, -0.5f, -0.5f,  0.33f, 0.25f,
+	 0.5f, -0.5f, -0.5f,  0.0f, 0.25f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,
+	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,
+	-0.5f,  0.5f, -0.5f,  0.33f, 0.5f,
+	-0.5f, -0.5f, -0.5f,  0.33f, 0.25f,
 
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	// Face 3
+	-0.5f, -0.5f,  0.5f,  0.66f, 0.25f,
+	 0.5f, -0.5f,  0.5f,  1.0f, 0.25f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,
+	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,
+	-0.5f,  0.5f,  0.5f,  0.66f, 0.5f,
+	-0.5f, -0.5f,  0.5f,  0.66f, 0.25f,
 
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	// Face 2
+	-0.5f, -0.5f, -0.5f,  0.33f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.66f, 0.25f,
+	-0.5f,  0.5f, -0.5f,  0.33f, 0.25f,
+	-0.5f, -0.5f,  0.5f,  0.66f, 0.0f,
+	-0.5f,  0.5f,  0.5f,  0.66f, 0.25f,
+	-0.5f, -0.5f, -0.5f,  0.33f, 0.0f,
 
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	// Face 4
+	 0.5f,  0.5f,  0.5f,  0.33f, 0.75f,
+	 0.5f,  0.5f, -0.5f,  0.66f, 0.75f,
+	 0.5f, -0.5f, -0.5f,  0.66f, 0.5f,
+	 0.5f, -0.5f, -0.5f,  0.66f, 0.5f,
+	 0.5f, -0.5f,  0.5f,  0.33f, 0.5f,
+	 0.5f,  0.5f,  0.5f,  0.33f, 0.75f,
+
+
+	 // Face 6
+	-0.5f, -0.5f, -0.5f,  0.66f, 0.5f,
+	 0.5f, -0.5f, -0.5f,  0.33f, 0.5f,
+	 0.5f, -0.5f,  0.5f,  0.33f, 0.25f,
+	 0.5f, -0.5f,  0.5f,  0.33f, 0.25f,
+	-0.5f, -0.5f,  0.5f,  0.66f, 0.25f,
+	-0.5f, -0.5f, -0.5f,  0.66f, 0.5f,
+
+	// Face 5
+	-0.5f,  0.5f, -0.5f,  0.66f, 0.75f,
+	 0.5f,  0.5f, -0.5f,  0.33f, 0.75f,
+	 0.5f,  0.5f,  0.5f,  0.33f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.33f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.66f, 1.0f,
+	-0.5f,  0.5f, -0.5f,  0.66f, 0.75f
 	};
 
 	for (int i = 0; i < 36; i++)
@@ -320,7 +353,7 @@ VAO::VAO(std::string shader_path, std::string type)
 	glBindVertexArray(vao);
 	vbo->bind_buffer();
 
-	shader_program->pass_variable();
+	shader_program->pass_variable(vbo->get_attributes());
 
 	vbo->unbind();
 	glBindVertexArray(0);
@@ -408,7 +441,7 @@ Texture::Texture(std::string a_texture_path): texture_path(a_texture_path)
 	// Load the texture
 	glGenTextures(1, &texture_id);
 	glBindTexture(GL_TEXTURE_2D, texture_id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	stbi_image_free(texture);

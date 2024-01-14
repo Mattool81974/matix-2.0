@@ -401,3 +401,6 @@ FodyWeavers.xsd
 # Added by developer
 glad.c
 matix/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user

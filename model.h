@@ -7,11 +7,18 @@
 #include <string>
 #include <vector>
 
+struct Shader_Program_Variable
+{
+	bool normalized = false;
+	unsigned short type = 0; // 0 = GL_FLOAT
+	unsigned short vector_size = 1;
+};
+
 class Shader_Program
 {
 public:
 	Shader_Program(std::string a_vertex_shader, std::string a_fragment_shader);
-	void pass_variable();
+	void pass_variable(std::vector<Shader_Program_Variable> *variables);
 	void set_uniform1f_value(std::string name, float v1);
 	void set_uniform2f_value(std::string name, float v1, float v2);
 	void set_uniform3f_value(std::string name, float v1, float v2, float v3);
@@ -39,6 +46,7 @@ public:
 	void unbind();
 	~VBO();
 
+	inline std::vector<Shader_Program_Variable> *get_attributes() { return &attributes; };
 	inline std::vector<unsigned int> get_indices() { return indices; };
 	inline unsigned int* get_indices_in_array() { return indices.data(); };
 	inline unsigned int& get_vbo() { return vbo; };
@@ -51,6 +59,7 @@ private:
 	unsigned int vbo = 0;
 
 	bool use_ebo = true;
+	std::vector<Shader_Program_Variable> attributes = std::vector<Shader_Program_Variable>();
 protected:
 	std::vector<unsigned int> indices = std::vector<unsigned int>();
 	std::vector<float> vertices = std::vector<float>();
