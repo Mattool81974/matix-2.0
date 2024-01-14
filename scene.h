@@ -10,6 +10,7 @@
 
 class Graphic_Scene
 {
+	// Class representing a collection of graphic object
 public:
 	Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name);
 	void add_object(std::string name, Graphic_Object* object);
@@ -32,6 +33,7 @@ private:
 
 class Physic_Scene
 {
+	// Class representing a collection of physic object
 public:
 	Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name);
 	~Physic_Scene();
@@ -49,6 +51,7 @@ private:
 
 class Scene: public Transform_Object
 {
+	// Class representing a collection of object
 public:
 	Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic = true, bool a_physic = true);
 	void add_object(std::string name, Transform_Object* object);

@@ -34,11 +34,32 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
 	// Configure variables for creation
-	if (texture_path == "") { texture_path = "textures/unknow.png"; }
+	if (texture_path == "")
+	{
+		if ((*get_advanced_struct()->get_type())[type] == "cube")
+		{
+			texture_path = "../textures/unknow_cube.png";
+		}
+		else
+		{
+			texture_path = "../textures/unknow.png";
+		}
+	}
+
+	Texture* texture = 0;
+	if (get_advanced_struct()->contains_texture(texture_path))
+	{
+		texture = get_advanced_struct()->get_texture(texture_path);
+	}
+	else
+	{
+		texture = new Texture(texture_path);
+		(*get_advanced_struct()->get_textures())[texture_path] = texture;
+	}
 
 	// Create and add the object
 	VAO* vao = (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())[type]];
-	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, texture_path, vao);
+	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, texture, vao);
 	add_object(name, object);
 
 	return object;
@@ -114,7 +135,7 @@ bool Scene::contains_object(std::string name)
 	std::map<std::string, Transform_Object*> *objects = get_objects();
 	for (std::map<std::string, Transform_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
-		if (it->first == name) { return true; } // Verify each scene name (first element of map)
+		if (it->first == name) { return true; } // Verify each object name (first element of map)
 	}
 	return false;
 }

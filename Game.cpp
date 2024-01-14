@@ -85,6 +85,12 @@ bool Game::contains_scene(std::string name)
     return false;
 }
 
+// Create a new part into the struct and return it
+Part Game::new_part(unsigned int number, std::string texture_path)
+{
+    return get_advanced_struct()->new_part(number, texture_path);
+}
+
 // Create a scene into the game and return it
 Scene* Game::new_scene(std::string name)
 {

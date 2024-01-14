@@ -15,10 +15,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 class Game
 {
+	// Class representing the game
 public:
 	Game(int a_window_width, int a_window_height);
 	void add_scene(std::string name, Scene* scene);
 	bool contains_scene(std::string name);
+	Part new_part(unsigned int number, std::string texture_path = "");
 	Scene* new_scene(std::string name);
 	void run();
 	void update();

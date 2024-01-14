@@ -3,7 +3,7 @@
 #include "model.h"
 
 // Graphic_Object contructor
-Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, std::string a_texture_path, VAO* a_vao) : base_struct(a_base_struct), attached_transform(a_attached_transform), texture(a_texture_path), vao(a_vao)
+Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, Texture *a_texture, VAO* a_vao) : base_struct(a_base_struct), attached_transform(a_attached_transform), texture(a_texture), vao(a_vao)
 {
 
 }
@@ -11,7 +11,7 @@ Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_a
 // Render the graphic object
 void Graphic_Object::render()
 {
-	texture.bind();
+	texture->bind();
 	vao->get_shader_program()->set_uniform4fv_value("model", attached_transform.get_model_matrix());
 	vao->get_shader_program()->set_uniform4fv_value("projection", get_base_struct()->get_projection());
 	vao->get_shader_program()->set_uniform4fv_value("view", get_base_struct()->get_camera()->get_view());

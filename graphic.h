@@ -6,7 +6,7 @@
 class Graphic_Object
 {
 public:
-	Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, std::string a_texture_path, VAO* a_vao);
+	Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, Texture *a_texture, VAO* a_vao);
 	void render();
 	void update();
 	~Graphic_Object();
@@ -16,5 +16,5 @@ private:
 	Transform_Object& attached_transform;
 	Base_Struct* base_struct = 0;
 	VAO* vao = 0;
-	Texture texture;
+	Texture *texture = 0;
 };
