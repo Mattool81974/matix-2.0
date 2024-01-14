@@ -2,13 +2,13 @@
 #include <iostream>
 
 // Part constructor
-Part::Part(std::string a_texture_path) : texture_path(a_texture_path)
+Part::Part(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale, std::string a_type, std::string a_texture_path) : position(a_position), rotation(a_rotation), scale(a_scale), type(a_type), texture_path(a_texture_path)
 {
 
 }
 
 // Part copy constructor
-Part::Part(const Part& copy) : Part(copy.texture_path)
+Part::Part(const Part& copy) : Part(copy.position, copy.rotation, copy.scale, copy.type, copy.texture_path)
 {
 
 }
@@ -60,6 +60,20 @@ bool Advanced_Struct::contains_texture(std::string texture_path)
 	return false;
 }
 
+// Returns a part
+Part* Advanced_Struct::get_part(unsigned int number)
+{
+	if (contains_part(number))
+	{
+		return &(*get_parts())[number];
+	}
+	else
+	{
+		std::cout << "Matrix game : error ! The part \"" << number << "\" you want to get does not exist." << std::endl;
+		return 0;
+	}
+}
+
 // Returns a texture in the struct
 Texture* Advanced_Struct::get_texture(std::string texture_path)
 {
@@ -75,12 +89,12 @@ Texture* Advanced_Struct::get_texture(std::string texture_path)
 }
 
 // Create a new part into the struct and return it
-Part Advanced_Struct::new_part(unsigned int number, std::string texture_path)
+Part Advanced_Struct::new_part(unsigned int number, std::string type, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
 {
 	if (contains_part(number)) { std::cout << "Matrix game : error ! The part \"" << number << "\" you want to create already exist." << std::endl; }
 
 	// Create the part
-	Part part = Part(texture_path);
+	Part part = Part(position, rotation, scale, type, texture_path);
 	assign_part(number, part);
 	return part;
 }

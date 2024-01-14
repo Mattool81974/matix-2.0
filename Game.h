@@ -4,6 +4,9 @@
 #include "base_struct.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <map>
 #include "model.h"
 #include "scene.h"
@@ -20,8 +23,8 @@ public:
 	Game(int a_window_width, int a_window_height);
 	void add_scene(std::string name, Scene* scene);
 	bool contains_scene(std::string name);
-	Part new_part(unsigned int number, std::string texture_path = "");
-	Scene* new_scene(std::string name);
+	Part new_part(unsigned int number, std::string type, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "");
+	Scene* new_scene(std::string name, std::string map_path = "");
 	void run();
 	void update();
 	~Game();

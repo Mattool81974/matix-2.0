@@ -11,16 +11,12 @@ int main()
 {
     // Construct game
     Game game(1600, 900);
-    game.new_part(1, "../textures/wall.png");
+    game.new_part(1, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/wall.png");
+    game.new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
 
     // Construct scene
-    Scene* scene = game.new_scene("level0");
+    Scene* scene = game.new_scene("level0", "../maps/level0.wad");
     game.set_current_scene("level0");
-
-    scene->new_object("sol", "cube", 0, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/unknow_cube.png");
-    scene->new_object("sol1", "cube", 0, glm::vec3(1, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/unknow_cube.png");
-    scene->new_object("sol2", "cube", 0, glm::vec3(2, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/unknow_cube.png");
-    scene->new_object("sol3", "cube", 0, glm::vec3(3, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/wall.png");
 
     game.run();
 

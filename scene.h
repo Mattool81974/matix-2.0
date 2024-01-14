@@ -53,9 +53,11 @@ class Scene: public Transform_Object
 {
 	// Class representing a collection of object
 public:
-	Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic = true, bool a_physic = true);
+	Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true);
 	void add_object(std::string name, Transform_Object* object);
 	bool contains_object(std::string name);
+	void load_from_map(std::string);
+	void load_from_file(std::string map_path);
 	Transform_Object *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "");
 	void update();
 	~Scene();

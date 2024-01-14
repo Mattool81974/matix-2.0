@@ -1,7 +1,9 @@
+#include <fstream>
 #include <iostream>
 #include <map>
 #include "scene.h"
 #include <string>
+#include <sstream>
 #include <vector>
 
 // Graphic_Scene constructor
@@ -109,7 +111,7 @@ Physic_Scene::~Physic_Scene()
 }
 
 // Scene constructor
-Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_graphic, bool a_physic): Transform_Object(), advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
+Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_map_path, bool a_graphic, bool a_physic): Transform_Object(), advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
 {
 	if (use_graphic())
 	{
@@ -119,6 +121,11 @@ Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, bool a_grap
 	if (use_physic())
 	{
 		physic_scene = new Physic_Scene(get_advanced_struct(), get_name());
+	}
+
+	if (a_map_path != "")
+	{
+		load_from_file(a_map_path);
 	}
 }
 
@@ -138,6 +145,70 @@ bool Scene::contains_object(std::string name)
 		if (it->first == name) { return true; } // Verify each object name (first element of map)
 	}
 	return false;
+}
+
+// Load the scene from a map
+void Scene::load_from_map(std::string map)
+{
+	std::vector<std::string> lines = cut_string(map, "\n");
+
+	std::vector<std::string> first_line = cut_string(lines[0], ";");
+	unsigned short width = std::stoi(first_line[0]);
+	unsigned short height = std::stoi(first_line[0]);
+
+	for (int i = 0; i < height; i++)
+	{
+		std::vector<std::string> line = cut_string(lines[i + 1], ";");
+		for (int j = 0; j < width; j++) // Browse the map char by char
+		{
+			unsigned int part_number = std::stoi(line[j]);
+			if (part_number != 0)
+			{
+				Part *part = get_advanced_struct()->get_part(part_number);
+				if (part != 0)
+				{
+					float x = j;
+					float y = 0;
+					float z = i;
+
+					std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+
+					new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path());
+				}
+			}
+		}
+	}
+}
+
+// Load the scene from a map file
+void Scene::load_from_file(std::string map_path)
+{
+	std::string map_content;
+	std::ifstream map_file;
+
+	// ensure ifstream objects can throw exceptions:
+	map_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		// open files
+		map_file.open(map_path);
+		std::stringstream map_stream;
+
+		// read file's buffer contents into streams
+		map_stream << map_file.rdbuf();
+
+		// close file handlers
+		map_file.close();
+
+		// convert stream into string
+		map_content = map_stream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "Scene \"" << get_name() << "\" : map file \"" << map_path << "\" unreadable." << std::endl;
+	}
+
+	load_from_map(map_content);
 }
 
 // Create a new object into the scene and return it

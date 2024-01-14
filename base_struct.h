@@ -3,6 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <string>
+#include <vector>
+
+std::vector<std::string> cut_string(std::string string, std::string cut);
 
 class Transform_Object
 {

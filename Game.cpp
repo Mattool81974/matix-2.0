@@ -86,17 +86,17 @@ bool Game::contains_scene(std::string name)
 }
 
 // Create a new part into the struct and return it
-Part Game::new_part(unsigned int number, std::string texture_path)
+Part Game::new_part(unsigned int number, std::string type, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
 {
-    return get_advanced_struct()->new_part(number, texture_path);
+    return get_advanced_struct()->new_part(number, type, position, rotation, scale, texture_path);
 }
 
 // Create a scene into the game and return it
-Scene* Game::new_scene(std::string name)
+Scene* Game::new_scene(std::string name, std::string map_path)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to create already exists." << std::endl; return 0; }
 
-    Scene* new_scene = new Scene(get_advanced_struct(), name);
+    Scene* new_scene = new Scene(get_advanced_struct(), name, map_path);
     add_scene(name, new_scene);
     return new_scene;
 }

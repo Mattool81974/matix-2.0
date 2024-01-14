@@ -3,6 +3,37 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <string>
+#include <vector>
+
+std::vector<std::string> cut_string(std::string string, std::string cut)
+{
+	std::string last_string = "";
+	std::string last_string_cut = "";
+	std::vector<std::string> result = std::vector<std::string>();
+	for (int i = 0; i < string.size(); i++)
+	{
+		last_string_cut += string[i];
+		if (last_string_cut.size() > cut.size())
+		{
+			last_string_cut = last_string_cut.substr(1, cut.size());
+		}
+
+		if (last_string_cut == cut)
+		{
+			result.push_back(last_string);
+			last_string = "";
+			last_string_cut = "";
+		}
+		else
+		{
+			last_string += string[i];
+		}
+	}
+
+	if (last_string.size() > 0) { result.push_back(last_string); }
+	return result;
+}
 
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(a_parent), position(a_position), rotation(a_rotation), scale(a_scale)
