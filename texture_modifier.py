@@ -3,6 +3,10 @@ import PIL.ImageDraw as id
 import PIL.Image as im
 
 def perfect_texture(path):
+    """Draw a perfect texture
+
+    Path (str): path where to store the texture
+    """
     w, h = 1000, 2000
     
     # creating new Image object 

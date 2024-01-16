@@ -165,6 +165,15 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(1.0f);
 		datas.push_back(1.0f);
 
+		datas.push_back(0.0f);
+		datas.push_back(0.0f);
+		datas.push_back(1.0f);
+		datas.push_back(1.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(-1.0f);
+		datas.push_back(1.0f);
+
 		datas.push_back(0.5f);
 		datas.push_back(-0.5f);
 		datas.push_back(0.0f);
@@ -172,18 +181,45 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(1.0f);
 		datas.push_back(0.0f);
 
+		datas.push_back(0.0f);
+		datas.push_back(0.0f);
+		datas.push_back(1.0f);
+		datas.push_back(1.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(-1.0f);
+		datas.push_back(1.0f);
+
 		datas.push_back(-0.5f);
 		datas.push_back(-0.5f);
 		datas.push_back(0.0f);
 
 		datas.push_back(0.0f);
 		datas.push_back(0.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(0.0f);
+		datas.push_back(1.0f);
+		datas.push_back(1.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(-1.0f);
+		datas.push_back(1.0f);
 
 		datas.push_back(-0.5f);
 		datas.push_back(0.5f);
 		datas.push_back(0.0f);
 
 		datas.push_back(0.0f);
+		datas.push_back(1.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(0.0f);
+		datas.push_back(1.0f);
+		datas.push_back(1.0f);
+
+		datas.push_back(0.0f);
+		datas.push_back(-1.0f);
 		datas.push_back(1.0f);
 
 		indices.push_back(0);
@@ -253,6 +289,43 @@ unsigned int VBO::get_vertice_number()
 	return (datas.size() * sizeof(float)) / attribute_size;
 }
 
+// Load the vertices from a file
+void VBO::load_from_file(std::string path)
+{
+	std::string content;
+	std::ifstream file;
+
+	// ensure ifstream objects can throw exceptions:
+	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		// open files
+		file.open(path);
+		std::stringstream stream;
+
+		// read file's buffer contents into streams
+		stream << file.rdbuf();
+
+		// close file handlers
+		file.close();
+
+		// convert stream into string
+		content = stream.str();
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "Matrix game : error ! Can't open the VBO file \"" << path << "\"." << std::endl;
+	}
+
+	// Fill the datas
+	datas.clear();
+	std::vector<std::string> cutted = cut_string(content, " ");
+	for (int i = 0; i < cutted.size(); i++)
+	{
+		datas.push_back(atof(cutted[i].c_str()));
+	}
+}
+
 // Unbind the VBO from the GPU memory
 void VBO::unbind()
 {
@@ -265,83 +338,16 @@ VBO::~VBO()
 	glDeleteBuffers(1, &vbo);
 }
 
-// Cube_VBO constructor
-Cube_VBO::Cube_VBO(): VBO(false, false)
-{
-	float vertices_array[] = {
-	// Face 1
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f, 0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 0.25f,     0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,      0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f, 0.5f,      0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.33333f, 0.5f,  0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.25f, 0.0f,     0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-
-	// Face 3
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.25f,     0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,      0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.5f,      0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.5f,  0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.66666f, 0.25f, 0.33333f, 0.25f, 0.0f, 1.0f, -1.0f,
-
-
-	// Face 2
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.33333f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.33333f, 0.0f,  0.33333f, 0.0f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-
-
-	// Face 4
-	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.5f,  0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 0.75f, 0.33333f, 0.5f, 0.33333f, 0.25f, -1.0f, 1.0f, 0.0f,
-
-
-	 // Face 6
-	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.33333f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.66666f, 0.25f, 0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.66666f, 0.5f,  0.33333f, 0.25f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-
-	// Face 5
-	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  0.33333f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  0.33333f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.66666f, 1.0f,  0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.66666f, 0.75f, 0.33333f, 0.75f, 0.33333f, 0.25f, 0.0f, -1.0f, 1.0f
-	};
-
-	for (int i = 0; i < sizeof(vertices_array) / sizeof(float); i++)
-	{
-		datas.push_back(vertices_array[i]);
-	}
-}
-
-// Cube_VBO destructor
-Cube_VBO::~Cube_VBO()
-{
-
-}
-
 // VAO constructor
-VAO::VAO(std::string shader_path, std::string type)
+VAO::VAO(std::string shader_path, std::string vbo_path)
 {
 	shader_program = load_shader_program(shader_path);
 
 	glGenVertexArrays(1, &vao);
-	if (type == "cube")
+	if (vbo_path != "")
 	{
-		vbo = new Cube_VBO();
+		vbo = new VBO(false, false);
+		vbo->load_from_file(vbo_path);
 	}
 	else
 	{

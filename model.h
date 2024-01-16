@@ -43,6 +43,7 @@ public:
 	void bind();
 	void bind_buffer();
 	unsigned int get_vertice_number();
+	void load_from_file(std::string path);
 	void unbind();
 	~VBO();
 
@@ -63,18 +64,10 @@ protected:
 	std::vector<float> datas = std::vector<float>();
 };
 
-class Cube_VBO : public VBO
-{
-public:
-	Cube_VBO();
-	~Cube_VBO();
-private:
-};
-
 class VAO
 {
 public:
-	VAO(std::string shader_path, std::string type);
+	VAO(std::string shader_path, std::string vbo_path = "");
 	void bind(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0));
 	Shader_Program *load_shader_program(std::string shader_path);
 	void render(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0));
