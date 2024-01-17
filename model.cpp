@@ -443,7 +443,7 @@ VAO::~VAO()
 }
 
 // Texture constructor
-Texture::Texture(std::string a_texture_path): texture_path(a_texture_path)
+Texture::Texture(std::string a_texture_path, bool a_resize): texture_path(a_texture_path), resize(a_resize)
 {
 	int nrChannels = 0;
 	unsigned char* texture = stbi_load(texture_path.c_str(), &width, &height, &nrChannels, 0);

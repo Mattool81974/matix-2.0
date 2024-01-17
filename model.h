@@ -87,11 +87,14 @@ private:
 class Texture
 {
 public:
-	Texture(std::string a_texture_path);
+	Texture(std::string a_texture_path, bool a_resize = true);
 	void bind();
 	~Texture();
+
+	inline bool use_resize() { return resize; };
 private:
 	int height = 0;
+	bool resize = true;
 	unsigned int texture_id = 0;
 	std::string texture_path = "";
 	int width = 0;

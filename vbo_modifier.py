@@ -4,6 +4,65 @@
 # Import librairies
 import math
 
+def flip_x(to_flip: tuple) -> tuple:
+    """Flip a tuple into the X axe
+
+    Args:
+        to_flip (tuple): tuple to flip
+
+    Returns:
+        tuple: tuple flipped
+    """
+    x = to_flip[0]
+    return (-x, to_flip[1])
+
+def flip_y(to_flip: tuple) -> tuple:
+    """Flip a tuple into the Y axe
+
+    Args:
+        to_flip (tuple): tuple to flip
+
+    Returns:
+        tuple: tuple flipped
+    """
+    y = to_flip[1]
+    return (to_flip[0], -y)
+
+class Vertice:
+    """Class representing a vertice
+    """
+
+    def __init__(self, point: tuple, rescaling: tuple, unchanged: int) -> None:
+        """Create a Vertice object
+        """
+        self.point = point
+        self.rescaling = rescaling
+        self.unchanged = unchanged
+
+    def get_point(self) -> tuple:
+        """Return the point of the vertice into the 3D space
+
+        Returns:
+            tuple: point of the vertice into the 3D space
+        """
+        return self.point
+    
+    def get_rescaling(self) -> tuple:
+        """Return the factor of rescaling of the vertice
+
+        Returns:
+            tuple: factor of rescaling of the vertice
+        """
+        return self.rescaling
+    
+    def get_unchanged(self) -> int:
+        """Return the index of the axes into the vertices who doesn't change in the face
+
+        Returns:
+            int: index of the axes into the vertices who doesn't change in the face
+        """
+        return self.unchanged
+
 def get_data(vertices: list, indices: list) -> list:
     """Return a list of vertices ordered by indices
 
@@ -19,8 +78,8 @@ def get_data(vertices: list, indices: list) -> list:
         for indice in triangle:
             data.append(vertices[indice])
     return data
-
-def cube(face = [0, 0, 0, 0, 0, 0], indices_start: int = 0, indices_texture_start: int = 0, position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> str:
+                    
+def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (1/3, 0)], face_size = (1/3, 1/4), position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> str:
     """Return the data for a cube
 
     Returns:
@@ -29,44 +88,86 @@ def cube(face = [0, 0, 0, 0, 0, 0], indices_start: int = 0, indices_texture_star
     to_return = ""
     vertices = [(-0.5, -0.5, 0.5), (0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5),
                 (-0.5, 0.5, -0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (0.5, 0.5, -0.5)]
-    indices = [(0, 2, 3), (0, 1, 2), # Face forward Z
-                (1, 7, 2), (1, 6, 7), # Face forward X
-                (6, 5, 4), (4, 7, 6), # Face backward Z
-                (3, 4, 5), (3, 5, 0), # Face backward X
-                (3, 7, 4), (3, 2, 7), # Face forward Y
-                (0, 6, 1), (0, 5, 6)] # Face backward Y
-    
-    vertices_rescaling = [(0, 1, -1), (0, 1, -1),
-                          (-1, 1, 0), (-1, 1, 0),
-                          (0, 1, -1), (0, 1, -1),
-                          (-1, 1, 0), (-1, 1, 0),
-                          (0, -1, 1), (0, -1, 1),
-                          (0, -1, 1), (0, -1, 1)]
-    for i in range(len(indices)): indices[i] = (indices[i][0] + indices_start, indices[i][1] + indices_start, indices[i][2] + indices_start)
-    
-    vertices_texture = [(0, 0, 0, 0, 1, 1), (1, 0, 0, 0, 1, 1), (1, 1, 0, 0, 1, 1), (0, 1, 0, 0, 1, 1)]
-    indices_texture = [(0, 2, 3), (0, 1, 2),
-                       (0, 2, 3), (0, 1, 2),
-                       (0, 1, 2), (2, 3, 0),
-                       (2, 3, 0), (2, 0, 1),
-                       (0, 2, 3), (0, 1, 2),
-                       (3, 1, 2), (3, 0, 1)]
-    for i in range(len(indices_texture)): indices_texture[i] = (indices_texture[i][0] + indices_texture_start, indices_texture[i][1] + indices_texture_start, indices_texture[i][2] + indices_texture_start)
-    
     for v in range(len(vertices)):
         vertices[v] = (vertices[v][0] * scale[0] + position[0], vertices[v][1] * scale[1] + position[1], vertices[v][2] * scale[2] + position[2])
+
+    indices = [(0, 2, 3), (0, 1, 2), # Face forward Z (1)
+                (1, 7, 2), (1, 6, 7), # Face forward X (4)
+                (6, 5, 4), (4, 7, 6), # Face backward Z (3)
+                (3, 4, 5), (3, 5, 0), # Face backward X (2)
+                (3, 4, 7), (3, 7, 2), # Face forward Y (5)
+                (0, 6, 1), (0, 5, 6)] # Face backward Y (6)
+    
+    vertices_rescaling = [(0.0, 1.0, -1.0), (0.0, 1.0, -1.0),
+                          (-1.0, 1.0, 0.0), (-1.0, 1.0, 0.0),
+                          (0.0, 1.0, -1.0), (0.0, 1.0, -1.0),
+                          (-1.0, 1.0, 0.0), (-1.0, 1.0, 0.0),
+                          (0.0, -1.0, 1.0), (0.0, -1.0, 1.0),
+                          (0.0, -1.0, 1.0), (0.0, -1.0, 1.0)]
+    vertices_unchanged = [(2, 2, 2), (2, 2, 2),
+                          (0, 0, 0), (0, 0, 0),
+                          (2, 2, 2), (2, 2, 2),
+                          (0, 0, 0), (0, 0, 0),
+                          (1, 1, 1), (1, 1, 1),
+                          (1, 1, 1), (1, 1, 1)]
     
     for i in range(len(indices)):
         for g in range(len(indices[i])):
-            part = vertices[indices[i][g]]
+            part = vertices[indices[i][g]] # Vertices pos
             for p in part:
-                to_return += str(p) + " "
-            part = vertices_texture[indices_texture[i][g]]
+                to_return += str(p) + "f "
+
+            initial_pos = face_pos[math.floor(i/2)]
+            pos = (0, 0)
+            n = 0
+            if vertices[indices[i][g]][vertices_unchanged[i][g]] > 0:
+                n = 1
+
+            o = 1
+            p = 0
+            if i // 2 == 2:
+                o = 0
+
+            if i // 2 == 4:
+                if i % 2 == 1:
+                    p = 1
+                else:
+                    o = 0
+
+            if i // 2 == 5:
+                if i % 2 == 0:
+                    p = 1
+                else:
+                    o = 0
+
+            if i % 2 == n:
+                if g % 3 == p: 
+                    pos = initial_pos
+                elif g % 3 == p + 1 or (p == 2 and g % 3 == 0): 
+                    pos = (initial_pos[0] + face_size[0], initial_pos[1])
+                else: 
+                    pos = (initial_pos[0] + face_size[0], initial_pos[1] + face_size[1])
+            else:
+                if g % 3 == o: 
+                    pos = (initial_pos[0] + face_size[0], initial_pos[1] + face_size[1])
+                elif g % 3 == o + 1: 
+                    pos = (initial_pos[0], initial_pos[1] + face_size[1])
+                else: 
+                    pos = initial_pos
+
+            local_pos = (pos[0] - initial_pos[0], pos[1] - initial_pos[1])
+            if i // 2 == 3:
+                local_pos = (-(local_pos[0] - face_size[0]), -(local_pos[1] - face_size[1]))
+            if i // 2 == 4:
+                local_pos = (local_pos[0], -(local_pos[1] - face_size[1]))
+
+            to_return += str(round(initial_pos[0] + local_pos[0], 5)) + "f " + str(round(initial_pos[1] + local_pos[1], 5)) + "f "
+            to_return += str(round(initial_pos[0], 5)) + "f " + str(round(initial_pos[1], 5)) + "f "
+            to_return += str(round(face_size[0], 5)) + "f " + str(round(face_size[1], 5)) + "f "
+
+            part = vertices_rescaling[i] # Rescaling factor
             for p in part:
-                to_return += str(p) + " "
-            part = vertices_rescaling[i]
-            for p in part:
-                to_return += str(p) + " "
+                to_return += str(p) + "f "
 
     return to_return[:-1]
 
@@ -359,6 +460,6 @@ def construct_table() -> None:
     constructor.save("vbos/table.vbo")
 
 # -0.5f -0.5f -0.5f 0.33333f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f -0.5f -0.5f 0.0f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f -0.5f 0.0f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f -0.5f 0.0f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f 0.5f -0.5f 0.33333f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f -0.5f 0.33333f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f -0.5f 0.5f 1.0f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f 0.5f 1.0f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f 0.5f 1.0f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f 0.5f 0.5f 0.66666f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f -0.5f 0.33333f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f 0.5f 0.66666f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f -0.5f 0.33333f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f 0.5f 0.66666f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f 0.5f 0.66666f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f -0.5f 0.33333f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f 0.5f 0.33333f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f 0.5f 0.33333f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f 0.5f 0.33333f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f -0.5f 0.33333f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f -0.5f 0.33333f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f 0.5f 0.33333f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f 0.5f 0.33333f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f 0.5f 0.66666f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f
-file = open("vbos/one_faced_cube.vbo", "w")
+file = open("vbos/cube.vbo", "w")
 file.write(cube())
 file.close()

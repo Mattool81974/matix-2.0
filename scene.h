@@ -15,7 +15,7 @@ public:
 	Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name);
 	void add_object(std::string name, Graphic_Object* object);
 	bool contains_object(std::string name);
-	Graphic_Object* new_object(std::string name, Transform_Object& transform, std::string type, std::string texture_path = "");
+	Graphic_Object* new_object(std::string name, Transform_Object& transform, std::string type, std::string texture_path = "", bool texture_resize = true);
 	void render();
 	void update();
 	~Graphic_Scene();
@@ -58,7 +58,7 @@ public:
 	bool contains_object(std::string name);
 	void load_from_map(std::string);
 	void load_from_file(std::string map_path);
-	Transform_Object *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "");
+	Transform_Object *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "", bool texture_resize = true);
 	void update();
 	~Scene();
 

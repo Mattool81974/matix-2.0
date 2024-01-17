@@ -31,7 +31,7 @@ bool Graphic_Scene::contains_object(std::string name)
 }
 
 // Create a new object into the scene and return it
-Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type, std::string texture_path)
+Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type, std::string texture_path, bool texture_resize)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
@@ -55,7 +55,7 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 	}
 	else
 	{
-		texture = new Texture(texture_path);
+		texture = new Texture(texture_path, texture_resize);
 		(*get_advanced_struct()->get_textures())[texture_path] = texture;
 	}
 
@@ -212,7 +212,7 @@ void Scene::load_from_file(std::string map_path)
 }
 
 // Create a new object into the scene and return it
-Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
+Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path, bool texture_resize)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 
@@ -226,7 +226,7 @@ Transform_Object* Scene::new_object(std::string name, std::string type, Transfor
 	// Create the object in graphic scene
 	if (use_graphic())
 	{
-		get_graphic_scene()->new_object(name, *object, type, texture_path);
+		get_graphic_scene()->new_object(name, *object, type, texture_path, texture_resize);
 	}
 
 	return object;
