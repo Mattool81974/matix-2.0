@@ -26,10 +26,12 @@ Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base
 	types["cube"] = "cube";
 	types["one_faced_cube"] = "one_faced_cube";
 	types["square"] = "triangle";
+	types["table"] = "table";
 
 	// Create VAOs
 	all_vaos["cube"] = new VAO("../shaders/default", "../vbos/cube.vbo");
 	all_vaos["one_faced_cube"] = new VAO("../shaders/default", "../vbos/one_faced_cube.vbo");
+	all_vaos["table"] = new VAO("../shaders/default", "../vbos/table.vbo");
 	all_vaos["triangle"] = new VAO("../shaders/default", "");
 }
 

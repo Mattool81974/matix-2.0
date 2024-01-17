@@ -32,11 +32,13 @@ class Vertice:
     """Class representing a vertice
     """
 
-    def __init__(self, point: tuple, rescaling: tuple, unchanged: int) -> None:
+    def __init__(self, point: tuple, rescaling: tuple, texture_pos: tuple, texture_rect: tuple, unchanged: int) -> None:
         """Create a Vertice object
         """
         self.point = point
         self.rescaling = rescaling
+        self.texture_pos = texture_pos
+        self.texture_rect = texture_rect
         self.unchanged = unchanged
 
     def get_point(self) -> tuple:
@@ -55,6 +57,22 @@ class Vertice:
         """
         return self.rescaling
     
+    def get_texture_pos(self) -> tuple:
+        """Return the pos of the texture
+
+        Returns:
+            tuple: pos of the texture
+        """
+        return self.texture_pos
+    
+    def get_texture_rect(self) -> tuple:
+        """Return the rect of the texture
+
+        Returns:
+            tuple: rect of the texture
+        """
+        return self.texture_rect
+    
     def get_unchanged(self) -> int:
         """Return the index of the axes into the vertices who doesn't change in the face
 
@@ -62,6 +80,18 @@ class Vertice:
             int: index of the axes into the vertices who doesn't change in the face
         """
         return self.unchanged
+    
+    def to_string(self) -> str:
+        """Return the vertices into a string
+
+        Returns:
+            str: vertices into a string
+        """
+        to_return = str(round(self.get_point()[0], 5)) + "f " + str(round(self.get_point()[1], 5)) + "f " + str(round(self.get_point()[2], 5)) + "f "
+        to_return += str(round(self.get_texture_pos()[0], 5)) + "f " + str(round(self.get_texture_pos()[1], 5)) + "f "
+        to_return += str(round(self.get_texture_rect()[0], 5)) + "f " + str(round(self.get_texture_rect()[1], 5)) + "f " + str(round(self.get_texture_rect()[2], 5)) + "f " + str(round(self.get_texture_rect()[3], 5)) + "f "
+        to_return += str(round(self.get_rescaling()[0], 5)) + "f " + str(round(self.get_rescaling()[1], 5)) + "f " + str(round(self.get_rescaling()[2], 5)) + "f"
+        return to_return
 
 def get_data(vertices: list, indices: list) -> list:
     """Return a list of vertices ordered by indices
@@ -79,7 +109,7 @@ def get_data(vertices: list, indices: list) -> list:
             data.append(vertices[indice])
     return data
                     
-def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (1/3, 0)], face_size = (1/3, 1/4), position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> str:
+def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (1/3, 0)], face_size = [(1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4)], position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> str:
     """Return the data for a cube
 
     Returns:
@@ -111,16 +141,16 @@ def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (
                           (1, 1, 1), (1, 1, 1),
                           (1, 1, 1), (1, 1, 1)]
     
+    final_vertices = []
+    
     for i in range(len(indices)):
         for g in range(len(indices[i])):
-            part = vertices[indices[i][g]] # Vertices pos
-            for p in part:
-                to_return += str(p) + "f "
+            part_vertices = vertices[indices[i][g]] # Vertices pos
 
-            initial_pos = face_pos[math.floor(i/2)]
+            initial_pos = face_pos[math.floor(i/2)] # Texture pos
             pos = (0, 0)
             n = 0
-            if vertices[indices[i][g]][vertices_unchanged[i][g]] > 0:
+            if vertices[indices[i][g]][vertices_unchanged[i][g]] > position[vertices_unchanged[i][g]]:
                 n = 1
 
             o = 1
@@ -140,34 +170,32 @@ def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (
                 else:
                     o = 0
 
+            size = face_size[math.floor(i/2)]
             if i % 2 == n:
                 if g % 3 == p: 
                     pos = initial_pos
                 elif g % 3 == p + 1 or (p == 2 and g % 3 == 0): 
-                    pos = (initial_pos[0] + face_size[0], initial_pos[1])
+                    pos = (initial_pos[0] + size[0], initial_pos[1])
                 else: 
-                    pos = (initial_pos[0] + face_size[0], initial_pos[1] + face_size[1])
+                    pos = (initial_pos[0] + size[0], initial_pos[1] + size[1])
             else:
                 if g % 3 == o: 
-                    pos = (initial_pos[0] + face_size[0], initial_pos[1] + face_size[1])
+                    pos = (initial_pos[0] + size[0], initial_pos[1] + size[1])
                 elif g % 3 == o + 1: 
-                    pos = (initial_pos[0], initial_pos[1] + face_size[1])
+                    pos = (initial_pos[0], initial_pos[1] + size[1])
                 else: 
                     pos = initial_pos
 
             local_pos = (pos[0] - initial_pos[0], pos[1] - initial_pos[1])
             if i // 2 == 3:
-                local_pos = (-(local_pos[0] - face_size[0]), -(local_pos[1] - face_size[1]))
+                local_pos = (-(local_pos[0] - size[0]), -(local_pos[1] - size[1]))
             if i // 2 == 4:
-                local_pos = (local_pos[0], -(local_pos[1] - face_size[1]))
+                local_pos = (local_pos[0], -(local_pos[1] - size[1]))
 
-            to_return += str(round(initial_pos[0] + local_pos[0], 5)) + "f " + str(round(initial_pos[1] + local_pos[1], 5)) + "f "
-            to_return += str(round(initial_pos[0], 5)) + "f " + str(round(initial_pos[1], 5)) + "f "
-            to_return += str(round(face_size[0], 5)) + "f " + str(round(face_size[1], 5)) + "f "
-
-            part = vertices_rescaling[i] # Rescaling factor
-            for p in part:
-                to_return += str(p) + "f "
+            final_vertices.append(Vertice(part_vertices, vertices_rescaling[i], (initial_pos[0] + local_pos[0], initial_pos[1] + local_pos[1]), (initial_pos[0], initial_pos[1], size[0], size[1]), vertices_unchanged[i][g]))
+    
+    for v in final_vertices:
+        to_return += v.to_string() + " "
 
     return to_return[:-1]
 
@@ -359,57 +387,27 @@ class VBO_Constructor:
     """Class representating a easy VBO constructor
     """
 
-    def __init__(self, attributes: str, format: str) -> None:
+    def __init__(self) -> None:
         """Create an easy VBO constructor
         """
-        self.attributes = attributes
-        self.format = format
-        self.vertices = ""
-        self.indices = ""
-        self.vertices_texture = ""
-        self.indices_texture = ""
-        self.faces = ""
+        self.content = ""
 
-    def add_form(self, parts: list) -> None:
-        """Add a form to the constructor
+    def add_content(self, content: str) -> None:
+        """Add content to the constructor
 
         Args:
             parts (list): form to add
         """
-        if self.vertices == "":
-            self.vertices += parts[0]
-        else:
-            self.vertices += " " + parts[0]
-        if self.indices == "":
-            self.indices += parts[1]
-        else:
-            self.indices += " " + parts[1]
-        
-        if self.vertices_texture == "":
-            self.vertices_texture += parts[2]
-        else:
-            self.vertices_texture += " " + parts[2]
-        if self.indices_texture == "":
-            self.indices_texture += parts[3]
-        else:
-            self.indices_texture += " " + parts[3]
+        if self.content != "" and self.content[-1] != " ": self.content += " "
+        self.content += content
 
-        if len(parts) > 4:
-            if self.faces == "":
-                self.faces += parts[4]
-            else:
-                self.faces += " " + parts[4]
-
-    def join(self) -> str:
-        """Return the vbo content
+    def get_content(self) -> str:
+        """Return the content into the constructor
 
         Returns:
-            str: vbo content
+            str: content into the constructor
         """
-        to_return = self.vertices + "\n" + self.indices + "\n" + self.vertices_texture + "\n" + self.indices_texture
-        if self.faces != []:
-            to_return += "\n" + self.faces
-        return to_return
+        return self.content
     
     def save(self, path: str) -> None:
         """Save the vbo into a file
@@ -418,15 +416,14 @@ class VBO_Constructor:
             path (str): file where to save the vbo
         """
         file = open(path, "w")
-        file.write(self.attributes + "\n" + self.format + "\n")
-        file.write(self.join())
+        file.write(self.get_content())
         file.close()
 
 def construct_chair() -> None:
     """Construct a simple chair
     """
     constructor = VBO_Constructor("in_texcoord_0 in_position", "2f 3f")
-    constructor.add_form(cube(face = [2, 2, 2, 2, 0, 0], position = (0, 0.1, 0), scale = (0.7, 0.1, 0.7)).split("\n"))
+    constructor.add_form(cube(face_pos = [()], position = (0, 0.1, 0), scale = (0.7, 0.1, 0.7)).split("\n"))
     constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 8, position = (-0.5, -0.5, -0.5), scale = (0.1, 0.5, 0.1)).split("\n"))
     constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 16, position = (-0.5, -0.5, 0.5), scale = (0.1, 0.5, 0.1)).split("\n"))
     constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 24, position = (0.5, -0.5, -0.5), scale = (0.1, 0.5, 0.1)).split("\n"))
@@ -451,15 +448,12 @@ def construct_polygon_3d(diagonal: float, edge: int = 4) -> None:
 def construct_table() -> None:
     """Construct a simple table
     """
-    constructor = VBO_Constructor("in_texcoord_0 in_position in_face", "2f 3f f")
-    constructor.add_form(cube(face = [2, 2, 2, 2, 0, 0], position = (0, 0.9, 0), scale = (1, 0.1, 1)).split("\n"))
-    constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 8, position = (-0.9, -0.1, -0.9), scale = (0.1, 0.9, 0.1)).split("\n"))
-    constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 16, position = (-0.9, -0.1, 0.9), scale = (0.1, 0.9, 0.1)).split("\n"))
-    constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 24, position = (0.9, -0.1, -0.9), scale = (0.1, 0.9, 0.1)).split("\n"))
-    constructor.add_form(cube(face = [1, 1, 1, 1, 3, 3], indices_start = 32, position = (0.9, -0.1, 0.9), scale = (0.1, 0.9, 0.1)).split("\n"))
+    constructor = VBO_Constructor()
+    constructor.add_content(cube(face_pos = [(1/2, 19/20), (1/2, 19/20), (1/2, 19/20), (1/2, 19/20), (0, 1/2), (0, 0)], face_size = [(1/2, 1/20), (1/2, 1/20), (1/2, 1/20), (1/2, 1/20), (1/2, 1/2), (1/2, 1/2)], position = (0, 0.45, 0), scale = (1, 0.1, 1)))
+    constructor.add_content(cube(face_pos = [(1/2, 0), (1/2, 0), (1/2, 0), (1/2, 0), (11/20, 0), (11/20, 0)], face_size = [(1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/20), (1/20, 1/20)], position = (-0.45, -0.05, -0.45), scale = (0.1, 0.9, 0.1)))
+    constructor.add_content(cube(face_pos = [(1/2, 0), (1/2, 0), (1/2, 0), (1/2, 0), (11/20, 0), (11/20, 0)], face_size = [(1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/20), (1/20, 1/20)], position = (-0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
+    constructor.add_content(cube(face_pos = [(1/2, 0), (1/2, 0), (1/2, 0), (1/2, 0), (11/20, 0), (11/20, 0)], face_size = [(1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/20), (1/20, 1/20)], position = (0.45, -0.05, -0.45), scale = (0.1, 0.9, 0.1)))
+    constructor.add_content(cube(face_pos = [(1/2, 0), (1/2, 0), (1/2, 0), (1/2, 0), (11/20, 0), (11/20, 0)], face_size = [(1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/2), (1/20, 1/20), (1/20, 1/20)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-# -0.5f -0.5f -0.5f 0.33333f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f -0.5f -0.5f 0.0f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f -0.5f 0.0f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f -0.5f 0.0f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f 0.5f -0.5f 0.33333f 0.5f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f -0.5f 0.33333f 0.25f 0.0f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f -0.5f 0.5f 1.0f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f 0.5f 1.0f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f 0.5f 0.5f 0.5f 1.0f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f 0.5f 0.5f 0.66666f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.66666f 0.25f 0.33333f 0.25f 0.0f 1.0f -1.0f -0.5f -0.5f -0.5f 0.33333f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f 0.5f 0.66666f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f -0.5f 0.33333f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f 0.5f 0.66666f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f 0.5f 0.5f 0.66666f 0.25f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f -0.5f 0.33333f 0.0f 0.33333f 0.0f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f 0.5f 0.33333f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f -0.5f 0.5f 0.33333f 0.5f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f 0.5f 0.5f 0.5f 0.33333f 0.75f 0.33333f 0.5f 0.33333f 0.25f -1.0f 1.0f 0.0f -0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f -0.5f 0.33333f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f -0.5f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f -0.5f 0.5f 0.66666f 0.25f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f -0.5f -0.5f 0.66666f 0.5f 0.33333f 0.25f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f -0.5f 0.33333f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f 0.5f 0.33333f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f 0.5f 0.5f 0.5f 0.33333f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f 0.5f 0.66666f 1.0f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f -0.5f 0.5f -0.5f 0.66666f 0.75f 0.33333f 0.75f 0.33333f 0.25f 0.0f -1.0f 1.0f
-file = open("vbos/cube.vbo", "w")
-file.write(cube())
-file.close()
+construct_table()
