@@ -36,6 +36,29 @@ def create_chair(path: str, final_path: str) -> None:
 
     cube.save(final_path)
 
+def create_cylinder(path: str, final_path: str) -> None:
+    """Create a cylinder texture
+
+    Args:
+        path (str): path of a directory with the textures
+        final_path (str): path where to register the cylinder
+    """
+    if not os.path.exists(path):
+        print("Error : the path \"" + path + "\" does not exist.")
+        return
+    
+    file1 = im.open(path + "/top.png").resize((500, 500))
+    file2 = im.open(path + "/bottom.png").resize((500, 500))
+    file3 = im.open(path + "/middle.png").resize((500, 1570))
+
+    w, h = 500, 2570
+    cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
+    cube.paste(file1, (0, 1570))
+    cube.paste(file2, (0, 2070))
+    cube.paste(file3, (0, 0))
+
+    cube.save(final_path)
+
 def create_cube(path: str, final_path: str) -> None:
     """Create a cube texture
 
@@ -120,4 +143,5 @@ def perfect_texture(path):
 #create_cube("textures/locker_dir", "textures/locker.png")
 #create_cube("textures/computer_dir", "textures/computer.png")
 #create_chair("textures/table_dir", "textures/table.png")
-create_chair("textures/chair_dir", "textures/chair.png")
+#create_chair("textures/chair_dir", "textures/chair.png")
+create_cylinder("textures/ammo_dir", "textures/ammo.png")

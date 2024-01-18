@@ -213,14 +213,16 @@ def points_polygon(diagonal: float, edge: int = 4, position: tuple = (0, 0, 0)) 
         vertices.append((x * diagonal + position[0], y * diagonal + position[1], position[2]))
     return vertices
 
-def polygon(diagonal: float, edge: int = 4, position: tuple = (0, 0, 0)) -> str:
+def polygon(diagonal: float, face_pos = (0, 0), face_size = (1, 1), edge: int = 4, position: tuple = (0, 0, 0)) -> str:
     """Return the data for a polygon
 
     Returns:
         list: data for a polygon
     """
     to_return = ""
-    vertices = points_polygon(diagonal, edge, position)
+    vertices = points_polygon(diagonal, edge, position) # Get the points into the polygon
+    for v in range(len(vertices)):
+        vertices[v] = (vertices[v][0] / 2, vertices[v][1] / 2, vertices[v][2] / 2)
 
     indices = []
     for i in range(edge - 1):
@@ -231,68 +233,68 @@ def polygon(diagonal: float, edge: int = 4, position: tuple = (0, 0, 0)) -> str:
     for i in range(len(vertices_texture)):
         pos = (vertices_texture[i][0], vertices_texture[i][1])
         vertices_texture[i] = ((1 + pos[0]) / 2.0, (1 + pos[1]) / 2.0)
+        vertices_texture[i] = (vertices_texture[i][0] + face_pos[0], vertices_texture[i][1] + face_pos[1])
 
-    indices_texture = []
-    for i in range(edge - 1):
-        indices_texture.append((0, i + 1, i + 2))
-    indices_texture.append((0, len(vertices_texture) - 1, 1))
+    final_vertices = []
+    for i in range(len(indices)):
+        for g in range(len(indices[i])):
+            part_vertices = vertices[indices[i][g]] # Vertices pos
 
-    for v in vertices:
-        for g in v:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
-    for i in indices:
-        for g in i:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
-    for v in vertices_texture:
-        for g in v:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
-    for i in indices_texture:
-        for g in i:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
+            initial_pos = vertices_texture[indices[i][g]]
+
+            vertice_rescaling = (0, 1, -1)
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], face_size[0], face_size[1]), 2))
+
+    for v in final_vertices:
+        to_return += v.to_string() + " "
 
     return to_return[:-1]
 
-def polygon_3d(diagonal: float, edge: int = 4, inversed: bool = False, scale: tuple = (1, 1, 1)) -> str:
+def polygon_3d(diagonal: float, edge: int = 4, scale: tuple = (1, 1, 1)) -> str:
     """Return the data for a 3d polygon
 
     Returns:
         list: data for a 3d polygon
     """
+    texture_bottom_pos = (0, 0)
+    texture_middle_pos = (0, 100/257)
+    texture_middle_size = (1, 157/257)
+    texture_top_pos = (0, 500/2570)
+    texture_top_bottom_size = (1, 500/2570)
     use_mid = True
 
     to_return = ""
     vertices = points_polygon(diagonal, edge, position = (0, 0, 1.0)) # Get vertices of the first face of the polygon
+    for v in range(len(vertices)):
+        vertices[v] = (vertices[v][0] / 2, vertices[v][1] / 2, vertices[v][2] / 2)
     indices = []
     for i in range(edge - 1): # Get the indices of every points in the first face
         indices.append((0, i + 1, i + 2))
     indices.append((0, len(vertices) - 1, 1))
 
     vertices_2 = points_polygon(diagonal, edge, position = (0, 0, -1.0)) # Get vertices of the second face of the polygon
-
+    for v in range(len(vertices_2)):
+        vertices_2[v] = (vertices_2[v][0] / 2, vertices_2[v][1] / 2, vertices_2[v][2] / 2)
     indices_2 = []
-    offset = len(vertices)
     for i in range(edge - 1): # Get the indices of every points in the second face
-        indices_2.append((i + 2 + offset, i + 1 + offset, offset))
-    indices_2.append((offset + 1, offset + len(vertices_2) - 1, offset))
+        indices_2.append((i + 2, i + 1, 0))
+    indices_2.append((1, len(vertices_2) - 1, 0))
 
     if use_mid:
         indices_mid = []
         for v in range(len(vertices)): # Get the indices of every points in the mids face
             v_plus_1 = v + 1
-            v_plus_offset = v + offset + 1
+            v_plus_offset = v + 1
             if v_plus_1 >= len(vertices): v_plus_1 = 1
-            if v_plus_offset >= len(vertices) + len(vertices_2): v_plus_offset = offset + 1
-            indices_mid.append((v + offset, v_plus_1, v))
-            indices_mid.append((v + offset, v_plus_offset, v_plus_1))
+            if v_plus_offset >= len(vertices_2): v_plus_offset = 1
+            indices_mid.append((v, v_plus_1, v))
+            indices_mid.append((v, v_plus_offset, v_plus_1))
 
     vertices_texture = points_polygon(diagonal, edge) # Get the textures points of the first face
     for i in range(len(vertices_texture)):
         pos = (vertices_texture[i][0], vertices_texture[i][1])
         vertices_texture[i] = ((1 + pos[0]) / 2.0, (1 + pos[1]) / 2.0)
+        vertices_texture[i] = ((vertices_texture[i][0]) * texture_top_bottom_size[0] + texture_top_pos[0], (vertices_texture[i][1]) * texture_top_bottom_size[1] + texture_top_pos[1])
 
     indices_texture = []
     for i in range(edge - 1): # Get the indices of the points of the first face
@@ -303,83 +305,60 @@ def polygon_3d(diagonal: float, edge: int = 4, inversed: bool = False, scale: tu
     for i in range(len(vertices_texture_2)):
         pos = (vertices_texture_2[i][0], vertices_texture_2[i][1])
         vertices_texture_2[i] = ((1 + pos[0]) / 2.0, (1 + pos[1]) / 2.0)
+        vertices_texture_2[i] = ((vertices_texture_2[i][0]) * texture_top_bottom_size[0] + texture_bottom_pos[0], (vertices_texture_2[i][1]) * texture_top_bottom_size[1] + texture_bottom_pos[1])
 
     indices_texture_2 = []
-    offset = len(vertices_texture_2)
     for i in range(edge - 1): # Get the indices of the textures points of the second face
-        indices_texture_2.append((i + 2 + offset, i + 1 + offset, offset))
-    indices_texture_2.append((offset + 1, offset + len(vertices_texture_2) - 1, offset))
+        indices_texture_2.append((i + 2, i + 1, 0))
+    indices_texture_2.append((1, len(vertices_texture_2) - 1, 0))
 
     if use_mid:
         indices_texture_mid = []
         for i in range(len(vertices) - 1): # Get the indices of the textures points of the mids face
             i_plus_1 = i + 2
-            i_plus_offset = i + offset + 2
+            i_plus_offset = i + 2
             if i_plus_1 >= len(vertices): i_plus_1 = 1
-            if i_plus_offset >= len(vertices) + len(vertices_2): i_plus_offset = offset + 1
-            indices_texture_mid.append((i + offset + 1, i_plus_1, i + 1))
-            indices_texture_mid.append((i + offset + 1, i_plus_offset, i_plus_1))
-        indices_texture_mid.append((len(vertices_2) + offset - 1, 1, i + 1))
-        indices_texture_mid.append((len(vertices_2) + offset - 1, offset + 1, i_plus_1))
+            if i_plus_offset >= len(vertices) + len(vertices_2): i_plus_offset = 1
+            indices_texture_mid.append((i + 1, i_plus_1, i + 1))
+            indices_texture_mid.append((i + 1, i_plus_offset, i_plus_1))
+        indices_texture_mid.append((len(vertices_2) - 1, 1, i + 1))
+        indices_texture_mid.append((len(vertices_2) - 1, 1, i_plus_1))
 
-    faces = []
-    for i in range(len(indices) * 3):
-        faces.append((0,))
+    final_vertices = []
+    for i in range(len(indices)):
+        for g in range(len(indices[i])):
+            part_vertices = vertices[indices[i][g]] # Vertices pos
+
+            initial_pos = vertices_texture[indices[i][g]]
+
+            vertice_rescaling = (0, 1, -1)
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], texture_top_bottom_size[0], texture_top_bottom_size[1]), 2))
 
     if use_mid:
-        faces_mid = []
-        for i in range(len(indices_mid) * 3):
-            faces_mid.append((2,))
+        for i in range(len(indices_mid)):
+            for g in range(len(indices_mid[i])):
+                initial_pos_x = 0
+                part_vertices = vertices[indices_mid[i][g // 2]] # Vertices pos
+                if g % 2 == i % 2:
+                    initial_pos_x = 1
+                    part_vertices = vertices_2[indices_mid[i][g // 2 + 1]] # Vertices pos
 
-    faces_2 = []
-    for i in range(len(indices_2) * 3):
-        faces_2.append((1,))
+                initial_pos = (initial_pos_x, texture_middle_pos[1] + i * (texture_middle_size[1] / len(indices_mid)))
 
-    for v in vertices:
-        for g in v:
-            to_return += str(g) + " "
-    for v in vertices_2:
-        for g in v:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
-    for i in indices:
-        for g in i:
-            to_return += str(g) + " "
-    for i in indices_2:
-        for g in i:
-            to_return += str(g) + " "
-    if use_mid:
-        for i in indices_mid:
-            for g in i:
-                to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
+                vertice_rescaling = (0, -1, 1)
+                final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], texture_middle_size[0], texture_middle_size[1]), 2))
+    
+    for i in range(len(indices_2)):
+        for g in range(len(indices_2[i])):
+            part_vertices = vertices_2[indices_2[i][g]] # Vertices pos
 
-    for v in vertices_texture:
-        for g in v:
-            to_return += str(g) + " "
-    for v in vertices_texture_2:
-        for g in v:
-            to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
-    for i in indices_texture:
-        for g in i:
-            to_return += str(g) + " "
-    for i in indices_texture_2:
-        for g in i:
-            to_return += str(g) + " "
-    if use_mid:
-        for i in indices_texture_mid:
-            for g in i:
-                to_return += str(g) + " "
-    to_return = to_return[:-1] + "\n"
+            initial_pos = vertices_texture_2[indices_2[i][g]]
 
-    for f in faces:
-        to_return += str(f[0]) + " "
-    for f in faces_2:
-        to_return += str(f[0]) + " "
-    if use_mid:
-        for f in faces_mid:
-            to_return += str(f[0]) + " "
+            vertice_rescaling = (0, 1, -1)
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], texture_top_bottom_size[0], texture_top_bottom_size[1]), 2))
+
+    for v in final_vertices:
+        to_return += v.to_string() + " "
 
     return to_return[:-1]
 
@@ -434,15 +413,15 @@ def construct_chair() -> None:
 def construct_polygon(diagonal: float, edge: int = 4) -> None:
     """Construct a simple polygon
     """
-    constructor = VBO_Constructor("in_texcoord_0 in_position", "2f 3f")
-    constructor.add_form(polygon(diagonal, edge).split("\n"))
+    constructor = VBO_Constructor()
+    constructor.add_content(polygon(diagonal, edge = edge))
     constructor.save("vbos/polygon" + str(edge) + ".vbo")
 
 def construct_polygon_3d(diagonal: float, edge: int = 4) -> None:
     """Construct a simple polygon
     """
-    constructor = VBO_Constructor("in_texcoord_0 in_position in_face", "2f 3f f")
-    constructor.add_form(polygon_3d(diagonal, edge).split("\n"))
+    constructor = VBO_Constructor()
+    constructor.add_content(polygon_3d(diagonal, edge))
     constructor.save("vbos/polygon_3d" + str(edge) + ".vbo")
 
 def construct_table() -> None:
@@ -456,4 +435,4 @@ def construct_table() -> None:
     constructor.add_content(cube(face_pos = [(10/11, 0), (10/11, 0), (10/11, 0), (10/11, 0), (10/11, 10/21), (10/11, 10/21)], face_size = [(1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 1/21), (1/11, 1/21)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-construct_chair()
+construct_polygon_3d(1, 50)
