@@ -3,7 +3,40 @@ import os
 import PIL.ImageDraw as id
 import PIL.Image as im
 
-def create_cube(path: str, final_path: str):
+def create_chair(path: str, final_path: str) -> None:
+    """Create a chair texture
+
+    Args:
+        path (str): path through the table texture dir
+        final_path (str): path through the final texture
+    """
+    if not os.path.exists(path):
+        print("Error : the path \"" + path + "\" does not exist.")
+        return
+    
+    file1 = im.open(path + "/front_back.png").resize((500, 286))
+    file2 = im.open(path + "/behind_back.png").resize((500, 286))
+    file3 = im.open(path + "/border_back.png").resize((50, 500))
+    file4 = im.open(path + "/top_seating.png").resize((500, 500))
+    file5 = im.open(path + "/bottom_seating.png").resize((500, 500))
+    file6 = im.open(path + "/border_seating.png").resize((500, 50))
+    file7 = im.open(path + "/leg.png").resize((50, 500))
+    file8 = im.open(path + "/floor.png").resize((50, 50))
+
+    w, h = 550, 1622
+    cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
+    cube.paste(file1, (0, 50))
+    cube.paste(file2, (0, 336))
+    cube.paste(file3, (500, 1122))
+    cube.paste(file4, (0, 622))
+    cube.paste(file5, (0, 1122))
+    cube.paste(file6, (0, 0))
+    cube.paste(file7, (500, 622))
+    cube.paste(file8, (500, 572))
+
+    cube.save(final_path)
+
+def create_cube(path: str, final_path: str) -> None:
     """Create a cube texture
 
     Args:
@@ -33,6 +66,33 @@ def create_cube(path: str, final_path: str):
 
     cube.save(final_path)
 
+def create_table(path: str, final_path: str) -> None:
+    """Create a table texture
+
+    Args:
+        path (str): path through the table texture dir
+        final_path (str): path through the final texture
+    """
+    if not os.path.exists(path):
+        print("Error : the path \"" + path + "\" does not exist.")
+        return
+    
+    file1 = im.open(path + "/top.png").resize((500, 500))
+    file2 = im.open(path + "/bottom.png").resize((500, 500))
+    file3 = im.open(path + "/border.png").resize((500, 50))
+    file4 = im.open(path + "/leg.png").resize((50, 500))
+    file5 = im.open(path + "/floor.png").resize((50, 50))
+
+    w, h = 550, 1050
+    cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
+    cube.paste(file1, (0, 50))
+    cube.paste(file2, (0, 550))
+    cube.paste(file3, (0, 0))
+    cube.paste(file4, (500, 550))
+    cube.paste(file5, (500, 500))
+
+    cube.save(final_path)
+
 def perfect_texture(path):
     """Draw a perfect texture
 
@@ -57,5 +117,7 @@ def perfect_texture(path):
     img1.rectangle(((rectangle_width, 500 - offset), (500 + rectangle_width, 500 + rectangle_width)), fill ="grey")"""
     img.save(path)
 
-create_cube("textures/locker_dir", "textures/locker.png")
-create_cube("textures/computer_dir", "textures/computer.png")
+#create_cube("textures/locker_dir", "textures/locker.png")
+#create_cube("textures/computer_dir", "textures/computer.png")
+#create_chair("textures/table_dir", "textures/table.png")
+create_chair("textures/chair_dir", "textures/chair.png")
