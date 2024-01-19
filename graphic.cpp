@@ -11,17 +11,17 @@ Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_a
 // Render the graphic object
 void Graphic_Object::render()
 {
-	texture->bind();
-	vao->get_shader_program()->set_uniform4fv_value("model", attached_transform.get_model_matrix());
+	texture->bind(); // Bind the texture
+	vao->get_shader_program()->set_uniform4fv_value("model", attached_transform.get_model_matrix()); // Write some uniform variables into the shader
 	vao->get_shader_program()->set_uniform4fv_value("projection", get_base_struct()->get_projection());
 	vao->get_shader_program()->set_uniform4fv_value("view", get_base_struct()->get_camera()->get_view());
 	if (texture->use_resize())
 	{
-		vao->render(attached_transform.get_scale());
+		vao->render(attached_transform.get_scale()); // Render the object with scaling
 	}
 	else
 	{
-		vao->render(glm::vec3(1.0, 1.0, 1.0));
+		vao->render(glm::vec3(1.0, 1.0, 1.0)); // Render the object without scaling
 	}
 }
 

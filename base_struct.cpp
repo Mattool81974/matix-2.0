@@ -6,20 +6,21 @@
 #include <string>
 #include <vector>
 
+// Cut a string where there are the "cut"
 std::vector<std::string> cut_string(std::string string, std::string cut)
 {
-	std::string last_string = "";
-	std::string last_string_cut = "";
+	std::string last_string = ""; // String since the last cut
+	std::string last_string_cut = ""; // String of the "cut" size which allows to know where to cut
 	std::vector<std::string> result = std::vector<std::string>();
-	for (int i = 0; i < string.size(); i++)
+	for (int i = 0; i < string.size(); i++) // Browse the string char by char
 	{
 		last_string_cut += string[i];
-		if (last_string_cut.size() > cut.size())
+		if (last_string_cut.size() > cut.size()) // If the string which allows to know where to cut is too long, cut him
 		{
 			last_string_cut = last_string_cut.substr(1, cut.size());
 		}
 
-		if (last_string_cut == cut)
+		if (last_string_cut == cut) // If the string which allows to know where to cut is equal to the part to cut, do a cut
 		{
 			result.push_back(last_string);
 			last_string = "";
@@ -31,7 +32,7 @@ std::vector<std::string> cut_string(std::string string, std::string cut)
 		}
 	}
 
-	if (last_string.size() > 0) { result.push_back(last_string); }
+	if (last_string.size() > 0) { result.push_back(last_string); } // Add the last non-cutted element
 	return result;
 }
 
@@ -50,12 +51,12 @@ Transform_Object::Transform_Object(const Transform_Object& copy): Transform_Obje
 // Calculate the direction vector of the transform object
 void Transform_Object::calculate_direction()
 {
-	float x = cos(glm::radians(get_rotation()[1])) * (cos(glm::radians(get_rotation()[0])));
+	float x = cos(glm::radians(get_rotation()[1])) * (cos(glm::radians(get_rotation()[0]))); // Use trigonometry to calculate forward direction
 	float y = sin(glm::radians(get_rotation()[0]));
 	float z = sin(glm::radians(get_rotation()[1])) * (cos(glm::radians(get_rotation()[0])));
 
 	forward = glm::normalize(glm::vec3(x, y, z));
-	right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
+	right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward)); // Use vector calcul to calculate right and up direction
 	up = glm::normalize(glm::cross(forward, right));
 }
 
