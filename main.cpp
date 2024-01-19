@@ -18,6 +18,7 @@ int main()
     Scene* scene = game.new_scene("level0", "../maps/level0.wad");
     game.set_current_scene("level0");
 
+    // Construct objects for testing
     scene->new_object("sol", "square", 0, glm::vec3(12, 0, 12), glm::vec3(90, 0, 0), glm::vec3(25, 25, 1), "../textures/floor.png");
     scene->new_object("locker", "cube", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 2, 1), "../textures/locker.png", false);
     scene->new_object("computer", "cube", 0, glm::vec3(2, 0.5, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/computer.png", false);

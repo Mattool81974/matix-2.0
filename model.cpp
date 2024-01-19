@@ -77,7 +77,7 @@ Shader_Program::Shader_Program(std::string a_vertex_shader, std::string a_fragme
 // Pass variable to the shader program
 void Shader_Program::pass_variable(std::vector<Shader_Program_Variable> *variables)
 {
-	// Define necessary variable for binding
+	// Define necessary variable size for binding
 	unsigned int total_size = 0;
 	for (std::vector<Shader_Program_Variable>::iterator it = variables->begin(); it != variables->end(); it++)
 	{
@@ -95,7 +95,7 @@ void Shader_Program::pass_variable(std::vector<Shader_Program_Variable> *variabl
 		if (it->type == 0) { type_size = sizeof(float); }
 
 		glVertexAttribPointer(variable_number, it->vector_size, GL_FLOAT, GL_FALSE, total_size, (void*)current_size);
-		glEnableVertexAttribArray(variable_number);
+		glEnableVertexAttribArray(variable_number); // Pass each variables to the shader
 		current_size += it->vector_size * type_size;
 		variable_number++;
 	}
@@ -156,7 +156,7 @@ Shader_Program::~Shader_Program()
 // VBO constructor
 VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 {
-	if(fill_datas)
+	if(fill_datas) // Fill datas with a basic square
 	{
 		datas.push_back(0.5f);
 		datas.push_back(0.5f);
@@ -231,6 +231,7 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		indices.push_back(3);
 	}
 
+	// Create base Shader_Program_Variable for the shader program
 	Shader_Program_Variable v1 = Shader_Program_Variable();
 	Shader_Program_Variable v2 = Shader_Program_Variable();
 	Shader_Program_Variable v3 = Shader_Program_Variable();
@@ -244,6 +245,7 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 	attributes.push_back(v3);
 	attributes.push_back(v4);
 
+	// Generate the VBO into the GPU memory
 	glGenBuffers(1, &vbo);
 	if(use_ebo)
 	{
@@ -263,10 +265,11 @@ void VBO::bind_buffer()
 	std::vector<float> datas = get_datas();
 	float* arr = datas.data();
 
+	// Bind the data into the GPU memory
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * datas.size(), arr, GL_STATIC_DRAW);
 
-	if(use_ebo)
+	if(use_ebo) // Bind the EBO if the VBO use them
 	{
 		unsigned int* arr_2 = get_indices_in_array();
 
@@ -284,9 +287,9 @@ unsigned int VBO::get_vertice_number()
 	{
 		unsigned int type_size = 0;
 		if ((*get_attributes())[i].type == 0) { type_size = sizeof(float); }
-		attribute_size += (*get_attributes())[i].vector_size * type_size;
+		attribute_size += (*get_attributes())[i].vector_size * type_size; // Get the total size of the datas
 	}
-	return (datas.size() * sizeof(float)) / attribute_size;
+	return (datas.size() * sizeof(float)) / attribute_size; // Divise the total size with the size of one float
 }
 
 // Load the vertices from a file
@@ -341,10 +344,11 @@ VBO::~VBO()
 // VAO constructor
 VAO::VAO(std::string shader_path, std::string vbo_path)
 {
-	shader_program = load_shader_program(shader_path);
+	shader_program = load_shader_program(shader_path); // Load the shader program
 
+	// Create the VAO into the GPU memory
 	glGenVertexArrays(1, &vao);
-	if (vbo_path != "")
+	if (vbo_path != "") // Create the VBO for this VAO
 	{
 		vbo = new VBO(false, false);
 		vbo->load_from_file(vbo_path);
@@ -354,11 +358,14 @@ VAO::VAO(std::string shader_path, std::string vbo_path)
 		vbo = new VBO();
 	}
 
+	// Bind the VAO and the VBO
 	glBindVertexArray(vao);
 	vbo->bind_buffer();
 
+	// Pass the "in" variables into the shader program
 	shader_program->pass_variable(vbo->get_attributes());
 
+	// Unbind all
 	vbo->unbind();
 	glBindVertexArray(0);
 }
@@ -408,7 +415,7 @@ Shader_Program* VAO::load_shader_program(std::string shader_path)
 	const char* vertex_code = vertex_content.c_str();
 	const char* fragment_code = fragment_content.c_str();
 
-	Shader_Program* shader = new Shader_Program(vertex_code, fragment_code);
+	Shader_Program* shader = new Shader_Program(vertex_code, fragment_code); // Create the shader program
 	return shader;
 }
 
@@ -416,7 +423,7 @@ Shader_Program* VAO::load_shader_program(std::string shader_path)
 void VAO::render(glm::vec3 scale)
 {
 	bind(scale);
-	if (get_vbo()->is_using_vbo())
+	if (get_vbo()->is_using_vbo()) // Render the VAO with a different function if the VBO use EBOs or not
 	{
 		glDrawElements(GL_TRIANGLES, vbo->get_indices().size(), GL_UNSIGNED_INT, 0);
 	}

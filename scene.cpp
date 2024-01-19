@@ -25,7 +25,7 @@ bool Graphic_Scene::contains_object(std::string name)
 	std::map<std::string, Graphic_Object*>* objects = get_objects();
 	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
-		if (it->first == name) { return true; } // Verify each scene name (first element of map)
+		if (it->first == name) { return true; } // Verify each object name (first element of map)
 	}
 	return false;
 }
@@ -48,6 +48,7 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 		}
 	}
 
+	// Create or get the texture
 	Texture* texture = 0;
 	if (get_advanced_struct()->contains_texture(texture_path))
 	{
@@ -73,7 +74,7 @@ void Graphic_Scene::render()
 	std::map<std::string, Graphic_Object*>* objects = get_objects();
 	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
-		it->second->render();
+		it->second->render(); // Render each object
 	}
 }
 
@@ -83,7 +84,7 @@ void Graphic_Scene::update()
 	std::map<std::string, Graphic_Object*>* objects = get_objects();
 	for (std::map<std::string, Graphic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
-		it->second->update();
+		it->second->update(); // Update each object one by one
 	}
 }
 
@@ -115,17 +116,17 @@ Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::string
 {
 	if (use_graphic())
 	{
-		graphic_scene = new Graphic_Scene(get_advanced_struct(), get_name());
+		graphic_scene = new Graphic_Scene(get_advanced_struct(), get_name()); // If use graphic, construct a graphic scene
 	}
 
 	if (use_physic())
 	{
-		physic_scene = new Physic_Scene(get_advanced_struct(), get_name());
+		physic_scene = new Physic_Scene(get_advanced_struct(), get_name()); // If use physic, construct a physic scene
 	}
 
 	if (a_map_path != "")
 	{
-		load_from_file(a_map_path);
+		load_from_file(a_map_path); // Load from a map if necessary
 	}
 }
 
@@ -153,7 +154,7 @@ void Scene::load_from_map(std::string map)
 	std::vector<std::string> lines = cut_string(map, "\n");
 
 	std::vector<std::string> first_line = cut_string(lines[0], ";");
-	unsigned short width = std::stoi(first_line[0]);
+	unsigned short width = std::stoi(first_line[0]); // Get the size of the map
 	unsigned short height = std::stoi(first_line[0]);
 
 	for (int i = 0; i < height; i++)
@@ -164,7 +165,7 @@ void Scene::load_from_map(std::string map)
 			unsigned int part_number = std::stoi(line[j]);
 			if (part_number != 0)
 			{
-				Part *part = get_advanced_struct()->get_part(part_number);
+				Part *part = get_advanced_struct()->get_part(part_number); // Get the part at the pos browsed
 				if (part != 0)
 				{
 					float x = j;
@@ -173,7 +174,7 @@ void Scene::load_from_map(std::string map)
 
 					std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
-					new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path());
+					new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path()); // Create the object
 				}
 			}
 		}
@@ -208,7 +209,7 @@ void Scene::load_from_file(std::string map_path)
 		std::cout << "Scene \"" << get_name() << "\" : map file \"" << map_path << "\" unreadable." << std::endl;
 	}
 
-	load_from_map(map_content);
+	load_from_map(map_content); // Load the map
 }
 
 // Create a new object into the scene and return it

@@ -5,14 +5,16 @@
 #include <iostream>
 #include "matix/stb_image.h"
 
-double mouse_x = 500;
-double mouse_y = 500;
+double mouse_x = 500; // Global variable representing the X pos of the mouse
+double mouse_y = 500; // Global variable representing the Y pos of the mouse
 
+// Callback function for window resizing
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
+// Callback function for mouse moving
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     mouse_x = xpos;
@@ -61,7 +63,7 @@ Game::Game(int a_window_width, int a_window_height): window_height(a_window_heig
     advanced_struct = new Advanced_Struct(base_struct);
 }
 
-// Add a scene to the game
+// Add an existing scene to the game
 void Game::add_scene(std::string name, Scene* scene)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to add already exists." << std::endl; return; }
@@ -114,6 +116,7 @@ void Game::run()
         get_base_struct()->set_mouse_move_x(mouse_move_x);
         get_base_struct()->set_mouse_move_y(mouse_move_y);
 
+        // Rotate and move camera
         float rotate_speed = 45;
         float sensitivity = 30;
         float speed = 5;
@@ -135,6 +138,7 @@ void Game::run()
 
         get_base_struct()->get_camera()->soft_reset();
 
+        // Update last mouse pos for future mouse pos calcul
         get_base_struct()->set_last_mouse_x(get_base_struct()->get_mouse_x());
         get_base_struct()->set_last_mouse_y(get_base_struct()->get_mouse_y());
 
@@ -168,9 +172,9 @@ Game::~Game()
     std::map<std::string, Scene*> *scenes = get_scenes();
     for (std::map<std::string, Scene*>::iterator it = scenes->begin(); it != scenes->end(); it++)
     {
-        delete it->second;
+        delete it->second; // Destroy each scenes
         it->second = 0;
     }
-    delete advanced_struct;
+    delete advanced_struct; // Destroy Advanced_Struct
     advanced_struct = 0;
 }
