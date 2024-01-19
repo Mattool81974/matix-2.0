@@ -11,6 +11,8 @@ int main()
 {
     // Construct game
     Game game(1600, 900);
+    game.get_advanced_struct()->new_vao("../vbos/famas.vbo", "famas");
+    game.get_advanced_struct()->new_vao("../vbos/shell.vbo", "shell");
     game.new_part(1, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/wall.png");
     game.new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
 
@@ -30,6 +32,7 @@ int main()
     scene->new_object("ammo3", "cylinder", 0, glm::vec3(0, 1.05, 0.25), glm::vec3(270, 0, 0), glm::vec3(0.05, 0.05, 0.1), "../textures/ammo.png", false);
     scene->new_object("famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/famas.png", false);
     scene->new_object("luxary_famas", "famas", 0, glm::vec3(1, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/luxary_famas.png", false);
+    scene->new_object("shell", "shell", 0, glm::vec3(1, 4, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/shell.png", false);
 
     game.run();
 

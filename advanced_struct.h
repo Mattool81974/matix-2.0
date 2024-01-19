@@ -38,9 +38,11 @@ public:
 	void assign_part(unsigned int number, Part part); // Assign to a number a part
 	bool contains_part(unsigned int number); // Returns if the struct contains a part
 	bool contains_texture(std::string texture_path); // Returns if the struct contains a textures
+	bool contains_vao(std::string type); // Returns if the struct contains a VAO
 	Part* get_part(unsigned int number); // Returns a part
 	Texture* get_texture(std::string texture_path); // Returns a texture in the struct
 	Part new_part(unsigned int number, std::string type, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(0, 0, 0), std::string texture_path = ""); // Create a new part into the struct and return it
+	VAO* new_vao(std::string path, std::string type, std::string shader_path = "../shaders/default"); // Create a new VAO into the game
 	~Advanced_Struct(); // Advanced_Struct destructor
 
 	// Getters and setters
@@ -49,6 +51,7 @@ public:
 	inline std::map<unsigned int, Part>* get_parts() { return &parts; };
 	inline std::map<std::string, Texture*>* get_textures() { return &textures; };
 	inline std::map<std::string, std::string>* get_type() { return &types; };
+	inline std::map<std::string, VAO*>* get_vaos() { return &all_vaos; };
 private:
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
 	std::map<unsigned int, Part> parts = std::map<unsigned int, Part>(); // Each parts, with their number as key, in the game

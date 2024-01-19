@@ -27,7 +27,6 @@ Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base
 	types["circle"] = "circle";
 	types["cube"] = "cube";
 	types["cylinder"] = "cylinder";
-	types["famas"] = "famas";
 	types["one_faced_cube"] = "one_faced_cube";
 	types["square"] = "triangle";
 	types["table"] = "table";
@@ -37,7 +36,6 @@ Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base
 	all_vaos["circle"] = new VAO("../shaders/default", "../vbos/polygon50.vbo");
 	all_vaos["cylinder"] = new VAO("../shaders/default", "../vbos/polygon_3d50.vbo");
 	all_vaos["cube"] = new VAO("../shaders/default", "../vbos/cube.vbo");
-	all_vaos["famas"] = new VAO("../shaders/default", "../vbos/famas.vbo");
 	all_vaos["one_faced_cube"] = new VAO("../shaders/default", "../vbos/one_faced_cube.vbo");
 	all_vaos["table"] = new VAO("../shaders/default", "../vbos/table.vbo");
 	all_vaos["triangle"] = new VAO("../shaders/default", "");
@@ -68,6 +66,17 @@ bool Advanced_Struct::contains_texture(std::string texture_path)
 	for (std::map<std::string, Texture*>::iterator it = textures->begin(); it != textures->end(); it++)
 	{
 		if (it->first == texture_path) { return true; } // Verify each texture path (first element of map)
+	}
+	return false;
+}
+
+// Returns if the struct contains a VAO
+bool Advanced_Struct::contains_vao(std::string type)
+{
+	std::map<std::string, VAO*>* vaos = get_vaos();
+	for (std::map<std::string, VAO*>::iterator it = vaos->begin(); it != vaos->end(); it++)
+	{
+		if (it->first == type) { return true; } // Verify each vaos name (first element of map)
 	}
 	return false;
 }
@@ -109,6 +118,16 @@ Part Advanced_Struct::new_part(unsigned int number, std::string type, glm::vec3 
 	Part part = Part(position, rotation, scale, type, texture_path);
 	assign_part(number, part);
 	return part;
+}
+
+// Create a new VAO into the game
+VAO* Advanced_Struct::new_vao(std::string path, std::string type, std::string shader_path)
+{
+	if (contains_vao(path)) { std::cout << "Matrix game : error ! The \"" << type << "\" VAO already exists." << std::endl; return 0; }
+
+	types[type] = type;
+	all_vaos[type] = new VAO(shader_path, path);
+	return all_vaos[type];
 }
 
 // Advanced_Struct destructor

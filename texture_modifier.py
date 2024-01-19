@@ -127,6 +127,27 @@ def create_famas(path: str, final_path: str) -> None:
 
     cube.save(final_path)
 
+def create_shell(path: str, final_path: str) -> None:
+    """Create a shell texture
+
+    Args:
+        path (str): path through the shell texture dir
+        final_path (str): path through the final texture
+    """
+    if not os.path.exists(path):
+        print("Error : the path \"" + path + "\" does not exist.")
+        return
+    
+    file1 = im.open(path + "/bottom.png").resize((500, 500))
+    file2 = im.open(path + "/side.png").resize((500, 500))
+
+    w, h = 500, 1000
+    cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
+    cube.paste(file1, (0, 500))
+    cube.paste(file2, (0, 0))
+
+    cube.save(final_path)
+
 def create_table(path: str, final_path: str) -> None:
     """Create a table texture
 
@@ -184,4 +205,5 @@ def perfect_texture(path):
 #create_chair("textures/chair_dir", "textures/chair.png")
 #create_cylinder("textures/ammo_dir", "textures/ammo.png")
 #create_famas("textures/famas_dir", "textures/famas.png")
-create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
+#create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
+create_shell("textures/shell_dir", "textures/shell.png")

@@ -362,6 +362,67 @@ def polygon_3d(diagonal: float, edge: int = 4, scale: tuple = (1, 1, 1)) -> str:
 
     return to_return[:-1]
 
+def pyramid(diagonal: float, apex_texture_pos = (0, 0), apex_size = (1, 1, 1), apex_texture_size = (1, 0.5), edge: int = 4, edge_position = (0, 0.5), edge_size = (1, 0.5), top_position = (0, 0, 0.5)) -> str:
+    """Return the data for a 3d pyramid
+
+    Returns:
+        list: data for a 3d polygon
+    """
+    to_return = ""
+    vertices = points_polygon(diagonal, edge, position = (0, 0, -1.0)) # Get vertices of the first face of the polygon
+    for v in range(len(vertices)):
+        vertices[v] = ((vertices[v][0] / 2) * apex_size[0], (vertices[v][1] / 2) * apex_size[1], (vertices[v][2] / 2) * apex_size[2])
+
+    indices = []
+    for i in range(edge - 1): # Get the indices of every points in the first face
+        indices.append((0, i + 1, i + 2))
+    indices.append((0, len(vertices) - 1, 1))
+
+    indices_mid = []
+    for i in range(edge - 1): # Get the indices of every triangle of the pyramid
+        indices_mid.append((-1, i + 1, i + 2))
+    indices_mid.append((-1, len(vertices) - 1, 1))
+
+    vertices_texture = points_polygon(diagonal, edge) # Get the textures points of the first face
+    for i in range(len(vertices_texture)):
+        pos = (vertices_texture[i][0], vertices_texture[i][1])
+        vertices_texture[i] = ((1 + pos[0]) / 2.0, (1 + pos[1]) / 2.0)
+        vertices_texture[i] = ((vertices_texture[i][0]) * apex_texture_size[0] + apex_texture_pos[0], (vertices_texture[i][1]) * apex_texture_size[1] + apex_texture_pos[1])
+
+    indices_texture = []
+    for i in range(edge - 1): # Get the indices of the points of the first face
+        indices_texture.append((0, i + 1, i + 2))
+    indices_texture.append((0, len(vertices_texture) - 1, 1))
+
+    final_vertices = []
+    for i in range(len(indices)):
+        for g in range(len(indices[i])):
+            part_vertices = vertices[indices[i][g]] # Vertices pos
+
+            initial_pos = vertices_texture[indices[i][g]]
+
+            vertice_rescaling = (0, 1, -1)
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], apex_texture_size[0], apex_texture_size[1]), 2))
+
+    vertices.append(top_position)
+
+    for i in range(len(indices_mid)):
+        for g in range(len(indices_mid[i])):
+            part_vertices = vertices[indices_mid[i][g]] # Vertices pos
+
+            if part_vertices == vertices[-1]:
+                initial_pos = (edge_position[0] + edge_size[0] / 2, edge_position[1] + edge_size[1])
+            else:
+                initial_pos = edge_position
+
+            vertice_rescaling = (0, 1, -1)
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], edge_size[0], edge_size[1]), 2))
+
+    for v in final_vertices:
+        to_return += v.to_string() + " "
+
+    return to_return[:-1]
+
 class VBO_Constructor:
     """Class representating a easy VBO constructor
     """
@@ -467,6 +528,13 @@ def construct_polygon_3d(diagonal: float, edge: int = 4) -> None:
     constructor.add_content(polygon_3d(diagonal, edge))
     constructor.save("vbos/polygon_3d" + str(edge) + ".vbo")
 
+def construct_shell() -> None:
+    """Construct a simple polygon
+    """
+    constructor = VBO_Constructor()
+    constructor.add_content(pyramid(1, edge = 10, apex_size = (1, 1, 1)))
+    constructor.save("vbos/shell.vbo")
+
 def construct_table() -> None:
     """Construct a simple table
     """
@@ -478,4 +546,4 @@ def construct_table() -> None:
     constructor.add_content(cube(face_pos = [(10/11, 0), (10/11, 0), (10/11, 0), (10/11, 0), (10/11, 10/21), (10/11, 10/21)], face_size = [(1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 1/21), (1/11, 1/21)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-construct_famas()
+construct_shell()
