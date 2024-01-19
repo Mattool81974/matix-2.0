@@ -28,6 +28,8 @@ int main()
     scene->new_object("ammo1", "cylinder", 0, glm::vec3(0.25, 1.05, 0), glm::vec3(270, 0, 0), glm::vec3(0.05, 0.05, 0.1), "../textures/ammo.png", false);
     scene->new_object("ammo2", "cylinder", 0, glm::vec3(0, 1.05, 0), glm::vec3(270, 0, 0), glm::vec3(0.05, 0.05, 0.1), "../textures/ammo.png", false);
     scene->new_object("ammo3", "cylinder", 0, glm::vec3(0, 1.05, 0.25), glm::vec3(270, 0, 0), glm::vec3(0.05, 0.05, 0.1), "../textures/ammo.png", false);
+    scene->new_object("famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/famas.png", false);
+    scene->new_object("luxary_famas", "famas", 0, glm::vec3(1, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/luxary_famas.png", false);
 
     game.run();
 

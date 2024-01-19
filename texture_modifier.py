@@ -89,6 +89,44 @@ def create_cube(path: str, final_path: str) -> None:
 
     cube.save(final_path)
 
+def create_famas(path: str, final_path: str) -> None:
+    """Create a famas texture
+
+    Args:
+        path (str): path through the famas texture dir
+        final_path (str): path through the final texture
+    """
+    file1 = im.open(path + "/breech_side.png").resize((500, 80))
+    file2 = im.open(path + "/breech_top_bottom.png").resize((500, 62))
+    file3 = im.open(path + "/breech_front_back.png").resize((38, 50))
+    file4 = im.open(path + "/gun_side.png").resize((102, 20))
+    file5 = im.open(path + "/gun_front_back.png").resize((50, 50))
+    file6 = im.open(path + "/top_wrist_side_1.png").resize((200, 16))
+    file7 = im.open(path + "/top_wrist_side_2.png").resize((25, 25))
+    file8 = im.open(path + "/top_wrist_side_3.png").resize((18, 50))
+    file9 = im.open(path + "/wrist_side.png").resize((21, 50))
+    file10 = im.open(path + "/wrist_top_bottom.png").resize((16, 25))
+    file11 = im.open(path + "/loader_side.png").resize((42, 100))
+    file12 = im.open(path + "/loader_front_back.png").resize((8, 8))
+
+    w, h = 542, 250
+    cube = im.new("RGBA", (w, h), (0, 0, 0, 255))
+    y = h - 80
+    cube.paste(file1, (0, y))
+    cube.paste(file2, (0, y - 62))
+    cube.paste(file3, (0, y - (62 + 50)))
+    cube.paste(file4, (38, y - (62 + 20)))
+    cube.paste(file5, (140, y - (62 + 50)))
+    cube.paste(file6, (190, y - (62 + 16)))
+    cube.paste(file7, (390, y - (62 + 25)))
+    cube.paste(file8, (415, y - (62 + 50)))
+    cube.paste(file9, (433, y - (62 + 50)))
+    cube.paste(file10, (454, y - (62 + 25)))
+    cube.paste(file11, (500, y - 20))
+    cube.paste(file12, (500, y - 28))
+
+    cube.save(final_path)
+
 def create_table(path: str, final_path: str) -> None:
     """Create a table texture
 
@@ -144,4 +182,6 @@ def perfect_texture(path):
 #create_cube("textures/computer_dir", "textures/computer.png")
 #create_chair("textures/table_dir", "textures/table.png")
 #create_chair("textures/chair_dir", "textures/chair.png")
-create_cylinder("textures/ammo_dir", "textures/ammo.png")
+#create_cylinder("textures/ammo_dir", "textures/ammo.png")
+#create_famas("textures/famas_dir", "textures/famas.png")
+create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")

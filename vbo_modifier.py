@@ -410,6 +410,49 @@ def construct_chair() -> None:
     constructor.add_content(cube(face_pos = [(0, 1286/1622), (10/11, 0), (0, 1000/1622), (10/11, 0), (10/11, 0), (10/11, 0)], face_size = [(10/11, 286/1622), (1/11, 500/1622), (10/11, 286/1622), (1/11, 500/1622), (1/11, 500/1622), (1/11, 500/1622)], position = (0.0, 0.3, -0.3), scale = (0.7, 0.4, 0.1)))
     constructor.save("vbos/chair.vbo")
 
+def construct_famas() -> None:
+    """Construct a FaMAS assault rifle
+    """
+    texture_size = (542, 250)
+
+    # 523 190
+    width = 1 / 10
+    constructor = VBO_Constructor()
+    breech_height = 25
+    breech_width = 430
+    breech_x = (93 + 430 / 2)
+    breech_y = 140 - breech_height / 2
+    constructor.add_content(cube(face_pos = [(0, 142/texture_size[1]), (0, 0), (0, 142/texture_size[1]), (0, 0), (0, 80/texture_size[1]), (0, 80/texture_size[1])], face_size = [(38/texture_size[0], 50/texture_size[1]), (500/texture_size[0], 80/texture_size[1]), (38/texture_size[0], 50/texture_size[1]), (500/texture_size[0], 80/texture_size[1]), (500/texture_size[0], 62/texture_size[1]), (500/texture_size[0], 62/texture_size[1])], position = (0, breech_y / 190, breech_x / 523), scale = (width, breech_height / 190, breech_width / 523)))
+
+    # Construct the top part
+    top_height = 20
+    top_wrist_height = 7
+    top_wrist_length = 240
+    top_y = breech_y / 190 + breech_height / 190 / 2 + top_height / 190 / 2
+    constructor.add_content(cube(face_pos = [(415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1])], face_size = [(18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (25/texture_size[0], 25/texture_size[1]), (25/texture_size[0], 25/texture_size[1])], position = (0, top_y, (93 + 20 / 2) / 523), scale = (width, top_height /  190, 20 / 523)))
+    constructor.add_content(cube(face_pos = [(415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (415/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1])], face_size = [(18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (18/texture_size[0], 50/texture_size[1]), (25/texture_size[0], 25/texture_size[1]), (25/texture_size[0], 25/texture_size[1])], position = (0, top_y, (315 + 20 / 2) / 523), scale = (width, top_height /  190, 20 / 523)))
+    constructor.add_content(cube(face_pos = [(390/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1]), (390/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1]), (190/texture_size[0], 142/texture_size[1])], face_size = [(25/texture_size[0], 25/texture_size[1]), (200/texture_size[0], 16/texture_size[1]), (25/texture_size[0], 25/texture_size[1]), (200/texture_size[0], 16/texture_size[1]), (200/texture_size[0], 16/texture_size[1]), (200/texture_size[0], 16/texture_size[1])], position = (0, top_y + top_height / 190 / 2, (93 + top_wrist_length / 2) / 523), scale = (width, top_wrist_height / 190, top_wrist_length / 523)))
+
+    # Construct the wrist
+    wrist_height = 30
+    wrist_length = 35
+    wrist_width = width / 2
+    wrist_x = 280 + wrist_length / 2
+    constructor.add_content(cube(face_pos = [(433/texture_size[0], 142/texture_size[1]), (433/texture_size[0], 142/texture_size[1]), (433/texture_size[0], 142/texture_size[1]), (433/texture_size[0], 142/texture_size[1]), (454/texture_size[0], 142/texture_size[1]), (454/texture_size[0], 142/texture_size[1])], face_size = [(21/texture_size[0], 50/texture_size[1]), (21/texture_size[0], 50/texture_size[1]), (21/texture_size[0], 50/texture_size[1]), (21/texture_size[0], 50/texture_size[1]), (16/texture_size[0], 25/texture_size[1]), (16/texture_size[0], 25/texture_size[1])], position = (0, (breech_y - (breech_height / 2 + wrist_height / 2)) / 190, wrist_x / 523), scale = (wrist_width, wrist_height / 190, wrist_length / 523)))
+
+    # Construct the loader
+    loader_height = 35
+    loader_length = 40
+    loader_width = width / 2
+    loader_x = 385 + loader_length / 2
+    constructor.add_content(cube(face_pos = [(500/texture_size[0], 100/texture_size[1]), (500/texture_size[0], 0), (500/texture_size[0], 100/texture_size[1]), (500/texture_size[0], 0), (500/texture_size[0], 100/texture_size[1]), (500/texture_size[0], 100/texture_size[1])], face_size = [(8/texture_size[0], 8/texture_size[1]), (42/texture_size[0], 100/texture_size[1]), (8/texture_size[0], 8/texture_size[1]), (42/texture_size[0], 100/texture_size[1]), (8/texture_size[0], 8/texture_size[1]), (8/texture_size[0], 8/texture_size[1])], position = (0, (breech_y - (breech_height / 2 + loader_height / 2)) / 190, loader_x / 523), scale = (loader_width, loader_height / 190, loader_length / 523)))
+
+    # Construct the gun
+    gun_length = 93
+    gun_width = width / 3
+    constructor.add_content(cube(face_pos = [(140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1])], face_size = [(50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1])], position = (0, breech_y / 190, (breech_x - (breech_width / 2 + gun_length / 2)) / 523), scale = (gun_width, gun_width, gun_length / 523)))
+    constructor.save("vbos/famas.vbo")
+
 def construct_polygon(diagonal: float, edge: int = 4) -> None:
     """Construct a simple polygon
     """
@@ -435,4 +478,4 @@ def construct_table() -> None:
     constructor.add_content(cube(face_pos = [(10/11, 0), (10/11, 0), (10/11, 0), (10/11, 0), (10/11, 10/21), (10/11, 10/21)], face_size = [(1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 1/21), (1/11, 1/21)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-construct_polygon_3d(1, 50)
+construct_famas()
