@@ -15,7 +15,7 @@ Graphic_Scene::Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_n
 // Add an existing object into the scene
 void Graphic_Scene::add_object(std::string name, Graphic_Object* object)
 {
-	if (contains_object(name)) { std::cout << "Graphic scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to add already exist." << std::endl; return; }
+	if (contains_object(name)) { std::cout << "Graphic scene \"" << get_name() << "\" : error ! The graphic object \"" << name << "\" you want to add already exist." << std::endl; return; }
 	(*get_objects())[name] = object;
 }
 
@@ -33,7 +33,7 @@ bool Graphic_Scene::contains_object(std::string name)
 // Create a new object into the scene and return it
 Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &transform, std::string type, std::string texture_path, bool texture_resize)
 {
-	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
+	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The graphic object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 	
 	// Configure variables for creation
 	if (texture_path == "")
@@ -105,10 +105,55 @@ Physic_Scene::Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_nam
 
 }
 
+// Add an existing object into the scene
+void Physic_Scene::add_object(std::string name, Physic_Object* object)
+{
+	if (contains_object(name)) { std::cout << "Graphic scene \"" << get_name() << "\" : error ! The physic object \"" << name << "\" you want to add already exist." << std::endl; return; }
+	(*get_objects())[name] = object;
+}
+
+// Returns if the scene contains an object
+bool Physic_Scene::contains_object(std::string name)
+{
+	std::map<std::string, Physic_Object*>* objects = get_objects();
+	for (std::map<std::string, Physic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		if (it->first == name) { return true; } // Verify each object name (first element of map)
+	}
+	return false;
+}
+
+// Create a new object into the scene and return it
+Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& transform)
+{
+	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The physic object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
+
+	// Create and add the object
+	Physic_Object* object = new Physic_Object(get_base_struct(), transform);
+	add_object(name, object);
+
+	return object;
+}
+
+// Update the Physic_Scene
+void Physic_Scene::update()
+{
+	std::map<std::string, Physic_Object*>* objects = get_objects();
+	for (std::map<std::string, Physic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		it->second->update(); // Update each object one by one
+	}
+}
+
 // Physic_Scene destructor
 Physic_Scene::~Physic_Scene()
 {
-
+	std::map<std::string, Physic_Object*>* objects = get_objects();
+	for (std::map<std::string, Physic_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		delete it->second; // Delete each object name (first element of map)
+		it->second = 0;
+	}
 }
 
 // Scene constructor
@@ -238,6 +283,12 @@ Transform_Object* Scene::new_object(std::string name, std::string type, Transfor
 		get_graphic_scene()->new_object(name, *object, type, texture_path, texture_resize);
 	}
 
+	// Create the object in physic scene
+	if (use_physic() and use_physic_object)
+	{
+		get_physic_scene()->new_object(name, *object);
+	}
+
 	return object;
 }
 
@@ -248,6 +299,11 @@ void Scene::update()
 	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
 		it->second->update(); // Update every objects
+	}
+
+	if (use_physic())
+	{
+		get_physic_scene()->update();
 	}
 
 	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)

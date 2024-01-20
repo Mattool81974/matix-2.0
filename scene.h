@@ -39,6 +39,10 @@ class Physic_Scene
 	// Class representing a collection of physic object
 public:
 	Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name); // Physic_Scene constructor
+	void add_object(std::string name, Physic_Object *object); // Add an existing object into the scene
+	bool contains_object(std::string name); // Returns if the scene contains an object
+	Physic_Object* new_object(std::string name, Transform_Object& transform); // Create a new object into the scene and return it
+	void update(); // Update the objects in the scene
 	~Physic_Scene(); // Physic_Scene destructor
 
 	// Getters and setters
