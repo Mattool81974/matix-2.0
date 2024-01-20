@@ -106,41 +106,8 @@ void Game::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Calculate delta time
-        get_base_struct()->set_delta_time(glfwGetTime() - last_frame_time);
-        last_frame_time = glfwGetTime();
-
-        // Calculate mouse move
-        double mouse_move_x = get_base_struct()->get_mouse_x() - get_base_struct()->get_last_mouse_x();
-        double mouse_move_y = get_base_struct()->get_mouse_y() - get_base_struct()->get_last_mouse_y();
-        get_base_struct()->set_mouse_move_x(mouse_move_x);
-        get_base_struct()->set_mouse_move_y(mouse_move_y);
-
-        // Rotate and move camera
-        float rotate_speed = 45;
-        float sensitivity = 30;
-        float speed = 5;
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * get_base_struct()->get_camera()->get_forward());
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * -get_base_struct()->get_camera()->get_forward());
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * get_base_struct()->get_camera()->get_right());
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * -get_base_struct()->get_camera()->get_right());
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * get_base_struct()->get_camera()->get_up());
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            get_base_struct()->get_camera()->move(glm::vec3(speed * get_base_struct()->get_delta_time()) * -get_base_struct()->get_camera()->get_up());
-
-        get_base_struct()->get_camera()->rotate(glm::vec3(0.0, sensitivity * get_base_struct()->get_delta_time() * mouse_move_x, 0.0));
-        get_base_struct()->get_camera()->rotate(glm::vec3(-sensitivity * get_base_struct()->get_delta_time() * mouse_move_y, 0.0, 0.0));
-
-        get_base_struct()->get_camera()->soft_reset();
-
-        // Update last mouse pos for future mouse pos calcul
-        get_base_struct()->set_last_mouse_x(get_base_struct()->get_mouse_x());
-        get_base_struct()->set_last_mouse_y(get_base_struct()->get_mouse_y());
+        // Update the event
+        update_event();
 
         // Update game
         update();
@@ -164,6 +131,42 @@ void Game::update()
     {
         std::cout << "Matrix game : error ! The current scene \"" << get_current_scene_name() << "\" does not exist." << std::endl;
     }
+}
+
+// Update the event of the game during this frame
+void Game::update_event()
+{
+    // Calculate delta time
+    get_base_struct()->set_delta_time(glfwGetTime() - last_frame_time);
+    last_frame_time = glfwGetTime();
+
+    // Calculate mouse move
+    double mouse_move_x = get_base_struct()->get_mouse_x() - get_base_struct()->get_last_mouse_x();
+    double mouse_move_y = get_base_struct()->get_mouse_y() - get_base_struct()->get_last_mouse_y();
+    get_base_struct()->set_mouse_move_x(mouse_move_x);
+    get_base_struct()->set_mouse_move_y(mouse_move_y);
+
+    // Update the keys
+    for (std::map<std::string, unsigned short>::iterator it = get_base_struct()->get_keys_state()->begin(); it != get_base_struct()->get_keys_state()->end(); it++)
+    {
+        it->second = 0; // Reset keys
+    }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["z"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["s"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["q"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["d"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["space"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        (*get_base_struct()->get_keys_state())["left shift"] = 1;
+
+    // Update last mouse pos for future mouse pos calcul
+    get_base_struct()->set_last_mouse_x(get_base_struct()->get_mouse_x());
+    get_base_struct()->set_last_mouse_y(get_base_struct()->get_mouse_y());
 }
 
 // Game destructor

@@ -27,6 +27,7 @@ public:
 	Scene* new_scene(std::string name, std::string map_path = ""); // Create a scene into the game and return it
 	void run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game
+	void update_event(); // Update the event of the game during this frame
 	~Game(); // Game destructor
 
 	// Getters and setters

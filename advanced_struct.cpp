@@ -27,6 +27,7 @@ Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base
 	types["circle"] = "circle";
 	types["cube"] = "cube";
 	types["cylinder"] = "cylinder";
+	types["player"] = "cube";
 	types["one_faced_cube"] = "one_faced_cube";
 	types["square"] = "triangle";
 	types["table"] = "table";

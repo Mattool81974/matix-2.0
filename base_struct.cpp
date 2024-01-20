@@ -37,8 +37,9 @@ std::vector<std::string> cut_string(std::string string, std::string cut)
 }
 
 // Transform_Object contructor
-Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(a_parent), position(a_position), rotation(a_rotation), scale(a_scale)
+Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
+	set_parent(a_parent);
 	calculate_direction();
 }
 
@@ -85,6 +86,16 @@ void Transform_Object::move(glm::vec3 a_movement)
 	movement = get_movement() + a_movement;
 }
 
+// Remove an object from the children
+void Transform_Object::remove_child(Transform_Object* object)
+{
+	std::vector<Transform_Object*>* children = get_children();
+	for (std::vector<Transform_Object*>::iterator it = children->begin(); it != children->end(); it++)
+	{
+		if ((*it) == object) { children->erase(it); break; } // Verify each child
+	}
+}
+
 // Scale the object
 void Transform_Object::rescale(glm::vec3 a_scale)
 {
@@ -96,6 +107,38 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 {
 	rotation += a_rotation;
 	calculate_direction();
+	std::vector<Transform_Object*>* children = get_children();
+	for (int i = 0; i < children->size(); i++)
+	{
+		Transform_Object* child = (*children)[i];
+		a_rotation = glm::vec3(a_rotation[0] * child->get_parent_rotation_multiplier(), a_rotation[1] * child->get_parent_rotation_multiplier(), a_rotation[2] * child->get_parent_rotation_multiplier());
+		child->rotate(a_rotation);
+		child->rotate_around(child->get_position(), get_rotation());
+	}
+}
+
+// Rotate the object around a point
+void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation)
+{
+	// Calculate the angle in a local XZ circle
+	glm::vec2 difference_position = glm::vec2(a_position[0], a_position[2]);
+	glm::vec2 difference_normalized = difference_position;
+	if (!(difference_position[0] == 0 and difference_position[1] == 0))
+	{
+		// Calculate the angle of the position
+		difference_normalized = glm::normalize(difference_position);
+		float difference_multiplier_x = difference_position[0] / difference_normalized[0];
+		float difference_multiplier_z = difference_position[1] / difference_normalized[1];
+	
+		float angle = glm::asin(difference_normalized[1] / glm::distance(glm::vec2(0, 0), difference_position));
+
+		// Calculate the position in the local circle
+		float final_angle = angle + glm::radians(a_rotation[1]);
+		glm::vec2 final_position = glm::vec2(glm::cos(final_angle) * difference_multiplier_x, glm::sin(final_angle) * difference_multiplier_z);
+
+		// Calculate the final position
+		position_offset = glm::vec3(final_position[0], 0, final_position[1]) - glm::vec3(difference_position[0], 0, difference_position[1]);
+	}
 }
 
 // Reset softly the object
@@ -129,7 +172,7 @@ glm::mat4 Camera::get_projection(int window_height, int window_width)
 // Return the view matrix
 glm::mat4 Camera::get_view()
 {
-	return glm::lookAt(get_position(), get_position() + get_forward(), get_up());
+	return glm::lookAt(get_absolute_position(), get_absolute_position() + get_forward(), get_up());
 }
 
 // Camera destructor
@@ -141,7 +184,12 @@ Camera::~Camera()
 // Base_Struct constructor
 Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y): mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
 {
-
+	(*get_keys_state())["z"] = 0;
+	(*get_keys_state())["s"] = 0;
+	(*get_keys_state())["q"] = 0;
+	(*get_keys_state())["d"] = 0;
+	(*get_keys_state())["space"] = 0;
+	(*get_keys_state())["left shift"] = 0;
 }
 
 // Return the projection matrix

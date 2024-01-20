@@ -213,7 +213,7 @@ void Scene::load_from_file(std::string map_path)
 }
 
 // Create a new object into the scene and return it
-Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path, bool texture_resize)
+Transform_Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 
@@ -221,11 +221,19 @@ Transform_Object* Scene::new_object(std::string name, std::string type, Transfor
 	if (parent == 0) { parent = this; }
 	
 	// Create and add the object
-	Transform_Object* object = new Transform_Object(parent, position, rotation, scale);
+	Transform_Object* object = 0;
+	if (type == "player")
+	{
+		object = new Player(get_base_struct(), parent, position, rotation, scale);
+	}
+	else
+	{
+		object = new Transform_Object(parent, position, rotation, scale);
+	}
 	add_object(name, object);
 
 	// Create the object in graphic scene
-	if (use_graphic())
+	if (use_graphic() and use_graphic_object)
 	{
 		get_graphic_scene()->new_object(name, *object, type, texture_path, texture_resize);
 	}
@@ -242,15 +250,15 @@ void Scene::update()
 		it->second->update(); // Update every objects
 	}
 
+	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->soft_reset(); // Reset every objects
+	}
+
 	if (use_graphic()) // Update graphic scene
 	{
 		get_graphic_scene()->update();
 		get_graphic_scene()->render();
-	}
-
-	for (std::map<std::string, Transform_Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
-	{
-		it->second->soft_reset(); // Reset every objects
 	}
 }
 
