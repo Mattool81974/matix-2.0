@@ -250,23 +250,18 @@ def polygon(diagonal: float, face_pos = (0, 0), face_size = (1, 1), edge: int = 
 
     return to_return[:-1]
 
-def polygon_3d(diagonal: float, edge: int = 4, scale: tuple = (1, 1, 1)) -> str:
+def polygon_3d(diagonal: float, edge: int = 4, position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1), texture_bottom_pos = (0, 0), texture_middle_pos = (0, 1000/2571), texture_middle_size = (1, 1570/2571), texture_top_bottom_size = (1, 500/2571), texture_top_pos = (0, 500/2571), top_texture_size = (0, 0)) -> str:
     """Return the data for a 3d polygon
 
     Returns:
         list: data for a 3d polygon
     """
-    texture_bottom_pos = (0, 0)
-    texture_middle_pos = (0, 100/257)
-    texture_middle_size = (1, 157/257)
-    texture_top_pos = (0, 500/2570)
-    texture_top_bottom_size = (1, 500/2570)
     use_mid = True
 
     to_return = ""
     vertices = points_polygon(diagonal, edge, position = (0, 0, 1.0)) # Get vertices of the first face of the polygon
     for v in range(len(vertices)):
-        vertices[v] = (vertices[v][0] / 2, vertices[v][1] / 2, vertices[v][2] / 2)
+        vertices[v] = (vertices[v][0] / 2 + position[0], vertices[v][1] / 2 + position[1], vertices[v][2] / 2 + position[2])
     indices = []
     for i in range(edge - 1): # Get the indices of every points in the first face
         indices.append((0, i + 1, i + 2))
@@ -274,7 +269,7 @@ def polygon_3d(diagonal: float, edge: int = 4, scale: tuple = (1, 1, 1)) -> str:
 
     vertices_2 = points_polygon(diagonal, edge, position = (0, 0, -1.0)) # Get vertices of the second face of the polygon
     for v in range(len(vertices_2)):
-        vertices_2[v] = (vertices_2[v][0] / 2, vertices_2[v][1] / 2, vertices_2[v][2] / 2)
+        vertices_2[v] = (vertices_2[v][0] / 2 + position[0], vertices_2[v][1] / 2 + position[1], vertices_2[v][2] / 2 + position[2])
     indices_2 = []
     for i in range(edge - 1): # Get the indices of every points in the second face
         indices_2.append((i + 2, i + 1, 0))
@@ -362,7 +357,7 @@ def polygon_3d(diagonal: float, edge: int = 4, scale: tuple = (1, 1, 1)) -> str:
 
     return to_return[:-1]
 
-def pyramid(diagonal: float, apex_texture_pos = (0, 0), apex_size = (1, 1, 1), apex_texture_size = (1, 0.5), edge: int = 4, edge_position = (0, 0.5), edge_size = (1, 0.5), top_position = (0, 0, 0.5)) -> str:
+def pyramid(diagonal: float, apex_texture_pos = (0, 0), apex_size = (1, 1, 1), apex_texture_size = (1, 0.5), edge: int = 4, edge_texture_pos = (0, 0.5), edge_texture_size = (1, 0.5), position = (0, 0, 0), top_position = (0, 0, 0.5)) -> str:
     """Return the data for a 3d pyramid
 
     Returns:
@@ -371,7 +366,7 @@ def pyramid(diagonal: float, apex_texture_pos = (0, 0), apex_size = (1, 1, 1), a
     to_return = ""
     vertices = points_polygon(diagonal, edge, position = (0, 0, -1.0)) # Get vertices of the first face of the polygon
     for v in range(len(vertices)):
-        vertices[v] = ((vertices[v][0] / 2) * apex_size[0], (vertices[v][1] / 2) * apex_size[1], (vertices[v][2] / 2) * apex_size[2])
+        vertices[v] = ((vertices[v][0] / 2) * apex_size[0] + position[0], (vertices[v][1] / 2) * apex_size[1] + position[1], (vertices[v][2] / 2) * apex_size[2] + position[2])
 
     indices = []
     for i in range(edge - 1): # Get the indices of every points in the first face
@@ -404,19 +399,19 @@ def pyramid(diagonal: float, apex_texture_pos = (0, 0), apex_size = (1, 1, 1), a
             vertice_rescaling = (0, 1, -1)
             final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], apex_texture_size[0], apex_texture_size[1]), 2))
 
-    vertices.append(top_position)
+    vertices.append((top_position[0] + position[0], top_position[1] + position[1], top_position[1] + position[2]))
 
     for i in range(len(indices_mid)):
         for g in range(len(indices_mid[i])):
             part_vertices = vertices[indices_mid[i][g]] # Vertices pos
 
             if part_vertices == vertices[-1]:
-                initial_pos = (edge_position[0] + edge_size[0] / 2, edge_position[1] + edge_size[1])
+                initial_pos = (edge_texture_pos[0] + edge_texture_size[0] / 2, edge_texture_pos[1] + edge_texture_size[1])
             else:
-                initial_pos = edge_position
+                initial_pos = edge_texture_pos
 
             vertice_rescaling = (0, 1, -1)
-            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], edge_size[0], edge_size[1]), 2))
+            final_vertices.append(Vertice(part_vertices, vertice_rescaling, (initial_pos[0], initial_pos[1]), (initial_pos[0], initial_pos[1], edge_texture_size[0], edge_texture_size[1]), 2))
 
     for v in final_vertices:
         to_return += v.to_string() + " "
@@ -531,8 +526,11 @@ def construct_polygon_3d(diagonal: float, edge: int = 4) -> None:
 def construct_shell() -> None:
     """Construct a simple polygon
     """
+    texture_size = (500, 2571)
+
     constructor = VBO_Constructor()
-    constructor.add_content(pyramid(1, edge = 10, apex_size = (1, 1, 1)))
+    constructor.add_content(pyramid(1, edge = 10, apex_size = (1, 1, 1), edge_texture_pos = (0, 0), edge_texture_size = (500 / texture_size[0], 500 / texture_size[1]), apex_texture_pos = (0, 500 / texture_size[1]), apex_texture_size = (500 / texture_size[0], 500 / texture_size[1]), position = (0, 0, 0.5)))
+    constructor.add_content(polygon_3d(1, edge = 10, position = (0, 0, -0.5), texture_bottom_pos = (0, 500 / texture_size[1]), texture_middle_pos = (0, 1000 / texture_size[1]), texture_middle_size = (500 / texture_size[0], 1571 / texture_size[1]), texture_top_pos = (0, 500 / texture_size[1])))
     constructor.save("vbos/shell.vbo")
 
 def construct_table() -> None:

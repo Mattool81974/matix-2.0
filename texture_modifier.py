@@ -139,12 +139,14 @@ def create_shell(path: str, final_path: str) -> None:
         return
     
     file1 = im.open(path + "/bottom.png").resize((500, 500))
-    file2 = im.open(path + "/side.png").resize((500, 500))
+    file2 = im.open(path + "/tip.png").resize((500, 500))
+    file3 = im.open(path + "/side.png").resize((500, 1571))
 
-    w, h = 500, 1000
+    w, h = 500, 2571
     cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
-    cube.paste(file1, (0, 500))
-    cube.paste(file2, (0, 0))
+    cube.paste(file1, (0, 2571 - 1000))
+    cube.paste(file2, (0, 2571 - 500))
+    cube.paste(file3, (0, 0))
 
     cube.save(final_path)
 
