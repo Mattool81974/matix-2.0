@@ -6,23 +6,8 @@
 #include <sstream>
 #include <vector>
 
-// Object constructor
-Object::Object(Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic)
-{
-
-}
-
-// Object destructor
-Object::~Object()
-{
-	if (use_graphic()) { delete attached_graphic; attached_graphic = 0; }
-	if (use_physic()) { delete attached_physic; attached_physic = 0; }
-	delete attached_transform;
-	attached_transform = 0;
-}
-
 // Graphic_Scene constructor
-Graphic_Scene::Graphic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::map<std::string, Object*>& a_objects): advanced_struct(a_advanced_struct), name(a_name), objects(a_objects)
+Graphic_Scene::Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects): game_struct(a_game_struct), name(a_name), objects(a_objects)
 {
 
 }
@@ -33,7 +18,7 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 	// Configure variables for creation
 	if (texture_path == "")
 	{
-		if ((*get_advanced_struct()->get_type())[type] == "cube")
+		if ((*get_game_struct()->get_type())[type] == "cube")
 		{
 			texture_path = "../textures/unknow_cube.png";
 		}
@@ -45,19 +30,19 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 
 	// Create or get the texture
 	Texture* texture = 0;
-	if (get_advanced_struct()->contains_texture(texture_path))
+	if (get_game_struct()->contains_texture(texture_path))
 	{
-		texture = get_advanced_struct()->get_texture(texture_path);
+		texture = get_game_struct()->get_texture(texture_path);
 	}
 	else
 	{
 		texture = new Texture(texture_path, texture_resize);
-		(*get_advanced_struct()->get_textures())[texture_path] = texture;
+		(*get_game_struct()->get_textures())[texture_path] = texture;
 	}
 
 	// Create and add the object
-	VAO* vao = (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())[type]];
-	Graphic_Object* object = new Graphic_Object(get_base_struct(), transform, texture, vao);
+	VAO* vao = (*get_game_struct()->get_all_vaos())[(*get_game_struct()->get_type())[type]];
+	Graphic_Object* object = new Graphic_Object(get_game_struct(), transform, texture, vao);
 
 	return object;
 }
@@ -95,7 +80,7 @@ Graphic_Scene::~Graphic_Scene()
 }
 
 // Physic_Scene constructor
-Physic_Scene::Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::map<std::string, Object*>& a_objects): advanced_struct(a_advanced_struct), name(a_name), objects(a_objects)
+Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects): game_struct(a_game_struct), name(a_name), objects(a_objects)
 {
 
 }
@@ -104,7 +89,7 @@ Physic_Scene::Physic_Scene(Advanced_Struct* a_advanced_struct, std::string a_nam
 Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& transform)
 {
 	// Create and add the object
-	Physic_Object* object = new Physic_Object(get_base_struct(), transform);
+	Physic_Object* object = new Physic_Object(get_game_struct(), transform);
 	return object;
 }
 
@@ -128,16 +113,16 @@ Physic_Scene::~Physic_Scene()
 }
 
 // Scene constructor
-Scene::Scene(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_map_path, bool a_graphic, bool a_physic): Transform_Object(), advanced_struct(a_advanced_struct), name(a_name), graphic(a_graphic), physic(a_physic)
+Scene::Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path, bool a_graphic, bool a_physic): Transform_Object(), game_struct(a_game_struct), name(a_name), graphic(a_graphic), physic(a_physic)
 {
 	if (use_graphic())
 	{
-		graphic_scene = new Graphic_Scene(get_advanced_struct(), get_name(), objects); // If use graphic, construct a graphic scene
+		graphic_scene = new Graphic_Scene(get_game_struct(), get_name(), objects); // If use graphic, construct a graphic scene
 	}
 
 	if (use_physic())
 	{
-		physic_scene = new Physic_Scene(get_advanced_struct(), get_name(), objects); // If use physic, construct a physic scene
+		physic_scene = new Physic_Scene(get_game_struct(), get_name(), objects); // If use physic, construct a physic scene
 	}
 
 	if (a_map_path != "")
@@ -181,7 +166,7 @@ void Scene::load_from_map(std::string map)
 			unsigned int part_number = std::stoi(line[j]);
 			if (part_number != 0)
 			{
-				Part *part = get_advanced_struct()->get_part(part_number); // Get the part at the pos browsed
+				Part *part = get_game_struct()->get_part(part_number); // Get the part at the pos browsed
 				if (part != 0)
 				{
 					float x = j;
@@ -190,7 +175,7 @@ void Scene::load_from_map(std::string map)
 
 					std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
-					new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path()); // Create the object
+					new_object<Object>(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path()); // Create the object
 				}
 			}
 		}
@@ -228,51 +213,14 @@ void Scene::load_from_file(std::string map_path)
 	load_from_map(map_content); // Load the map
 }
 
-// Create a new object into the scene and return it
-Object* Scene::new_object(std::string name, std::string type, Transform_Object *parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object)
-{
-	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
-
-	// Configure object
-	if (parent == 0) { parent = this; }
-	
-	// Create and add the object
-	Transform_Object* object = 0;
-	if (type == "player")
-	{
-		object = new Player(get_base_struct(), parent, position, rotation, scale);
-	}
-	else
-	{
-		object = new Transform_Object(parent, position, rotation, scale);
-	}
-
-	// Create the object in graphic scene
-	Graphic_Object* graphic_object = 0;
-	if (use_graphic() and use_graphic_object)
-	{
-		graphic_object = get_graphic_scene()->new_object(name, *object, type, texture_path, texture_resize);
-	}
-
-	// Create the object in physic scene
-	Physic_Object* physic_object = 0;
-	if (use_physic() and use_physic_object)
-	{
-		physic_object = get_physic_scene()->new_object(name, *object);
-	}
-	Object* final_object = new Object(object, graphic_object, physic_object);
-	add_object(name, final_object);
-
-	return final_object;
-}
-
 // Update the scene
 void Scene::update()
 {
 	std::map<std::string, Object *> *objects_to_update = get_objects();
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
-		it->second->get_attached_transform()->update(); // Update every objects
+		it->second->update(); // Update every objects
+		it->second->get_attached_transform()->update(); // Update every transform objects
 	}
 
 	if (use_physic())

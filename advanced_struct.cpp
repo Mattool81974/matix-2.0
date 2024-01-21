@@ -20,26 +20,9 @@ Part::~Part()
 }
 
 // Advanced_Struct constructor
-Advanced_Struct::Advanced_Struct(Base_Struct *a_base_struct): base_struct(a_base_struct)
+Advanced_Struct::Advanced_Struct(double& a_mouse_x, double& a_mouse_y): Base_Struct(a_mouse_x, a_mouse_y)
 {
-	// Create types
-	types["chair"] = "chair";
-	types["circle"] = "circle";
-	types["cube"] = "cube";
-	types["cylinder"] = "cylinder";
-	types["player"] = "cube";
-	types["one_faced_cube"] = "one_faced_cube";
-	types["square"] = "triangle";
-	types["table"] = "table";
-
-	// Create VAOs
-	all_vaos["chair"] = new VAO("../shaders/default", "../vbos/chair.vbo");
-	all_vaos["circle"] = new VAO("../shaders/default", "../vbos/polygon50.vbo");
-	all_vaos["cylinder"] = new VAO("../shaders/default", "../vbos/polygon_3d50.vbo");
-	all_vaos["cube"] = new VAO("../shaders/default", "../vbos/cube.vbo");
-	all_vaos["one_faced_cube"] = new VAO("../shaders/default", "../vbos/one_faced_cube.vbo");
-	all_vaos["table"] = new VAO("../shaders/default", "../vbos/table.vbo");
-	all_vaos["triangle"] = new VAO("../shaders/default", "");
+	
 }
 
 // Assign to a number a part
@@ -110,6 +93,29 @@ Texture* Advanced_Struct::get_texture(std::string texture_path)
 	}
 }
 
+// Loads the VAOs in the advanced struct
+void Advanced_Struct::load_VAOs()
+{
+	// Create types
+	types["chair"] = "chair";
+	types["circle"] = "circle";
+	types["cube"] = "cube";
+	types["cylinder"] = "cylinder";
+	types["player"] = "cube";
+	types["one_faced_cube"] = "one_faced_cube";
+	types["square"] = "triangle";
+	types["table"] = "table";
+
+	// Create VAOs
+	all_vaos["chair"] = new VAO("../shaders/default", "../vbos/chair.vbo");
+	all_vaos["circle"] = new VAO("../shaders/default", "../vbos/polygon50.vbo");
+	all_vaos["cylinder"] = new VAO("../shaders/default", "../vbos/polygon_3d50.vbo");
+	all_vaos["cube"] = new VAO("../shaders/default", "../vbos/cube.vbo");
+	all_vaos["one_faced_cube"] = new VAO("../shaders/default", "../vbos/one_faced_cube.vbo");
+	all_vaos["table"] = new VAO("../shaders/default", "../vbos/table.vbo");
+	all_vaos["triangle"] = new VAO("../shaders/default", "");
+}
+
 // Create a new part into the struct and return it
 Part Advanced_Struct::new_part(unsigned int number, std::string type, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
 {
@@ -147,4 +153,19 @@ Advanced_Struct::~Advanced_Struct()
 		delete it->second; // Delete textures
 		it->second = 0;
 	}
+}
+
+// Object constructor
+Object::Object(Advanced_Struct* a_game_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name)
+{
+
+}
+
+// Object destructor
+Object::~Object()
+{
+	if (use_graphic()) { delete attached_graphic; attached_graphic = 0; }
+	if (use_physic()) { delete attached_physic; attached_physic = 0; }
+	delete attached_transform;
+	attached_transform = 0;
 }

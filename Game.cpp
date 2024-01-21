@@ -5,8 +5,8 @@
 #include <iostream>
 #include "matix/stb_image.h"
 
-double mouse_x = 500; // Global variable representing the X pos of the mouse
-double mouse_y = 500; // Global variable representing the Y pos of the mouse
+double global_mouse_x = 500; // Global variable representing the X pos of the mouse
+double global_mouse_y = 500; // Global variable representing the Y pos of the mouse
 
 // Callback function for window resizing
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -17,19 +17,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // Callback function for mouse moving
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    mouse_x = xpos;
-    mouse_y = ypos;
+    global_mouse_x = xpos;
+    global_mouse_y = ypos;
 }
 
 // Game constructor
-Game::Game(int a_window_width, int a_window_height): window_height(a_window_height), window_width(a_window_width)
+Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mouse_x, global_mouse_y), window_height(a_window_height), window_width(a_window_width)
 {
     // Configurate base_struct
-    Base_Struct *base_struct = new Base_Struct(mouse_x, mouse_y);
-    base_struct->get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
-    base_struct->get_camera()->set_rotation(glm::vec3(0.0, 0.0, 0.0));
-    base_struct->set_window_height(window_height);
-    base_struct->set_window_width(window_width);
+    get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
+    get_camera()->set_rotation(glm::vec3(0.0, 0.0, 0.0));
+    set_window_height(window_height);
+    set_window_width(window_width);
 
     // GLFW Window generation
     glfwInit();
@@ -60,7 +59,7 @@ Game::Game(int a_window_width, int a_window_height): window_height(a_window_heig
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    advanced_struct = new Advanced_Struct(base_struct);
+    load_VAOs();
 }
 
 // Add an existing scene to the game
@@ -81,18 +80,12 @@ bool Game::contains_scene(std::string name)
     return false;
 }
 
-// Create a new part into the struct and return it
-Part Game::new_part(unsigned int number, std::string type, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
-{
-    return get_advanced_struct()->new_part(number, type, position, rotation, scale, texture_path);
-}
-
 // Create a scene into the game and return it
 Scene* Game::new_scene(std::string name, std::string map_path)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to create already exists." << std::endl; return 0; }
 
-    Scene* new_scene = new Scene(get_advanced_struct(), name, map_path);
+    Scene* new_scene = new Scene(this, name, map_path);
     add_scene(name, new_scene);
     return new_scene;
 }
@@ -137,36 +130,38 @@ void Game::update()
 void Game::update_event()
 {
     // Calculate delta time
-    get_base_struct()->set_delta_time(glfwGetTime() - last_frame_time);
+    set_delta_time(glfwGetTime() - last_frame_time);
     last_frame_time = glfwGetTime();
 
     // Calculate mouse move
-    double mouse_move_x = get_base_struct()->get_mouse_x() - get_base_struct()->get_last_mouse_x();
-    double mouse_move_y = get_base_struct()->get_mouse_y() - get_base_struct()->get_last_mouse_y();
-    get_base_struct()->set_mouse_move_x(mouse_move_x);
-    get_base_struct()->set_mouse_move_y(mouse_move_y);
+    double mouse_move_x = get_mouse_x() - get_last_mouse_x();
+    double mouse_move_y = get_mouse_y() - get_last_mouse_y();
+    set_mouse_move_x(mouse_move_x);
+    set_mouse_move_y(mouse_move_y);
 
     // Update the keys
-    for (std::map<std::string, unsigned short>::iterator it = get_base_struct()->get_keys_state()->begin(); it != get_base_struct()->get_keys_state()->end(); it++)
+    for (std::map<std::string, unsigned short>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
     {
         it->second = 0; // Reset keys
     }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        (*get_keys_state())["a"] = 1;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["z"] = 1;
+        (*get_keys_state())["z"] = 1;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["s"] = 1;
+        (*get_keys_state())["s"] = 1;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["q"] = 1;
+        (*get_keys_state())["q"] = 1;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["d"] = 1;
+        (*get_keys_state())["d"] = 1;
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["space"] = 1;
+        (*get_keys_state())["space"] = 1;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        (*get_base_struct()->get_keys_state())["left shift"] = 1;
+        (*get_keys_state())["left shift"] = 1;
 
     // Update last mouse pos for future mouse pos calcul
-    get_base_struct()->set_last_mouse_x(get_base_struct()->get_mouse_x());
-    get_base_struct()->set_last_mouse_y(get_base_struct()->get_mouse_y());
+    set_last_mouse_x(get_mouse_x());
+    set_last_mouse_y(get_mouse_y());
 }
 
 // Game destructor
@@ -178,6 +173,4 @@ Game::~Game()
         delete it->second; // Destroy each scenes
         it->second = 0;
     }
-    delete advanced_struct; // Destroy Advanced_Struct
-    advanced_struct = 0;
 }

@@ -184,6 +184,7 @@ Camera::~Camera()
 // Base_Struct constructor
 Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y): mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
 {
+	(*get_keys_state())["a"] = 0;
 	(*get_keys_state())["z"] = 0;
 	(*get_keys_state())["s"] = 0;
 	(*get_keys_state())["q"] = 0;

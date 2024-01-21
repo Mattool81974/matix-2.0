@@ -87,7 +87,6 @@ public:
 	glm::mat4 get_projection(); // Return the projection matrix
 	~Base_Struct(); // Base_Struct destructor
 
-
 	// Getters and setters
 	inline Camera* get_camera() { return &camera; };
 	inline float get_delta_time() { return delta_time; };
