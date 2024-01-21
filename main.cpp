@@ -5,19 +5,21 @@ class Ammo : public Object
 {
     // Class representing an Ammo
 public:
-    Ammo(Advanced_Struct* a_advanced_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
+    Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
     void update(); // Update the ammo
     ~Ammo(); // Ammo destructor
 private:
     float creation_time = 0;
     float deadline = 3;
+
+    Game* game = 0;
 };
 
 class Famas : public Object
 {
     // Class representing a Famas
 public:
-    Famas(Advanced_Struct* a_advanced_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Famas constructor
+    Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Famas constructor
     void shoot(); // Shoot with the famas
     void update(); // Update the famas
     ~Famas(); // Famas destructor
@@ -30,15 +32,20 @@ private:
 };
 
 // Ammo constructor
-Ammo::Ammo(Advanced_Struct* a_advanced_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+Ammo::Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
+    game = (Game*)get_game_struct();
     creation_time = glfwGetTime();
 }
 
 // Update the ammo
 void Ammo::update()
 {
-    
+    if (glfwGetTime() - creation_time > deadline)
+    {
+        Scene* scene = (*game->get_scenes())[get_scene_name()];
+        scene->destroy(get_name());
+    }
 }
 
 // Ammo destructor
@@ -48,7 +55,7 @@ Ammo::~Ammo()
 }
 
 // Famas constructor
-Famas::Famas(Advanced_Struct* a_advanced_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+Famas::Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
     game = (Game*)get_game_struct();
 }
@@ -79,13 +86,17 @@ void Famas::shoot()
 // Update the famas
 void Famas::update()
 {
-    if (get_game_struct()->get_key_state("a")) // If the A (AZERTY) key is pressed
+    if (get_game_struct()->get_left_mouse_button_state()) // If the left button is pressed
     {
         if (glfwGetTime() - last_ammo_shooted > 1.0f/(float)ammo_by_second)
         {
             shoot();
         }
     }
+    glm::vec3 rotation = glm::vec3(get_game_struct()->get_camera()->get_rotation()[0], get_game_struct()->get_camera()->get_rotation()[0], get_game_struct()->get_camera()->get_rotation()[0]);
+    get_attached_transform()->set_rotation(rotation, glm::vec3(1, 0, 0));
+    get_attached_transform()->rotate_around(get_attached_transform()->get_position(), glm::vec3(get_game_struct()->get_camera()->get_rotation()[0], 0, 0), glm::vec3(1, 0, 0));
+    std::cout << "Ohm " << get_attached_transform()->get_rotation()[0] << " " << get_attached_transform()->get_rotation()[1] << " " << get_attached_transform()->get_rotation()[2] << std::endl;
 }
 
 // Famas destructor
@@ -118,7 +129,6 @@ int main()
     scene->new_object("clock", "circle", 0, glm::vec3(4.49, 2.25, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/clock.png", false);
     Famas *famas = scene->new_object<Famas>("famas", "famas", player->get_attached_transform(), glm::vec3(1, -0.9, 0.35), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/famas.png", false);
     scene->new_object("luxary_famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/luxary_famas.png", false);
-    Ammo *ammo = scene->new_object<Ammo>("ammo", "ammo", 0, glm::vec3(1, 3.6725, -0.03), glm::vec3(0, 180, 0), glm::vec3(0.01, 0.01, 0.03), "../textures/shell.png", false);
     
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());

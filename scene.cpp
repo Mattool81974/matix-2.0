@@ -149,6 +149,22 @@ bool Scene::contains_object(std::string name)
 	return false;
 }
 
+// Destroy an object in the scene
+void Scene::destroy(std::string name)
+{
+	if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to destroy does not exist." << std::endl; return; }
+
+	std::map<std::string, Object*>* objects = get_objects();
+	for (std::map<std::string, Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		if (it->first == name) // Verify each object name (first element of map)
+		{
+			to_destroy.push_back(it);
+			return;
+		}
+	}
+}
+
 // Load the scene from a map
 void Scene::load_from_map(std::string map)
 {
@@ -238,6 +254,15 @@ void Scene::update()
 		get_graphic_scene()->update();
 		get_graphic_scene()->render();
 	}
+
+	for (int i = 0; i < get_to_destroy()->size(); i++)
+	{
+		std::map<std::string, Object*>::iterator it = (*get_to_destroy())[i];
+		delete it->second;
+		it->second = 0;
+		objects_to_update->erase(it);
+	}
+	get_to_destroy()->clear();
 }
 
 // Scene destructor

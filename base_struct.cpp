@@ -36,6 +36,39 @@ std::vector<std::string> cut_string(std::string string, std::string cut)
 	return result;
 }
 
+// Normalize a rotation and return it
+glm::vec3 normalize_rotation(glm::vec3 rotation)
+{
+	while (rotation[0] >= 360)
+	{
+		rotation[0] -= 360;
+	}
+	while (rotation[0] < 0)
+	{
+		rotation[0] += 360;
+	}
+
+	while (rotation[1] >= 360)
+	{
+		rotation[1] -= 360;
+	}
+	while (rotation[1] < 0)
+	{
+		rotation[1] += 360;
+	}
+
+	while (rotation[2] >= 360)
+	{
+		rotation[2] -= 360;
+	}
+	while (rotation[2] < 0)
+	{
+		rotation[2] += 360;
+	}
+
+	return rotation;
+}
+
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
@@ -113,20 +146,19 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 		Transform_Object* child = (*children)[i];
 		a_rotation = glm::vec3(a_rotation[0] * child->get_parent_rotation_multiplier(), a_rotation[1] * child->get_parent_rotation_multiplier(), a_rotation[2] * child->get_parent_rotation_multiplier());
 		child->rotate(a_rotation);
-		child->rotate_around(child->get_position(), get_rotation());
+		child->rotate_around(child->get_position(), get_rotation(), glm::vec3(0, 1, 0));
 	}
 }
 
-// Rotate the object around a point
-void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation)
+// Rotate the object around a point with euler angle
+void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
 {
-	// Calculate the angle in a local XZ circle
+	// Calculate the angle in a local XZ circle with Y angle
 	glm::vec2 difference_position = glm::vec2(a_position[0], a_position[2]);
-	glm::vec2 difference_normalized = difference_position;
-	if (!(difference_position[0] == 0 and difference_position[1] == 0))
+	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[1] == 1)
 	{
 		// Calculate the angle of the position
-		difference_normalized = glm::normalize(difference_position);
+		glm::vec2 difference_normalized = glm::normalize(difference_position);
 		float difference_multiplier_x = difference_position[0] / difference_normalized[0];
 		float difference_multiplier_z = difference_position[1] / difference_normalized[1];
 	
@@ -137,7 +169,29 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation)
 		glm::vec2 final_position = glm::vec2(glm::cos(final_angle) * difference_multiplier_x, glm::sin(final_angle) * difference_multiplier_z);
 
 		// Calculate the final position
-		position_offset = glm::vec3(final_position[0], 0, final_position[1]) - glm::vec3(difference_position[0], 0, difference_position[1]);
+		position_offset[0] = final_position[0] - difference_position[0];
+		position_offset[2] = final_position[1] - difference_position[1];
+	}
+
+	std::cout << "Go" << std::endl;
+	// Calculate the angle in a local YZ circle with X angle
+	difference_position = glm::vec2(a_position[1], a_position[0]);
+	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[0] == 1)
+	{
+		// Calculate the angle of the position
+		glm::vec2 difference_normalized = glm::normalize(difference_position);
+		float difference_multiplier_y = difference_position[0] / difference_normalized[0];
+		float difference_multiplier_z = difference_position[1] / difference_normalized[1];
+
+		float angle = glm::asin(difference_normalized[1] / glm::distance(glm::vec2(0, 0), difference_position)) - glm::radians(33.0);
+
+		// Calculate the position in the local circle
+		float final_angle = angle + glm::radians(a_rotation[0]);
+		std::cout << glm::degrees(angle) << " " << final_angle << " " << glm::sin(final_angle) * difference_multiplier_z << " " << difference_multiplier_y << std::endl;
+
+		// Calculate the final position
+		position_offset[1] = glm::sin(final_angle) * difference_multiplier_z;
+		std::cout << position_offset[1] << " " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
 	}
 }
 
@@ -173,6 +227,21 @@ glm::mat4 Camera::get_projection(int window_height, int window_width)
 glm::mat4 Camera::get_view()
 {
 	return glm::lookAt(get_absolute_position(), get_absolute_position() + get_forward(), get_up());
+}
+
+// Rotate the object
+void Camera::rotate(glm::vec3 a_rotation)
+{
+	glm::vec3 rotation = a_rotation;
+	glm::vec3 final_rotation = normalize_rotation(get_rotation() + a_rotation);
+	if (final_rotation[0] > 89 and final_rotation[0] < 271) // Resize the position if necessary
+	{
+		if(rotation[0] > 0)
+			rotation[0] = 89 - normalize_rotation(get_rotation())[0];
+		else
+			rotation[0] = 271 - normalize_rotation(get_rotation())[0];
+	}
+	Transform_Object::rotate(rotation);
 }
 
 // Camera destructor

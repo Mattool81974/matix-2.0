@@ -65,7 +65,7 @@ class Object
 {
 	// Class representing an object into a scene
 public:
-	Object(Advanced_Struct* a_game_struct, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
+	Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
 
@@ -74,10 +74,12 @@ public:
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
+	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
 	inline bool use_graphic() { return get_attached_graphic_object() != 0; };
 	inline bool use_physic() { return get_attached_physic_object() != 0; };
 private:
+	std::string name; // Name of the object
 	std::string scene_name; // Name of the scene of the object
 
 	Advanced_Struct* game_struct = 0; // Base struct in the game

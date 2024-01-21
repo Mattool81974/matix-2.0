@@ -133,11 +133,17 @@ void Game::update_event()
     set_delta_time(glfwGetTime() - last_frame_time);
     last_frame_time = glfwGetTime();
 
-    // Calculate mouse move
+    // Calculate mouse move and button
     double mouse_move_x = get_mouse_x() - get_last_mouse_x();
     double mouse_move_y = get_mouse_y() - get_last_mouse_y();
+    set_left_mouse_button_state(0);
     set_mouse_move_x(mouse_move_x);
     set_mouse_move_y(mouse_move_y);
+    set_right_mouse_button_state(0);
+    if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        set_left_mouse_button_state(1);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        set_right_mouse_button_state(1);
 
     // Update the keys
     for (std::map<std::string, unsigned short>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)

@@ -8,6 +8,7 @@
 #include <vector>
 
 std::vector<std::string> cut_string(std::string string, std::string cut); // Cut a string where there are the "cut"
+glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 
 class Transform_Object
 {
@@ -19,9 +20,9 @@ public:
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
 	void remove_child(Transform_Object* object); // Remove an object from the children
-	void rescale(glm::vec3 a_scale); // Rotate the object
-	void rotate(glm::vec3 a_rotation); // Scale the object
-	void rotate_around(glm::vec3 a_position, glm::vec3 a_rotation); // Rotate the object around a point
+	void rescale(glm::vec3 a_scale); // Rescale the object
+	virtual void rotate(glm::vec3 a_rotation); // Rotate the object
+	void rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier); // Rotate the object around a point with eulers angle
 	void soft_reset(); // Reset softly the object
 	virtual void update() {}; // Update the object
 	~Transform_Object(); // Transform_Object destructor
@@ -44,7 +45,7 @@ public:
 	inline void set_parent_rotation_multiplier(short a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
 	inline void set_position(glm::vec3 new_position) { position = new_position; };
-	inline void set_rotation(glm::vec3 new_rotation) { rotation = new_rotation; calculate_direction(); };
+	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };
 protected:
 	glm::vec3 position_offset = glm::vec3(0.0f, 0.0f, 0.0f); // Offset position of the object
@@ -70,6 +71,7 @@ public:
 	Camera(glm::vec3 a_position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_rotation = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_scale = glm::vec3(1.0f, 1.0f, 1.0f)); // Camera constructor
 	glm::mat4 get_projection(int window_height, int window_width); // Return the projection matrix
 	glm::mat4 get_view(); // Return the view matrix
+	void rotate(glm::vec3 a_rotation); // Rotate the object
 	~Camera(); // Camera destructor
 
 	// Getter
@@ -94,23 +96,29 @@ public:
 	inline std::map<std::string, unsigned short>* get_keys_state() { return &keys_state; };
 	inline double get_last_mouse_x() { return last_mouse_x; };
 	inline double get_last_mouse_y() { return last_mouse_y; };
+	inline unsigned short get_left_mouse_button_state() { return left_mouse_button_state; };
 	inline double get_mouse_move_x() { return mouse_move_x; };
 	inline double get_mouse_move_y() { return mouse_move_y; };
 	inline double get_mouse_x() { return mouse_x; };
 	inline double get_mouse_y() { return mouse_y; };
+	inline unsigned short get_right_mouse_button_state() { return right_mouse_button_state; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
 	inline void set_delta_time(float new_delta_time) { delta_time = new_delta_time; };
 	inline void set_last_mouse_x(double a_last_mouse_x) { last_mouse_x = a_last_mouse_x; };
 	inline void set_last_mouse_y(double a_last_mouse_y) { last_mouse_y = a_last_mouse_y; };
+	inline void set_left_mouse_button_state(unsigned short new_state) { left_mouse_button_state = new_state; };
 	inline void set_mouse_move_x(double a_mouse_move_x) { mouse_move_x = a_mouse_move_x; };
 	inline void set_mouse_move_y(double a_mouse_move_y) { mouse_move_y = a_mouse_move_y; };
+	inline void set_right_mouse_button_state(unsigned short new_state) { right_mouse_button_state = new_state; };
 	inline void set_window_height(int height) { window_height = height; };
 	inline void set_window_width(int width) { window_width = width; };
 private:
 	float delta_time = 0; // Time since the last frame of the game
 	double last_mouse_x = 0; // Last X position of the mouse
 	double last_mouse_y = 0; // Last Y position of the mouse
+	unsigned short left_mouse_button_state = 0; // State of the left button mouse
+	unsigned short right_mouse_button_state = 0; // State of the left button mouse
 	double mouse_move_x = 0; // Last X move of the mouse
 	double mouse_move_y = 0; // Last Y move of the mouse
 	double& mouse_x; // Reference towards the mouse X pos

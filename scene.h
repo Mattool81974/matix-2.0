@@ -58,6 +58,7 @@ public:
 	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
 	bool contains_object(std::string name); // Returns if the scene contains an object
+	void destroy(std::string name); // Destroy an object in the scene
 	void load_from_map(std::string); // Load the scene from a map
 	void load_from_file(std::string map_path); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
@@ -72,6 +73,7 @@ public:
 	inline Object* get_object(std::string name) { if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\": error : The object \"" << name << "\" you want to access does not exist." << std::endl; return 0; } return (*get_objects())[name]; };
 	inline std::map<std::string, Object*> *get_objects() { return &objects; };
 	inline Physic_Scene* get_physic_scene() { return physic_scene; };
+	inline std::vector<std::map<std::string, Object*>::iterator>* get_to_destroy() { return &to_destroy; };
 	inline bool use_graphic() { return graphic; };
 	inline bool use_physic() { return physic; };
 private:
@@ -83,6 +85,7 @@ private:
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
+	std::vector<std::map<std::string, Object*>::iterator> to_destroy = std::vector<std::map<std::string, Object*>::iterator>(); // Name of the objects to destroy at the end of the frame
 };
 
 // Create a new object into the scene and return it
@@ -118,7 +121,7 @@ O* Scene::new_object(std::string name, std::string type, Transform_Object* paren
 	{
 		physic_object = get_physic_scene()->new_object(name, *object);
 	}
-	O* final_object = new O(get_game_struct(), get_name(), object, graphic_object, physic_object);
+	O* final_object = new O(get_game_struct(), name, get_name(), object, graphic_object, physic_object);
 	add_object(name, final_object);
 
 	return final_object;
