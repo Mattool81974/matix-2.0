@@ -2,6 +2,8 @@
 # File used to build complex VBO
 
 # Import librairies
+from tkinter import NO
+import glm
 import math
 
 def flip_x(to_flip: tuple) -> tuple:
@@ -81,6 +83,11 @@ class Vertice:
         """
         return self.unchanged
     
+    def set_point(self, point: tuple) -> None:
+        """Change the value of a point
+        """
+        self.point = point
+    
     def to_string(self) -> str:
         """Return the vertices into a string
 
@@ -92,6 +99,23 @@ class Vertice:
         to_return += str(round(self.get_texture_rect()[0], 5)) + "f " + str(round(self.get_texture_rect()[1], 5)) + "f " + str(round(self.get_texture_rect()[2], 5)) + "f " + str(round(self.get_texture_rect()[3], 5)) + "f "
         to_return += str(round(self.get_rescaling()[0], 5)) + "f " + str(round(self.get_rescaling()[1], 5)) + "f " + str(round(self.get_rescaling()[2], 5)) + "f"
         return to_return
+
+def rotate(points: list, rotation: tuple) -> list:
+    """Take a list of point and rotate it
+    """
+    if rotation[1] != 0:
+        for point in points:
+            difference_position = point.get_point()
+            difference_normalized = glm.normalize(difference_position)
+            difference_multiplier_x = difference_position[0] / difference_normalized[0]
+            difference_multiplier_z = difference_position[1] / difference_normalized[1]
+                
+            angle = glm.asin(difference_normalized[1] / glm.distance(glm.vec2(0, 0), difference_position))
+
+            final_angle = angle + glm.radians(rotation[1])
+            final_position = glm.vec3(glm.cos(final_angle) * difference_multiplier_x, 0, glm.sin(final_angle) * difference_multiplier_z)
+
+            point.set_point(final_position)
 
 def get_data(vertices: list, indices: list) -> list:
     """Return a list of vertices ordered by indices

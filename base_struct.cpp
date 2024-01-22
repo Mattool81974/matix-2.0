@@ -103,9 +103,9 @@ glm::mat4 Transform_Object::get_model_matrix()
 	matrix = glm::translate(matrix, get_absolute_position());
 
 	// Rotate matrix
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[0]), glm::vec3(1, 0, 0));
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[1]), glm::vec3(0, 1, 0));
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[2]), glm::vec3(0, 0, 1));
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[0]), get_forward());
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[1]), get_up());
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[2]), get_right());
 
 	// Scale matrix
 	matrix = glm::scale(matrix, get_scale());
