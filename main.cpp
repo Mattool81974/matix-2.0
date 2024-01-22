@@ -70,7 +70,9 @@ void Famas::shoot()
     forward = glm::cross(forward, glm::vec3(0, -1, 0));
     forward = glm::vec3(-forward[0], forward[1], forward[2]);
 
-    glm::vec3 position = get_attached_transform()->get_absolute_position() + glm::vec3(0, 0.67, 0.0) + glm::vec3(0.2, 0, 0.2) * forward;
+    float x_offset = 0.75;
+    float z_offset = 0.75;
+    glm::vec3 position = get_attached_transform()->get_absolute_position() + glm::vec3(0, 0.0, 0.0) + glm::vec3(x_offset, 0, z_offset) * forward;
     glm::vec3 rotation = get_attached_transform()->get_rotation() + glm::vec3(0, 180, 0);
     glm::vec3 scale = glm::vec3(0.1, 0.1, 0.3);
 
@@ -94,9 +96,10 @@ void Famas::update()
         }
     }
     glm::vec3 rotation = glm::vec3(get_game_struct()->get_camera()->get_rotation()[0], get_game_struct()->get_camera()->get_rotation()[0], get_game_struct()->get_camera()->get_rotation()[0]);
-    get_attached_transform()->set_rotation(rotation, glm::vec3(0, 0, 1));
-    // get_attached_transform()->rotate_around(get_attached_transform()->get_position(), glm::vec3(get_game_struct()->get_camera()->get_rotation()[0], 0, 0), glm::vec3(1, 0, 0));
+    get_attached_transform()->set_rotation(rotation, glm::vec3(1, 0, 0));
+    get_attached_transform()->rotate_around(-get_attached_transform()->get_position(), glm::vec3(get_game_struct()->get_camera()->get_rotation()[0], 0, 0), glm::vec3(1, 0, 0));
     std::cout << "Ohm " << get_attached_transform()->get_rotation()[0] << " " << get_attached_transform()->get_rotation()[1] << " " << get_attached_transform()->get_rotation()[2] << std::endl;
+    std::cout << "Ohm " << get_game_struct()->get_camera()->get_rotation()[0] << " " << get_attached_transform()->get_position()[0] << " " << get_attached_transform()->get_position()[1] << " " << get_attached_transform()->get_position()[2] << std::endl;
 }
 
 // Famas destructor
@@ -127,13 +130,20 @@ int main()
     scene->new_object("table", "table", 0, glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/table.png", false);
     scene->new_object("chair", "chair", 0, glm::vec3(1, 0.5, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/chair.png", false);
     scene->new_object("clock", "circle", 0, glm::vec3(4.49, 2.25, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/clock.png", false);
-    Famas *famas = scene->new_object<Famas>("famas", "famas", player->get_attached_transform(), glm::vec3(1, -0.9, 0.35), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/famas.png", false);
-    scene->new_object("luxary_famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 45, 45), glm::vec3(1, 1, 1), "../textures/luxary_famas.png", false);
+    Famas *famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0.0, 0.0, 0.01), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), "../textures/famas.png", false);
+    Object *luxary_famas = scene->new_object("luxary_famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/luxary_famas.png", false);
     
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
 
-    game.run();
+    while (game.run())
+    {
+        game.update_event();
+
+        luxary_famas->get_attached_transform()->rotate_around(glm::vec3(0, 0, 1), glm::vec3(glfwGetTime() * 90, glfwGetTime() * 90, glfwGetTime() * 90), glm::vec3(1, 0, 0));
+
+        game.update();
+    }
 
     return 0;
 }

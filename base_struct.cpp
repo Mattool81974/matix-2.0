@@ -103,9 +103,9 @@ glm::mat4 Transform_Object::get_model_matrix()
 	matrix = glm::translate(matrix, get_absolute_position());
 
 	// Rotate matrix
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[0]), get_forward());
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[1]), get_up());
-	matrix = glm::rotate(matrix, glm::radians(get_rotation()[2]), get_right());
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[1]), glm::vec3(0, 1, 0));
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[0]), glm::vec3(1, 0, 0));
+	matrix = glm::rotate(matrix, glm::radians(get_rotation()[2]), glm::vec3(0, 0, 1));
 
 	// Scale matrix
 	matrix = glm::scale(matrix, get_scale());
@@ -173,25 +173,25 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation,
 		position_offset[2] = final_position[1] - difference_position[1];
 	}
 
-	std::cout << "Go" << std::endl;
 	// Calculate the angle in a local YZ circle with X angle
-	difference_position = glm::vec2(a_position[1], a_position[0]);
-	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[0] == 1)
+	difference_position = glm::vec2(a_position[0], a_position[2]);
+	if (!(a_position[1] == 0 and a_position[2] == 0) and rotation_multiplier[0] == 1)
 	{
 		// Calculate the angle of the position
-		glm::vec2 difference_normalized = glm::normalize(difference_position);
-		float difference_multiplier_y = difference_position[0] / difference_normalized[0];
-		float difference_multiplier_z = difference_position[1] / difference_normalized[1];
+		float opposite = glm::distance(difference_position, glm::vec2(0, 0));
+		glm::vec2 opposite_normalized = glm::normalize(glm::vec2(a_position[0], a_position[2]));
 
-		float angle = glm::asin(difference_normalized[1] / glm::distance(glm::vec2(0, 0), difference_position)) - glm::radians(33.0);
+		float angle = glm::atan(opposite / glm::abs(a_position[0] - get_position()[0]));
 
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(a_rotation[0]);
-		std::cout << glm::degrees(angle) << " " << final_angle << " " << glm::sin(final_angle) * difference_multiplier_z << " " << difference_multiplier_y << std::endl;
 
 		// Calculate the final position
-		position_offset[1] = glm::sin(final_angle) * difference_multiplier_z;
-		std::cout << position_offset[1] << " " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
+		position_offset[1] = glm::sin(final_angle);
+		position_offset[0] = opposite * glm::sin(opposite_normalized[0]) * glm::cos(final_angle);
+		position_offset[2] = opposite * glm::cos(opposite_normalized[1]) * glm::cos(final_angle);
+		std::cout << "Q " << position_offset[1] << " " << final_angle << " " << angle << " " << glm::abs(a_position[0] - get_position()[0]) << " " << opposite << std::endl;
+		// std::cout << "R " << position_offset[1] << " " << angle << " " << final_angle << " " << glm::asin(final_angle) << " " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
 	}
 }
 

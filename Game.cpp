@@ -91,26 +91,13 @@ Scene* Game::new_scene(std::string name, std::string map_path)
 }
 
 // Run the game by doing multiples call to update
-void Game::run()
+bool Game::run()
 {
-    while (!glfwWindowShouldClose(window))
-    {
-        // Clear OpenGL window
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    bool to_return = glfwWindowShouldClose(window);
 
-        // Update the event
-        update_event();
-
-        // Update game
-        update();
-
-        // Update OpenGL
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
+    if(to_return)
+        glfwTerminate();
+    return !to_return;
 }
 
 // Update one frame of the game
@@ -124,11 +111,19 @@ void Game::update()
     {
         std::cout << "Matrix game : error ! The current scene \"" << get_current_scene_name() << "\" does not exist." << std::endl;
     }
+
+    // Update OpenGL
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }
 
 // Update the event of the game during this frame
 void Game::update_event()
 {
+    // Clear OpenGL window
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Calculate delta time
     set_delta_time(glfwGetTime() - last_frame_time);
     last_frame_time = glfwGetTime();

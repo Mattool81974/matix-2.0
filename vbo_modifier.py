@@ -100,6 +100,30 @@ class Vertice:
         to_return += str(round(self.get_rescaling()[0], 5)) + "f " + str(round(self.get_rescaling()[1], 5)) + "f " + str(round(self.get_rescaling()[2], 5)) + "f"
         return to_return
 
+def form_informations(points: list) -> None:
+    """Print some rotation about a form
+
+    Args:
+        points (list): points to test
+    """
+    max_x = -100
+    minus_x = 100
+    max_y = -100
+    minus_y = 100
+    max_z = -100
+    minus_z = 100
+    for point in points:
+        position = point.get_point()
+        if position[0] < minus_x: minus_x = position[0]
+        if position[0] > max_x: max_x = position[0]
+        if position[1] < minus_y: minus_y = position[1]
+        if position[1] > max_y: max_y = position[1]
+        if position[2] < minus_z: minus_z = position[2]
+        if position[2] > max_z: max_z = position[2]
+
+    print("Informations : ")
+    print("Minus/max x :", minus_x, max_x, "| minus/max y :", minus_y, max_y, "| minus/max z:", minus_z, max_z)
+
 def rotate(points: list, rotation: tuple) -> list:
     """Take a list of point and rotate it
     """
@@ -117,6 +141,14 @@ def rotate(points: list, rotation: tuple) -> list:
 
             point.set_point(final_position)
 
+def translate(points: list, translation: tuple) -> list:
+    """Take a list of point and translate it
+    """
+    for point in points:
+        difference_position = point.get_point()
+
+        point.set_point((difference_position[0] + translation[0], difference_position[1] + translation[1], difference_position[2] + translation[2]))
+
 def get_data(vertices: list, indices: list) -> list:
     """Return a list of vertices ordered by indices
 
@@ -133,13 +165,12 @@ def get_data(vertices: list, indices: list) -> list:
             data.append(vertices[indice])
     return data
                     
-def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (1/3, 0)], face_size = [(1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4)], position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> str:
+def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (1/3, 0)], face_size = [(1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4), (1/3, 1/4)], position: tuple = (0, 0, 0), scale: tuple = (1, 1, 1)) -> list:
     """Return the data for a cube
 
     Returns:
         list: data for a cube
     """
-    to_return = ""
     vertices = [(-0.5, -0.5, 0.5), (0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5),
                 (-0.5, 0.5, -0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (0.5, 0.5, -0.5)]
     for v in range(len(vertices)):
@@ -218,10 +249,7 @@ def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (
 
             final_vertices.append(Vertice(part_vertices, vertices_rescaling[i], (initial_pos[0] + local_pos[0], initial_pos[1] + local_pos[1]), (initial_pos[0], initial_pos[1], size[0], size[1]), vertices_unchanged[i][g]))
     
-    for v in final_vertices:
-        to_return += v.to_string() + " "
-
-    return to_return[:-1]
+    return final_vertices
 
 def points_polygon(diagonal: float, edge: int = 4, position: tuple = (0, 0, 0)) -> list:
     """Return a list of the point into a polygon
@@ -449,24 +477,28 @@ class VBO_Constructor:
     def __init__(self) -> None:
         """Create an easy VBO constructor
         """
-        self.content = ""
+        self.vertices = []
 
-    def add_content(self, content: str) -> None:
+    def add_content(self, vertices: str) -> None:
         """Add content to the constructor
 
         Args:
             parts (list): form to add
         """
-        if self.content != "" and self.content[-1] != " ": self.content += " "
-        self.content += content
+        self.vertices += vertices
 
-    def get_content(self) -> str:
-        """Return the content into the constructor
+    def get_vertices(self) -> str:
+        """Return the vertices into the constructor
 
         Returns:
-            str: content into the constructor
+            list: content into the constructor
         """
-        return self.content
+        return self.vertices
+    
+    def informations(self) -> None:
+        """Gives informations about the VBO
+        """
+        form_informations(self.get_vertices())
     
     def save(self, path: str) -> None:
         """Save the vbo into a file
@@ -474,8 +506,12 @@ class VBO_Constructor:
         Args:
             path (str): file where to save the vbo
         """
+        content = ""
+        for i in self.get_vertices():
+            content += i.to_string() + " "
+
         file = open(path, "w")
-        file.write(self.get_content())
+        file.write(content[:-1])
         file.close()
 
 def construct_chair() -> None:
@@ -531,6 +567,9 @@ def construct_famas() -> None:
     gun_length = 93
     gun_width = width / 3
     constructor.add_content(cube(face_pos = [(140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1])], face_size = [(50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1])], position = (0, breech_y / 190, (breech_x - (breech_width / 2 + gun_length / 2)) / 523), scale = (gun_width, gun_width, gun_length / 523)))
+    
+    translate(constructor.get_vertices(), (0, -(0.4210526315789474 + (0.8605263157894736 - 0.4210526315789474) / 2), -0.5))
+    constructor.informations()
     constructor.save("vbos/famas.vbo")
 
 def construct_polygon(diagonal: float, edge: int = 4) -> None:
@@ -568,4 +607,4 @@ def construct_table() -> None:
     constructor.add_content(cube(face_pos = [(10/11, 0), (10/11, 0), (10/11, 0), (10/11, 0), (10/11, 10/21), (10/11, 10/21)], face_size = [(1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 1/21), (1/11, 1/21)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-construct_shell()
+construct_famas()

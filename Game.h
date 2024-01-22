@@ -24,7 +24,7 @@ public:
 	void add_scene(std::string name, Scene* scene); // Add an existing scene to the game
 	bool contains_scene(std::string name); // Returns if the game contains a scene
 	Scene* new_scene(std::string name, std::string map_path = ""); // Create a scene into the game and return it
-	void run(); // Run the game by doing multiples call to update
+	bool run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game
 	void update_event(); // Update the event of the game during this frame
 	~Game(); // Game destructor
