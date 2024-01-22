@@ -28,12 +28,20 @@ public:
 	~Transform_Object(); // Transform_Object destructor
 
 	// Getters
-	inline glm::vec3 get_absolute_position() { if (get_parent() != 0) { return get_parent()->get_absolute_position() + get_position() + position_offset; } return get_position() + position_offset; };
+	inline glm::vec3 get_absolute_position()
+	{
+		if (get_parent() != 0)
+		{
+			return get_parent()->get_absolute_position() + (get_position()) + position_offset;
+		}
+		return (get_position()) + position_offset;
+	};
+	inline glm::vec3 get_anchored_position() { return anchored_position; };
 	inline std::vector<Transform_Object*> *get_children() { return &children; };
 	inline glm::vec3 get_forward() { return forward; };
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
-	inline short get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
+	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
 	inline glm::vec3 get_position() { return position; };
 	inline glm::vec3 get_right() { return right; };
 	inline glm::vec3 get_rotation() { return rotation; };
@@ -41,8 +49,9 @@ public:
 	inline glm::vec3 get_up() { return up; };
 
 	// Setters
+	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position; };
 	inline void set_parent(Transform_Object* new_parent) { if (get_parent() != 0) { get_parent()->remove_child(this); } parent = new_parent; if (new_parent != 0) { new_parent->get_children()->push_back(this); } };
-	inline void set_parent_rotation_multiplier(short a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
+	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
 	inline void set_position(glm::vec3 new_position) { position = new_position; };
 	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
@@ -52,13 +61,14 @@ protected:
 private:
 	std::vector<Transform_Object*> children = std::vector<Transform_Object*>(); // List of all the children of the object
 	Transform_Object* parent = 0; // Pointer to the parent of the object
-	short parent_rotation_multiplier = -1; // Multiplier to apply to a rotation coming from a parent
 
 	glm::vec3 forward = glm::vec3(1.0f, 0.0f, 0.0f); // Forward vector of the object
 	glm::vec3 right = glm::vec3(0.0f, 0.0f, 1.0f); // Right vector for the object
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up vector for the object
 
+	glm::vec3 anchored_position = glm::vec3(0.0f, 0.0f, 0.0f); // Base position of the object
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f); // Movement of the object
+	glm::vec3 parent_rotation_multiplier = glm::vec3(1.0f, 1.0f, 1.0f); // Multiplier to apply to a rotation coming from a parent
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the object
 	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // Rotation of the object
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f); // Scale of the object
