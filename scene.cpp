@@ -117,6 +117,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -128,6 +130,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -139,6 +143,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 		}
@@ -153,6 +159,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -164,6 +172,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -175,6 +185,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 		}
@@ -189,6 +201,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -200,6 +214,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -211,6 +227,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[2] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 		}
@@ -225,6 +243,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -236,6 +256,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 
@@ -247,6 +269,8 @@ void Physic_Scene::check_collisions()
 					glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
 					new_movement[0] = 0;
 					object->get_attached_transform()->set_movement(new_movement);
+					object->get_collisions()->push_back(Collision_Result(object, collide_object));
+					collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
 				}
 			}
 		}
@@ -328,6 +352,10 @@ void Scene::destroy(std::string name)
 	{
 		if (it->first == name) // Verify each object name (first element of map)
 		{
+			for (int i = 0; i < to_destroy.size(); i++) // Check if to_destroy contains the object
+			{
+				if (to_destroy[i] == it) { return; }
+			}
 			to_destroy.push_back(it);
 			return;
 		}
@@ -374,6 +402,7 @@ void Scene::load_from_map(std::string map)
 					std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
 					Object *object = new_object<Object>(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), true, part->get_texture_path()); // Create the object
+					object->set_map_pos(glm::vec2(x, z));
 					objects_map[x][z] = object;
 				}
 			}
@@ -429,6 +458,11 @@ void Scene::update()
 
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
+		it->second->late_update(); // Late update every objects
+	}
+
+	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
 		it->second->get_attached_transform()->soft_reset(); // Reset every objects
 	}
 
@@ -438,11 +472,15 @@ void Scene::update()
 		get_graphic_scene()->render();
 	}
 
-	for (int i = 0; i < get_to_destroy()->size(); i++)
+	for (int i = 0; i < get_to_destroy()->size(); i++) // Destroyed all needed objects
 	{
 		std::map<std::string, Object*>::iterator it = (*get_to_destroy())[i];
-		delete it->second;
-		it->second = 0;
+		if (it->second != 0)
+		{
+			if (it->second->get_map_pos()[0] != -1) { (*get_objects_map())[it->second->get_map_pos()[0]][it->second->get_map_pos()[1]] = 0; }
+			delete it->second;
+			it->second = 0;
+		}
 		objects_to_update->erase(it);
 	}
 	get_to_destroy()->clear();

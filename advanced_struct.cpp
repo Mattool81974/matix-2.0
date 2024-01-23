@@ -155,6 +155,24 @@ Advanced_Struct::~Advanced_Struct()
 	}
 }
 
+// Clossion_Result constructor
+Collision_Result::Collision_Result(void* a_object1, void* a_object2) : object1(a_object1), object2(a_object2)
+{
+
+}
+
+// Collision_Result copy constructor
+Collision_Result::Collision_Result(const Collision_Result& copy) : Collision_Result(copy.object1, copy.object2)
+{
+
+}
+
+// Collision_Result destructor
+Collision_Result::~Collision_Result()
+{
+
+}
+
 // Object constructor
 Object::Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), name(a_name), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name)
 {

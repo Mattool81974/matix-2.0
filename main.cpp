@@ -6,6 +6,7 @@ class Ammo : public Object
     // Class representing an Ammo
 public:
     Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
+    void late_update(); // Late update the ammo
     void update(); // Update the ammo
     ~Ammo(); // Ammo destructor
 private:
@@ -38,6 +39,29 @@ Ammo::Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a
 {
     game = (Game*)get_game_struct();
     creation_time = glfwGetTime();
+}
+
+// Late update the ammo
+void Ammo::late_update()
+{
+    if (get_collisions()->size() > 0)
+    {
+        Scene* scene = (*game->get_scenes())[get_scene_name()];
+        scene->destroy(get_name());
+        for (int i = 0; i < get_collisions()->size(); i++)
+        {
+            Object* object1 = ((Object*)(*get_collisions())[i].get_object1());
+            Object* object2 = ((Object*)(*get_collisions())[i].get_object2());
+            if (object1 == this)
+            {
+                scene->destroy(object2->get_name());
+            }
+            else
+            {
+                scene->destroy(object1->get_name());
+            }
+        }
+    }
 }
 
 // Update the ammo

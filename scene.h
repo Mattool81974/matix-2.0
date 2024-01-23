@@ -75,6 +75,7 @@ public:
 	inline std::string get_name() { return name; };
 	inline Object* get_object(std::string name) { if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\": error : The object \"" << name << "\" you want to access does not exist." << std::endl; return 0; } return (*get_objects())[name]; };
 	inline std::map<std::string, Object*> *get_objects() { return &objects; };
+	inline std::vector<std::vector<Object*>>* get_objects_map() { return &objects_map; };
 	inline Physic_Scene* get_physic_scene() { return physic_scene; };
 	inline std::vector<std::map<std::string, Object*>::iterator>* get_to_destroy() { return &to_destroy; };
 	inline bool use_graphic() { return graphic; };
