@@ -141,6 +141,14 @@ def rotate(points: list, rotation: tuple) -> list:
 
             point.set_point(final_position)
 
+def scale(points: list, scaling: tuple) -> list:
+    """Take a list of point and scale it
+    """
+    for point in points:
+        difference_position = point.get_point()
+
+        point.set_point((difference_position[0] * scaling[0], difference_position[1] * scaling[1], difference_position[2] * scaling[2]))
+
 def translate(points: list, translation: tuple) -> list:
     """Take a list of point and translate it
     """
@@ -569,6 +577,7 @@ def construct_famas() -> None:
     constructor.add_content(cube(face_pos = [(140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (140/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1]), (38/texture_size[0], 142/texture_size[1])], face_size = [(50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (50/texture_size[0], 50/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1]), (102/texture_size[0], 20/texture_size[1])], position = (0, breech_y / 190, (breech_x - (breech_width / 2 + gun_length / 2)) / 523), scale = (gun_width, gun_width, gun_length / 523)))
     
     translate(constructor.get_vertices(), (0, -(0.4210526315789474 + (0.8605263157894736 - 0.4210526315789474) / 2), -0.5))
+    scale(constructor.get_vertices(), (0.5, 0.5, 0.5))
     constructor.informations()
     constructor.save("vbos/famas.vbo")
 
