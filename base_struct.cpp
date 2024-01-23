@@ -180,16 +180,21 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation,
 	if (!(a_position[0] == 0 and a_position[2] == 0) and rotation_multiplier[0] == 1)
 	{
 		// Calculate the angle of the position
-		float opposite = glm::distance(difference_position, glm::vec2(0, 0));
+		float adjacent = glm::distance(difference_position, glm::vec2(0, 0));
+		float hypothenus = glm::distance(glm::vec3(difference_position[0], a_position[1] - get_position()[1], difference_position[1]), glm::vec3(0, 0, 0));
 		glm::vec2 opposite_normalized = glm::normalize(difference_position);
 
-		float angle = 0;
+		float angle = glm::acos(adjacent / hypothenus);
+		if (a_position[1] - get_position()[1] < 0)
+		{
+			angle = 3.1415 * 2 - glm::acos(adjacent / hypothenus);
+		}
 
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(a_rotation[0]);
 
 		// Calculate the final position
-		position_offset[1] += glm::sin(final_angle) * opposite;
+		position_offset[1] = glm::sin(final_angle) * hypothenus;
 		position_offset[0] *= -glm::cos(final_angle);
 		position_offset[2] *= -glm::cos(final_angle);
 	}
@@ -218,7 +223,7 @@ Camera::Camera(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale): T
 glm::mat4 Camera::get_projection(int window_height, int window_width)
 {
 	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(glm::radians(45.0f), float(window_width) / float(window_height), 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(get_fov()), float(window_width) / float(window_height), 0.1f, 100.0f);
 
 	return projection;
 }

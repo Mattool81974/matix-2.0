@@ -22,11 +22,13 @@ public:
     Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Famas constructor
     void shoot(); // Shoot with the famas
     void update(); // Update the famas
+    void zoom(); // Apply a zoom to shoot
     ~Famas(); // Famas destructor
 private:
     unsigned short ammo_by_second = 6;
     unsigned int ammo_shooted = 0;
     float last_ammo_shooted = 0;
+    unsigned short zoom_state = 0;
 
     Game* game = 0;
 };
@@ -96,6 +98,28 @@ void Famas::update()
             shoot();
         }
     }
+    
+    if (get_game_struct()->get_right_mouse_button_state()) // If the right button is pressed
+    {
+        zoom();
+    }
+}
+
+// Apply a zoom to the famas
+void Famas::zoom()
+{
+    if (zoom_state == 0)
+    {
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.0, -0.275f, -0.5));
+        get_game_struct()->get_camera()->set_fov(30.0f);
+        zoom_state = 1;
+    }
+    else
+    {
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.35, -0.25f, -0.5));
+        get_game_struct()->get_camera()->set_fov(45.0f);
+        zoom_state = 0;
+    }
 }
 
 // Famas destructor
@@ -131,7 +155,7 @@ int main()
     
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
-    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.25f, -1));
+    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.35, -0.25f, -0.5));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
 
     while (game.run())

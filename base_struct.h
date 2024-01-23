@@ -87,6 +87,7 @@ public:
 	// Getter
 	inline float get_fov() { return fov; };
 	inline float get_sensitivity() { return sensitivity; };
+	inline void set_fov(float a_fov) { fov = a_fov; };
 private:
 	float fov = 45.0f; // Fov of the camera
 	float sensitivity = 30; // Sensitivity of the camera
