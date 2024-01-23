@@ -80,16 +80,48 @@ Graphic_Scene::~Graphic_Scene()
 }
 
 // Physic_Scene constructor
-Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects): game_struct(a_game_struct), name(a_name), objects(a_objects)
+Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<Object*>>& a_objects_map): game_struct(a_game_struct), name(a_name), objects(a_objects), objects_map(a_objects_map)
 {
 
 }
 
+// Check the collisions in the system
+void Physic_Scene::check_collisions()
+{
+	std::vector<Object*> dynamic_objects = std::vector<Object*>();
+	for (std::map<std::string, Object*>::iterator it = get_objects()->begin(); it != get_objects()->end(); it++)
+	{
+		if (it->second->use_physic() && !it->second->get_attached_physic_object()->is_static() && it->second->get_attached_physic_object()->use_collision())
+		{
+			dynamic_objects.push_back(it->second);
+		}
+	}
+
+	for (int i = 0; i < dynamic_objects.size(); i++)
+	{
+		Object* object = dynamic_objects[i];
+		glm::vec2 pos = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f + object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_position()[2] + 0.5f + object->get_attached_transform()->get_movement()[1]); // Calculate max and min pos
+		glm::vec2 max_pos = glm::vec2(glm::floor(pos[0] + object->get_attached_physic_object()->get_collision()->get_width() / 2), glm::floor(pos[1] + object->get_attached_physic_object()->get_collision()->get_width() / 2));
+		glm::vec2 min_pos = glm::vec2(glm::floor(pos[0] - object->get_attached_physic_object()->get_collision()->get_width() / 2), glm::floor(pos[1] - object->get_attached_physic_object()->get_collision()->get_width() / 2));
+		
+		if (max_pos[0] >= 0 and max_pos[0] < get_objects_map()->size() and max_pos[1] >= 0 and max_pos[1] < (*get_objects_map())[max_pos[0]].size()) // Check max position collision
+		{
+			std::cout << "G " << max_pos[0] << " " << max_pos[1] << " " << (*get_objects_map())[max_pos[0]][max_pos[1]] << std::endl;
+			if ((*get_objects_map())[max_pos[0]][max_pos[1]] != 0)
+			{
+				Object* collide_object = (*get_objects_map())[max_pos[0]][max_pos[1]];
+				std::cout << collide_object->get_attached_transform()->get_position()[0] << " " << collide_object->get_attached_transform()->get_position()[1] << " " << collide_object->get_attached_transform()->get_position()[2] << " " << std::endl;
+				object->get_attached_transform()->set_movement(glm::vec3(0, 0, 0));
+			}
+		}
+	}
+}
+
 // Create a new object into the scene and return it
-Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& transform)
+Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& transform, bool static_object)
 {
 	// Create and add the object
-	Physic_Object* object = new Physic_Object(get_game_struct(), transform);
+	Physic_Object* object = new Physic_Object(get_game_struct(), transform, static_object);
 	return object;
 }
 
@@ -104,6 +136,7 @@ void Physic_Scene::update()
 			it->second->get_attached_physic_object()->update(); // Update each object one by one
 		}
 	}
+	check_collisions();
 }
 
 // Physic_Scene destructor
@@ -122,7 +155,7 @@ Scene::Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_m
 
 	if (use_physic())
 	{
-		physic_scene = new Physic_Scene(get_game_struct(), get_name(), objects); // If use physic, construct a physic scene
+		physic_scene = new Physic_Scene(get_game_struct(), get_name(), objects, objects_map); // If use physic, construct a physic scene
 	}
 
 	if (a_map_path != "")
@@ -168,11 +201,24 @@ void Scene::destroy(std::string name)
 // Load the scene from a map
 void Scene::load_from_map(std::string map)
 {
+	// Reset the scene map
+	objects_map.clear();
+
 	std::vector<std::string> lines = cut_string(map, "\n");
 
 	std::vector<std::string> first_line = cut_string(lines[0], ";");
 	unsigned short width = std::stoi(first_line[0]); // Get the size of the map
 	unsigned short height = std::stoi(first_line[0]);
+
+	for (int i = 0; i < width; i++) // Full the map with 0
+	{
+		std::vector<Object*> line = std::vector<Object*>();
+		for (int j = 0; j < height; j++)
+		{
+			line.push_back(0);
+		}
+		objects_map.push_back(line);
+	}
 
 	for (int i = 0; i < height; i++)
 	{
@@ -191,7 +237,8 @@ void Scene::load_from_map(std::string map)
 
 					std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
-					new_object<Object>(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), part->get_texture_path()); // Create the object
+					Object *object = new_object<Object>(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), true, part->get_texture_path()); // Create the object
+					objects_map[x][z] = object;
 				}
 			}
 		}

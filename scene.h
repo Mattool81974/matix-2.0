@@ -35,8 +35,9 @@ class Physic_Scene
 {
 	// Class representing a collection of physic object
 public:
-	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects); // Physic_Scene constructor
-	Physic_Object* new_object(std::string name, Transform_Object& transform); // Create a new object into the scene and return it
+	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<Object*>>& a_objects_map); // Physic_Scene constructor
+	void check_collisions(); // Check the collisions in the system
+	Physic_Object* new_object(std::string name, Transform_Object& transform, bool static_object = true); // Create a new object into the scene and return it
 	void update(); // Update the objects in the scene
 	~Physic_Scene(); // Physic_Scene destructor
 
@@ -44,11 +45,13 @@ public:
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline std::string get_name() { return name; };
 	inline std::map<std::string, Object*>* get_objects() { return &objects; };
+	inline std::vector<std::vector<Object*>>* get_objects_map() { return &objects_map; };
 private:
 	std::string name; // Name of the scene
 
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	std::map<std::string, Object*>& objects; // Each objects, with their name at key, in the game
+	std::vector<std::vector<Object*>> &objects_map; // Each objects, arranged as a map, in the scene
 };
 
 class Scene: public Transform_Object
@@ -62,7 +65,7 @@ public:
 	void load_from_map(std::string); // Load the scene from a map
 	void load_from_file(std::string map_path); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
-	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true); // Create a new object into the scene and return it
+	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true); // Create a new object into the scene and return it
 	void update(); // Update the scene
 	~Scene(); // Scene destructor
 
@@ -84,13 +87,14 @@ private:
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
+	std::vector<std::vector<Object*>> objects_map = std::vector<std::vector<Object*>>(); // Each objects, arranged as a map, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
 	std::vector<std::map<std::string, Object*>::iterator> to_destroy = std::vector<std::map<std::string, Object*>::iterator>(); // Name of the objects to destroy at the end of the frame
 };
 
 // Create a new object into the scene and return it
 template <class O> // Template for adding a type of object
-O* Scene::new_object(std::string name, std::string type, Transform_Object* parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object)
+O* Scene::new_object(std::string name, std::string type, Transform_Object* parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, bool static_object, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 
@@ -119,7 +123,7 @@ O* Scene::new_object(std::string name, std::string type, Transform_Object* paren
 	Physic_Object* physic_object = 0;
 	if (use_physic() and use_physic_object)
 	{
-		physic_object = get_physic_scene()->new_object(name, *object);
+		physic_object = get_physic_scene()->new_object(name, *object, static_object);
 	}
 	O* final_object = new O(get_game_struct(), name, get_name(), object, graphic_object, physic_object);
 	add_object(name, final_object);
