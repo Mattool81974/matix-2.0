@@ -66,19 +66,20 @@ void Famas::shoot()
     Scene* scene = (*game->get_scenes())[get_scene_name()];
 
     // Calculate ammo transformation
-    glm::vec3 forward = glm::normalize(get_attached_transform()->get_forward());
-    forward = glm::cross(forward, glm::vec3(0, -1, 0));
-    forward = glm::vec3(-forward[0], forward[1], forward[2]);
+    glm::vec3 normalized_forward = glm::normalize(get_attached_transform()->get_forward());
+    glm::vec3 forward = glm::cross(normalized_forward, glm::vec3(0, -1, 0));
+    forward = glm::vec3(-forward[0], normalized_forward[1], forward[2]);
 
     float x_offset = 0.75;
+    float y_offset = 0.8;
     float z_offset = 0.75;
-    glm::vec3 position = get_attached_transform()->get_absolute_position() + glm::vec3(0, 0.0, 0.0) + glm::vec3(x_offset, 0, z_offset) * forward;
+    glm::vec3 position = get_attached_transform()->get_absolute_position() + glm::vec3(0, 0.0, 0.0) + glm::vec3(x_offset, y_offset, z_offset) * forward;
     glm::vec3 rotation = get_attached_transform()->get_rotation() * glm::vec3(-1.0, 1.0, 1.0) + glm::vec3(0, 180, 0);
     glm::vec3 scale = glm::vec3(0.1, 0.1, 0.3);
 
     // Create the ammo
     Ammo *ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, "../textures/shell.png", false);
-    ammo->get_attached_physic_object()->set_velocity(glm::vec3(50, 0, 50) * forward);
+    ammo->get_attached_physic_object()->set_velocity(glm::vec3(50, 50, 50) * forward);
 
     // Update shoot datas
     ammo_shooted += 1;
@@ -130,16 +131,12 @@ int main()
     
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
-    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, -1.0f, -1));
+    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.25f, -1));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
 
     while (game.run())
     {
         game.update_event();
-
-        // luxary_famas->get_attached_transform()->rotate_around(glm::vec3(0, 0, 1), glm::vec3(glfwGetTime() * 90, glfwGetTime() * 90, glfwGetTime() * 90), glm::vec3(1, 0, 0));
-        std::cout << "Pos " << famas->get_attached_transform()->get_absolute_position().x << " " << famas->get_attached_transform()->get_absolute_position().y << " " << famas->get_attached_transform()->get_absolute_position().z << std::endl;
-        std::cout << "Pos 2 " << famas->get_attached_transform()->get_anchored_position().x << " " << famas->get_attached_transform()->get_anchored_position().y << " " << famas->get_attached_transform()->get_anchored_position().z << std::endl;
 
         game.update();
     }

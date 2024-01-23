@@ -174,8 +174,6 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation,
 		// Calculate the final position
 		position_offset[0] = final_position[0];
 		position_offset[2] = final_position[1];
-
-		std::cout << "U " << final_position[0] << " " << final_position[1] << " " << final_angle << " " << position_offset[0] << " " << position_offset[2] << " " << normalized[0] << " " << normalized[1] << std::endl;
 	}
 
 	// Calculate the angle in a local YZ circle with X angle
@@ -185,22 +183,16 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation,
 		float opposite = glm::distance(difference_position, glm::vec2(0, 0));
 		glm::vec2 opposite_normalized = glm::normalize(difference_position);
 
-		float angle = 1 - glm::atan(opposite / glm::abs(a_position[1] - get_position()[1]));
-		if (glm::abs(a_position[1] - get_position()[1]) == 0) { angle = 0; }
+		float angle = 0;
 
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(a_rotation[0]);
 
 		// Calculate the final position
-		position_offset[1] =  glm::sin(final_angle) * opposite;
+		position_offset[1] += glm::sin(final_angle) * opposite;
 		position_offset[0] *= -glm::cos(final_angle);
 		position_offset[2] *= -glm::cos(final_angle);
-		std::cout << "G " << glm::degrees(angle) << " " << glm::degrees(final_angle) << " " << a_position[1] << " " << get_anchored_position()[1] << " " << glm::atan(opposite / glm::abs(a_position[1] - get_position()[1])) << std::endl;
-		//std::cout << "Q " << position_offset[1] << " " << glm::degrees(final_angle) << " " << glm::degrees(angle) << " " << get_anchored_position()[1] << " " << a_position[1] << " " << get_position()[0] << " " << glm::abs(a_position[1] - get_position()[1]) << " " << opposite << " " << std::endl;
-		//std::cout << "R " << position_offset[1] << " " << glm::sin(final_angle) << " " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
 	}
-
-	std::cout << "Ta " << position_offset[0] << " " << position_offset[1] << " " << position_offset[2] << " " << a_position[2] << " " << rotation_multiplier[0] << std::endl;
 }
 
 // Reset softly the object
