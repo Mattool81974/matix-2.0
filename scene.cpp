@@ -29,16 +29,7 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 	}
 
 	// Create or get the texture
-	Texture* texture = 0;
-	if (get_game_struct()->contains_texture(texture_path))
-	{
-		texture = get_game_struct()->get_texture(texture_path);
-	}
-	else
-	{
-		texture = new Texture(texture_path, texture_resize);
-		(*get_game_struct()->get_textures())[texture_path] = texture;
-	}
+	Texture* texture = get_game_struct()->get_texture(texture_path, texture_resize);
 
 	// Create and add the object
 	VAO* vao = (*get_game_struct()->get_all_vaos())[(*get_game_struct()->get_type())[type]];

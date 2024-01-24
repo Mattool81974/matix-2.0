@@ -57,11 +57,12 @@ void Famas::shoot()
     glm::vec3 scale = glm::vec3(0.1, 0.1, 0.3);
 
     // Create the ammo
+    float ammo_speed = 150;
     Ammo* ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, false, "../textures/shell.png", false);
     ammo->get_tags()->push_back("ammo");
     ammo->get_attached_physic_object()->get_collision()->set_height(0.1);
     ammo->get_attached_physic_object()->get_collision()->set_width(0.1);
-    ammo->get_attached_physic_object()->set_velocity(glm::vec3(50, 50, 50) * forward);
+    ammo->get_attached_physic_object()->set_velocity(glm::vec3(ammo_speed, ammo_speed, ammo_speed) * forward);
 
     // Update shoot datas
     ammo_shooted += 1;
@@ -142,6 +143,7 @@ void Target::late_update()
 // Place randomly the target
 void Target::place_randomly()
 {
+    int rand_texture = rand() % get_textures()->size();
     int rand_x = get_min_pos()[0] + (rand() % (int)(get_max_pos()[0] - get_min_pos()[0]));
     float rand_y = rand() % 2;
     int rand_z = get_min_pos()[1] + (rand() % (int)(get_max_pos()[1] - get_min_pos()[1]));
@@ -156,6 +158,7 @@ void Target::place_randomly()
 
     deployed = true;
     set_map_pos(glm::vec2(rand_x, rand_z));
+    get_attached_graphic_object()->set_texture(get_game_struct()->get_texture((*get_textures())[rand_texture]));
     get_attached_transform()->set_position(glm::vec3(rand_x, rand_y, rand_z));
 }
 
@@ -164,7 +167,6 @@ void Target::undeploy()
 {
     if (is_deployed())
     {
-        std::cout << "A" << std::endl;
         deployed = false;
         undeployed_time = glfwGetTime();
     }

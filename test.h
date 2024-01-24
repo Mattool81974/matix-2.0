@@ -51,6 +51,7 @@ public:
     inline float get_bottom_y() { return bottom_y; };
     inline glm::vec2 get_max_pos() { return max_pos; };
     inline glm::vec2 get_min_pos() { return min_pos; };
+    inline std::vector<std::string>* get_textures() { return &textures; };
     inline float get_top_y() { return top_y; };
     inline float get_undeployed_time() { return undeployed_time; };
     inline bool is_deployed() { return deployed; };
@@ -59,10 +60,12 @@ public:
     inline void set_min_pos(glm::vec2 a_min_pos) { min_pos = a_min_pos; };
     inline void set_top_y(float a_y) { top_y = a_y; };
 private:
-    float bottom_y = 0;
-    bool deployed = false;
-    glm::vec2 min_pos = glm::vec2(0, 0);
-    glm::vec2 max_pos = glm::vec2(10, 10);
-    float top_y = 0;
-    float undeployed_time = glfwGetTime();
+    float bottom_y = 0; // Bottom Y pos of the target
+    bool deployed = false; // If the target is deployed or not
+    glm::vec2 min_pos = glm::vec2(0, 0); // Minimum pos of the target
+    glm::vec2 max_pos = glm::vec2(10, 10); // Maximum pos of the target
+    float top_y = 0; // Top Y pos of the target
+    float undeployed_time = glfwGetTime(); // Time at the last undeployement of the target
+
+    std::vector<std::string> textures = std::vector<std::string>(); // Vector of all the possible texture for a target
 };

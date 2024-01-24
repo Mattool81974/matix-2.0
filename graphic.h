@@ -14,6 +14,7 @@ public:
 
 	// Getters and setters
 	inline Base_Struct* get_base_struct() { return base_struct; };
+	inline void set_texture(Texture* a_texture) { texture = a_texture; };
 private:
 	Transform_Object& attached_transform; // Reference to the attached transform object
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game

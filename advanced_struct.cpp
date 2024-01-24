@@ -80,7 +80,7 @@ Part* Advanced_Struct::get_part(unsigned int number)
 }
 
 // Returns a texture in the struct
-Texture* Advanced_Struct::get_texture(std::string texture_path)
+Texture* Advanced_Struct::get_texture(std::string texture_path, bool texture_resize)
 {
 	if (contains_texture(texture_path))
 	{
@@ -88,8 +88,9 @@ Texture* Advanced_Struct::get_texture(std::string texture_path)
 	}
 	else
 	{
-		std::cout << "Matrix game : error ! The texture of path\"" << texture_path << "\" is not loaded." << std::endl;
-		return 0;
+		Texture *texture = new Texture(texture_path, texture_resize);
+		(*get_textures())[texture_path] = texture;
+		return texture;
 	}
 }
 

@@ -42,7 +42,7 @@ public:
 	bool contains_texture(std::string texture_path); // Returns if the struct contains a textures
 	bool contains_vao(std::string type); // Returns if the struct contains a VAO
 	Part* get_part(unsigned int number); // Returns a part
-	Texture* get_texture(std::string texture_path); // Returns a texture in the struct
+	Texture* get_texture(std::string texture_path, bool texture_resize = true); // Returns a texture in the struct
 	void load_VAOs(); // Loads the VAOs in the advanced struct
 	Part new_part(unsigned int number, std::string type, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(0, 0, 0), std::string texture_path = ""); // Create a new part into the struct and return it
 	VAO* new_vao(std::string path, std::string type, std::string shader_path = "../shaders/default"); // Create a new VAO into the game

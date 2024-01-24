@@ -205,11 +205,11 @@ def perfect_texture(path):
     img1.rectangle(((rectangle_width, 500 - offset), (500 + rectangle_width, 500 + rectangle_width)), fill ="grey")"""
     img.save(path)
 
-#create_cube("textures/locker_dir", "textures/locker.png")
+create_cube("textures/target_dir", "textures/target5.png")
 #create_cube("textures/computer_dir", "textures/computer.png")
 #create_chair("textures/table_dir", "textures/table.png")
 #create_chair("textures/chair_dir", "textures/chair.png")
 #create_cylinder("textures/ammo_dir", "textures/ammo.png")
 #create_famas("textures/famas_dir", "textures/famas.png")
 #create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
-create_shell("textures/shell_dir", "textures/shell.png")
+#create_shell("textures/shell_dir", "textures/shell.png")
