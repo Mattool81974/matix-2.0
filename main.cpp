@@ -159,7 +159,7 @@ int main()
     game.set_current_scene("shooting_range");
 
     // Construct objects for testing
-    Object *player = scene->new_object("player", "player", 0, glm::vec3(2, 1.5, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+    Object *player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
     scene->new_object("sol", "square", 0, glm::vec3(6, 0, 26), glm::vec3(90, 0, 0), glm::vec3(12, 52, 1), true, "../textures/floor.png");
     // scene->new_object("locker", "cube", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 2, 1), true, "../textures/locker.png", false);
     // scene->new_object("table", "table", 0, glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/table.png", false);
@@ -171,6 +171,7 @@ int main()
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
+    camera->set_position(glm::vec3(0, 0.75, 0));
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
     player->get_attached_physic_object()->get_collision()->set_height(2);

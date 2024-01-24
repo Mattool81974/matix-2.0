@@ -190,14 +190,14 @@ Collision_Result Object::collides_with(Object *object)
 	float y = get_attached_transform()->get_absolute_position()[1];
 	if (object_y < y)
 	{
-		if (y - height > object_y + height)
+		if (y - height > object_y + object_height)
 		{
 			result.set_colliding(false);
 		}
 	}
 	else
 	{
-		if (y + height < object_y - height)
+		if (y + height < object_y - object_height)
 		{
 			result.set_colliding(false);
 		}
