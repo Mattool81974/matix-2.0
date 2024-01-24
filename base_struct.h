@@ -10,12 +10,28 @@
 std::vector<std::string> cut_string(std::string string, std::string cut); // Cut a string where there are the "cut"
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 
+struct Transform_Animation {
+	// Class representing a transform object animation
+	glm::vec3 base_position = glm::vec3(0, 0, 0);
+	glm::vec3 base_rotation = glm::vec3(0, 0, 0);
+	glm::vec3 base_scale = glm::vec3(1, 1, 1);
+
+	float duration = 0;
+
+	glm::vec3 final_position = glm::vec3(0, 0, 0);
+	glm::vec3 final_rotation = glm::vec3(0, 0, 0);
+	glm::vec3 final_scale = glm::vec3(1, 1, 1);
+
+	float state = 0;
+};
+
 class Transform_Object
 {
 	// Class representing a object with a transform value
 public:
 	Transform_Object(Transform_Object* a_parent = 0, glm::vec3 a_position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_rotation = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_scale = glm::vec3(1.0f, 1.0f, 1.0f)); // Transform_Object contructor
 	Transform_Object(const Transform_Object &copy); // Transform_Object copy constructor
+	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale);
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
@@ -24,7 +40,8 @@ public:
 	virtual void rotate(glm::vec3 a_rotation); // Rotate the object
 	void rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier); // Rotate the object around a point with eulers angle
 	void soft_reset(); // Reset softly the object
-	virtual void update() {}; // Update the object
+	virtual void update() { update_animation(); }; // Update the object
+	void update_animation(); // Update the animations for the object
 	~Transform_Object(); // Transform_Object destructor
 
 	// Getters
@@ -37,6 +54,7 @@ public:
 		return (get_position()) + position_offset;
 	};
 	inline glm::vec3 get_anchored_position() { return anchored_position; };
+	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
 	inline std::vector<Transform_Object*> *get_children() { return &children; };
 	inline glm::vec3 get_forward() { return forward; };
 	inline glm::vec3 get_movement() { return movement; };
@@ -48,6 +66,7 @@ public:
 	inline glm::vec3 get_rotation() { return rotation; };
 	inline glm::vec3 get_scale() { return scale; };
 	inline glm::vec3 get_up() { return up; };
+	inline bool is_animation_playing() { return animation_playing; };
 
 	// Setters
 	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position; };
@@ -58,9 +77,14 @@ public:
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
 	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };
+	inline void start_animation() { animation_playing = true; };
+	inline void stop_animation() { animation_playing = false; };
 protected:
 	glm::vec3 position_offset = glm::vec3(0.0f, 0.0f, 0.0f); // Offset position of the object
 private:
+	bool animation_playing = false; // If the animation is playing or not
+	std::vector<Transform_Animation> animations = std::vector<Transform_Animation>(); // List of all the animations in the object
+
 	std::vector<Transform_Object*> children = std::vector<Transform_Object*>(); // List of all the children of the object
 	Transform_Object* parent = 0; // Pointer to the parent of the object
 

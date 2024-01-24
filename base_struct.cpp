@@ -82,6 +82,26 @@ Transform_Object::Transform_Object(const Transform_Object& copy): Transform_Obje
 
 }
 
+// Add an animation to the object
+void Transform_Object::add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale)
+{
+	add_animation(duration, get_position(), get_rotation(), get_scale(), final_position, final_rotation, final_scale);
+}
+
+// Add an animation to the object with the base position
+void Transform_Object::add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale)
+{
+	Transform_Animation animation;
+	animation.base_position = base_position;
+	animation.base_rotation = base_rotation;
+	animation.base_scale = base_scale;
+	animation.duration = duration;
+	animation.final_position = final_position;
+	animation.final_rotation = final_rotation;
+	animation.final_scale = final_scale;
+	(*get_animations()).push_back(animation);
+}
+
 // Calculate the direction vector of the transform object
 void Transform_Object::calculate_direction()
 {
@@ -205,6 +225,15 @@ void Transform_Object::soft_reset()
 {
 	set_position(get_position() + get_movement());
 	set_movement(glm::vec3(0.0, 0.0, 0.0));
+}
+
+// Update the animation for this transform object
+void Transform_Object::update_animation()
+{
+	if (is_animation_playing() && get_animations()->size() > 0)
+	{
+		Transform_Animation animation = (*get_animations())[0];
+	}
 }
 
 // Transform_Object destructor
