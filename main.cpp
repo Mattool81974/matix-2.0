@@ -34,11 +34,11 @@ int main()
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
     player->get_attached_transform()->set_position_move_multipler(glm::vec3(1, 0, 1));
-    target1->get_textures()->push_back("../textures/target1.png");
-    target1->get_textures()->push_back("../textures/target2.png");
-    target1->get_textures()->push_back("../textures/target3.png");
-    target1->get_textures()->push_back("../textures/target4.png");
-    target1->get_textures()->push_back("../textures/target5.png");
+    target1->get_textures()->push_back("../textures/target/target1.png");
+    target1->get_textures()->push_back("../textures/target/target2.png");
+    target1->get_textures()->push_back("../textures/target/target3.png");
+    target1->get_textures()->push_back("../textures/target/target4.png");
+    target1->get_textures()->push_back("../textures/target/target5.png");
     target1->set_max_pos(glm::vec2(11, 51));
     target1->set_min_pos(glm::vec2(1, 20));
     target1->set_bottom_y(0.5);
