@@ -87,19 +87,22 @@ class Object
 public:
 	Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
 	virtual Collision_Result collides_with(Object* object); // Returns if the object collides with an other object
-	virtual void late_update() { get_collisions()->clear(); }; // Update the object after physic modification
+	virtual void late_update() { get_collisions()->clear(); last_map_pos = map_pos; }; // Update the object after physic modification
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
 
 	// Getters and setters
+	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
 	inline std::vector<Collision_Result>* get_collisions() { return &collisions; };
+	inline glm::vec2 get_last_map_pos() { return last_map_pos; };
 	inline glm::vec2 get_map_pos() { return map_pos; };
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
+	inline std::vector<std::string>* get_tags() { return &tags; };
 	inline void set_map_pos(glm::vec2 a_map_pos) { map_pos = a_map_pos; };
 	inline bool use_graphic() { return get_attached_graphic_object() != 0; };
 	inline bool use_physic() { return get_attached_physic_object() != 0; };
@@ -112,5 +115,7 @@ private:
 	Transform_Object* attached_transform = 0; // Transform object attached
 	std::vector<Collision_Result> collisions = std::vector<Collision_Result>(); // Collisions during this frame
 	Advanced_Struct* game_struct = 0; // Base struct in the game
+	glm::vec2 last_map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
 	glm::vec2 map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
+	std::vector<std::string> tags = std::vector<std::string>(); // Tags about the object
 };

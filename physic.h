@@ -36,6 +36,7 @@ public:
 	inline Collision* get_collision() { return &collision; };
 	inline glm::vec3 get_velocity() { return velocity; };
 	inline bool is_static() { return static_object; };
+	inline void set_use_collision(bool a_use_collision) { is_using_collision = a_use_collision; };
 	inline void set_velocity(glm::vec3 a_velocity) { velocity = a_velocity; };
 	inline bool use_collision() { return is_using_collision; };
 private:

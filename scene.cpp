@@ -497,6 +497,23 @@ void Scene::update()
 	{
 		it->second->update(); // Update every objects
 		it->second->get_attached_transform()->update(); // Update every transform objects
+
+		glm::vec2 last_map_pos = it->second->get_last_map_pos();
+		glm::vec2 map_pos = it->second->get_map_pos();
+		if (map_pos[0] != -1 && map_pos[1] != -1)
+		{
+			if ((*get_objects_map())[map_pos[0]][map_pos[1]] != it->second)
+			{
+				(*get_objects_map())[map_pos[0]][map_pos[1]] = it->second;
+				if (last_map_pos[0] != -1 && last_map_pos[1] != -1)
+				{
+					if ((*get_objects_map())[last_map_pos[0]][last_map_pos[1]] == it->second)
+					{
+						(*get_objects_map())[last_map_pos[0]][last_map_pos[1]] = 0;
+					}
+				}
+			}
+		}
 	}
 
 	if (use_physic())

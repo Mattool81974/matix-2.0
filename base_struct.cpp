@@ -116,7 +116,7 @@ glm::mat4 Transform_Object::get_model_matrix()
 // Move the object
 void Transform_Object::move(glm::vec3 a_movement)
 {
-	movement = get_movement() + a_movement;
+	movement = get_movement() + a_movement * get_position_move_multiplier();
 }
 
 // Remove an object from the children
