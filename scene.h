@@ -125,6 +125,7 @@ O* Scene::new_object(std::string name, std::string type, Transform_Object* paren
 	if (use_physic() and use_physic_object)
 	{
 		physic_object = get_physic_scene()->new_object(name, *object, static_object);
+		physic_object->get_collision()->set_height(scale[1] / 2.0);
 	}
 	O* final_object = new O(get_game_struct(), name, get_name(), object, graphic_object, physic_object);
 	add_object(name, final_object);

@@ -164,7 +164,7 @@ Collision_Result::Collision_Result(void* a_object1, void* a_object2) : object1(a
 // Collision_Result copy constructor
 Collision_Result::Collision_Result(const Collision_Result& copy) : Collision_Result(copy.object1, copy.object2)
 {
-
+	collide = copy.collide;
 }
 
 // Collision_Result destructor
@@ -177,6 +177,33 @@ Collision_Result::~Collision_Result()
 Object::Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), name(a_name), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name)
 {
 
+}
+
+// Returns if the object collides with an other object
+Collision_Result Object::collides_with(Object *object)
+{
+	Collision_Result result(this, object);
+
+	float object_height = object->get_attached_physic_object()->get_collision()->get_height() / 2.0; // Calculate if the objects collides on the Y axis
+	float object_y = object->get_attached_transform()->get_absolute_position()[1];
+	float height = get_attached_physic_object()->get_collision()->get_height() / 2.0;
+	float y = get_attached_transform()->get_absolute_position()[1];
+	if (object_y < y)
+	{
+		if (y - height > object_y + height)
+		{
+			result.set_colliding(false);
+		}
+	}
+	else
+	{
+		if (y + height < object_y - height)
+		{
+			result.set_colliding(false);
+		}
+	}
+
+	return result;
 }
 
 // Object destructor

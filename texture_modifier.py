@@ -1,3 +1,7 @@
+# texture_modifier.py
+# File used to build complex VBO
+
+# Import librairies
 import math
 import os
 import PIL.ImageDraw as id

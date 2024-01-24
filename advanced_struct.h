@@ -72,9 +72,13 @@ public:
 	// Getters
 	inline void* get_object1() { return object1; };
 	inline void* get_object2() { return object2; };
+	inline bool is_colliding() { return collide; };
+	inline void set_colliding(bool colliding) { collide = colliding; };
 private:
-	void* object1 = 0;
-	void* object2 = 0;
+	bool collide = true; // If the 2 objects are colliding or not
+
+	void* object1 = 0; // Pointer to the first object
+	void* object2 = 0; // Pointer to the second object
 };
 
 class Object
@@ -82,6 +86,7 @@ class Object
 	// Class representing an object into a scene
 public:
 	Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
+	virtual Collision_Result collides_with(Object* object); // Returns if the object collides with an other object
 	virtual void late_update() { get_collisions()->clear(); }; // Update the object after physic modification
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor

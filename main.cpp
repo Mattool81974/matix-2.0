@@ -48,19 +48,6 @@ void Ammo::late_update()
     {
         Scene* scene = (*game->get_scenes())[get_scene_name()];
         scene->destroy(get_name());
-        for (int i = 0; i < get_collisions()->size(); i++)
-        {
-            Object* object1 = ((Object*)(*get_collisions())[i].get_object1());
-            Object* object2 = ((Object*)(*get_collisions())[i].get_object2());
-            if (object1 == this)
-            {
-                scene->destroy(object2->get_name());
-            }
-            else
-            {
-                scene->destroy(object1->get_name());
-            }
-        }
     }
 }
 
@@ -105,6 +92,7 @@ void Famas::shoot()
 
     // Create the ammo
     Ammo *ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, false, "../textures/shell.png", false);
+    ammo->get_attached_physic_object()->get_collision()->set_height(0.1);
     ammo->get_attached_physic_object()->get_collision()->set_width(0.1);
     ammo->get_attached_physic_object()->set_velocity(glm::vec3(50, 50, 50) * forward);
 
@@ -126,8 +114,13 @@ void Famas::update()
     
     if (get_game_struct()->get_right_mouse_button_state()) // If the right button is pressed
     {
-        zoom();
+        zoom_state = 0;
     }
+    else
+    {
+        zoom_state = 1;
+    }
+    zoom();
 }
 
 // Apply a zoom to the famas
@@ -135,15 +128,13 @@ void Famas::zoom()
 {
     if (zoom_state == 0)
     {
-        get_attached_transform()->set_anchored_position(glm::vec3(-0.0, -0.275f, -0.5));
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.0, -0.15f, -0.5));
         get_game_struct()->get_camera()->set_fov(30.0f);
-        zoom_state = 1;
     }
     else
     {
-        get_attached_transform()->set_anchored_position(glm::vec3(-0.35, -0.25f, -0.5));
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
         get_game_struct()->get_camera()->set_fov(45.0f);
-        zoom_state = 0;
     }
 }
 
@@ -160,28 +151,29 @@ int main()
     Camera* camera = game.get_camera();
     game.new_vao("../vbos/famas.vbo", "famas");
     game.new_vao("../vbos/shell.vbo", "ammo");
-    game.new_part(1, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/wall.png");
-    game.new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
+    game.new_part(1, "one_faced_cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/dark_wall.png");
+    game.new_part(2, "table", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/table.png");
 
     // Construct scene
-    Scene* scene = game.new_scene("level0", "../maps/level0.wad");
-    game.set_current_scene("level0");
+    Scene* scene = game.new_scene("shooting_range", "../maps/shooting_range.wad");
+    game.set_current_scene("shooting_range");
 
     // Construct objects for testing
-    Object *player = scene->new_object("player", "player", 0, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
-    // scene->new_object("sol", "square", 0, glm::vec3(12, 0, 12), glm::vec3(90, 0, 0), glm::vec3(25, 25, 1), true, "../textures/floor.png");
+    Object *player = scene->new_object("player", "player", 0, glm::vec3(2, 1.5, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+    scene->new_object("sol", "square", 0, glm::vec3(6, 0, 26), glm::vec3(90, 0, 0), glm::vec3(12, 52, 1), true, "../textures/floor.png");
     // scene->new_object("locker", "cube", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 2, 1), true, "../textures/locker.png", false);
     // scene->new_object("table", "table", 0, glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/table.png", false);
     // scene->new_object("chair", "chair", 0, glm::vec3(1, 0.5, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/chair.png", false);
     // scene->new_object("clock", "circle", 0, glm::vec3(4.49, 2.25, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/clock.png", false);
     Famas *famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
-    Object *luxary_famas = scene->new_object("luxary_famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/luxary_famas.png", false, true, false);
-    scene->new_object("computer", "cube", 0, glm::vec3(1, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/computer.png", false, true, false);
+    // Object *luxary_famas = scene->new_object("luxary_famas", "famas", 0, glm::vec3(0, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/luxary_famas.png", false, true, false);
+    // scene->new_object("computer", "cube", 0, glm::vec3(1, 3, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/computer.png", false, true, false);
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
+    player->get_attached_physic_object()->get_collision()->set_height(2);
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
 
     while (game.run())

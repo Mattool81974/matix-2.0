@@ -2,7 +2,7 @@
 #include "physic.h"
 
 // Collision constructor
-Collision::Collision(unsigned short a_type, unsigned short a_width): type(a_type), width(a_width)
+Collision::Collision(unsigned short a_type, float a_width, float a_height): type(a_type), width(a_width), height(a_height)
 {
 
 }

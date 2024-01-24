@@ -1,4 +1,4 @@
-# vbo_contructor.py
+# vbo_modifier.py
 # File used to build complex VBO
 
 # Import librairies
