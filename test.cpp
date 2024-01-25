@@ -116,6 +116,7 @@ Famas::~Famas()
 Target::Target(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
     get_attached_transform()->set_position(glm::vec3(-1, -1, -1));
+    get_textures()->push_back(get_attached_graphic_object()->get_texture()->get_texture_path());
 }
 
 // Update lately the target
@@ -138,6 +139,13 @@ void Target::late_update()
         }
     }
     Object::late_update();
+}
+
+// Add a texture to the target
+void Target::new_texture(std::string texture)
+{
+    get_textures()->push_back(texture);
+    get_game_struct()->get_texture(texture);
 }
 
 // Place randomly the target

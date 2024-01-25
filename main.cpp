@@ -23,7 +23,7 @@ int main()
     scene->new_object("sol", "square", 0, glm::vec3(6, 0, 26), glm::vec3(90, 0, 0), glm::vec3(12, 52, 1), true, "../textures/floor.png");
     scene->new_object("plafond", "square", 0, glm::vec3(6,3, 26), glm::vec3(90, 0, 0), glm::vec3(12, 52, 1), true, "../textures/floor.png");
     Famas *famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
-    Target* target1 = scene->new_object<Target>("target1", "cube", 0, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/target1.png", false, true, true);
+    Target* target1 = scene->new_object<Target>("target1", "cube", 0, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/target/target1.png", false, true, true);
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
@@ -34,11 +34,10 @@ int main()
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
     player->get_attached_transform()->set_position_move_multipler(glm::vec3(1, 0, 1));
-    target1->get_textures()->push_back("../textures/target/target1.png");
-    target1->get_textures()->push_back("../textures/target/target2.png");
-    target1->get_textures()->push_back("../textures/target/target3.png");
-    target1->get_textures()->push_back("../textures/target/target4.png");
-    target1->get_textures()->push_back("../textures/target/target5.png");
+    target1->new_texture("../textures/target/target2.png");
+    target1->new_texture("../textures/target/target3.png");
+    target1->new_texture("../textures/target/target4.png");
+    target1->new_texture("../textures/target/target5.png");
     target1->set_max_pos(glm::vec2(11, 51));
     target1->set_min_pos(glm::vec2(1, 20));
     target1->set_bottom_y(0.5);

@@ -100,6 +100,7 @@ public:
 	~Texture(); // Texture destructor
 
 	// Getters and setters
+	inline std::string get_texture_path() { return texture_path; };
 	inline bool use_resize() { return resize; };
 private:
 	int height = 0; // Height of the texture

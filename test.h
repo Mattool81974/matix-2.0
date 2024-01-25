@@ -42,6 +42,7 @@ class Target : public Object
 public:
     Target(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Target constructor
     void late_update(); // Update lately the target
+    void new_texture(std::string texture); // Add a texture to the target
     void place_randomly(); // Place randomly the target
     void undeploy(); // Undexploy the target
     void update(); // Update the target

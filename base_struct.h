@@ -31,7 +31,8 @@ class Transform_Object
 public:
 	Transform_Object(Transform_Object* a_parent = 0, glm::vec3 a_position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_rotation = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_scale = glm::vec3(1.0f, 1.0f, 1.0f)); // Transform_Object contructor
 	Transform_Object(const Transform_Object &copy); // Transform_Object copy constructor
-	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale);
+	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object
+	void add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object with base transform
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
