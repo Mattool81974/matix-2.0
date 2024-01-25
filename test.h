@@ -27,11 +27,18 @@ public:
     void update(); // Update the famas
     void zoom(); // Apply a zoom to shoot
     ~Famas(); // Famas destructor
+
+    // Getters and setters
+    inline unsigned short get_ammo_by_second() { return ammo_by_second; };
+    inline float get_step_back_duration() { return step_back_duration; };
+    inline glm::vec3 get_step_back_force() { return step_back_force; };
 private:
-    unsigned short ammo_by_second = 6;
-    unsigned int ammo_shooted = 0;
-    float last_ammo_shooted = 0;
-    unsigned short zoom_state = 0;
+    unsigned short ammo_by_second = 10; // Number of ammo shot by second
+    unsigned int ammo_shooted = 0; // Time when the last ammo was shot
+    float last_ammo_shooted = 0; // Time when the last-last ammo was shot
+    float step_back_duration = 1 / (10 * 2.01); // Duration of a step back
+    glm::vec3 step_back_force = glm::vec3(0, 0, 0.03); // Force of a step back
+    unsigned short zoom_state = 0; // State of zoom of the weapon
 
     Game* game = 0;
 };

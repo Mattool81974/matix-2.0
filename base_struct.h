@@ -22,6 +22,10 @@ struct Transform_Animation {
 	glm::vec3 final_rotation = glm::vec3(0, 0, 0);
 	glm::vec3 final_scale = glm::vec3(1, 1, 1);
 
+	bool modify_position = true;
+	bool modify_rotation = true;
+	bool modify_scale = true;
+
 	float state = 0;
 };
 
@@ -33,6 +37,7 @@ public:
 	Transform_Object(const Transform_Object &copy); // Transform_Object copy constructor
 	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object
 	void add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object with base transform
+	void add_position_animation(float duration, glm::vec3 base_position, glm::vec3 final_position); // Add an animation to the object with the position
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
@@ -50,13 +55,14 @@ public:
 	{
 		if (get_parent() != 0)
 		{
-			return get_parent()->get_absolute_position() + (get_position()) + position_offset;
+			return get_parent()->get_absolute_position() + position_offset;
 		}
-		return (get_position()) + position_offset;
+		return position_offset;
 	};
 	inline glm::vec3 get_anchored_position() { return anchored_position; };
 	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
 	inline std::vector<Transform_Object*> *get_children() { return &children; };
+	inline Transform_Animation* get_current_animation() { if (get_animations()->size() <= 0) return 0; return &((*get_animations())[get_animations()->size() - 1]); };
 	inline glm::vec3 get_forward() { return forward; };
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
@@ -70,11 +76,11 @@ public:
 	inline bool is_animation_playing() { return animation_playing; };
 
 	// Setters
-	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position; };
+	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position + get_position(); };
 	inline void set_parent(Transform_Object* new_parent) { if (get_parent() != 0) { get_parent()->remove_child(this); } parent = new_parent; if (new_parent != 0) { new_parent->get_children()->push_back(this); } };
 	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
-	inline void set_position(glm::vec3 new_position) { position = new_position; };
+	inline void set_position(glm::vec3 new_position) { position_offset -= get_position(); position = new_position; position_offset += get_position(); };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
 	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };

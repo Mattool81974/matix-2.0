@@ -486,6 +486,11 @@ void Scene::update()
 	std::map<std::string, Object *> *objects_to_update = get_objects();
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
+		// Update every animations
+		if (it->second->get_attached_transform()->is_animation_playing() && it->second->get_attached_transform()->get_animations()->size() > 0)
+		{
+			it->second->get_attached_transform()->get_current_animation()->state += get_game_struct()->get_delta_time();
+		}
 		it->second->update(); // Update every objects
 		it->second->get_attached_transform()->update(); // Update every transform objects
 

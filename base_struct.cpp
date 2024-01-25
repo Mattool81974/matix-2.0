@@ -72,6 +72,7 @@ glm::vec3 normalize_rotation(glm::vec3 rotation)
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
+	position_offset = a_position;
 	set_parent(a_parent);
 	calculate_direction();
 }
@@ -99,6 +100,19 @@ void Transform_Object::add_animation(float duration, glm::vec3 base_position, gl
 	animation.final_position = final_position;
 	animation.final_rotation = final_rotation;
 	animation.final_scale = final_scale;
+	(*get_animations()).push_back(animation);
+}
+
+// Add an animation to the object with the position
+void Transform_Object::add_position_animation(float duration, glm::vec3 base_position, glm::vec3 final_position)
+{
+	Transform_Animation animation;
+	animation.base_position = base_position;
+	animation.duration = duration;
+	animation.final_position = final_position;
+	animation.modify_rotation = false;
+	animation.modify_rotation = false;
+	animation.modify_scale = false;
 	(*get_animations()).push_back(animation);
 }
 
@@ -173,7 +187,7 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 // Rotate the object around a point with euler angle
 void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
 {
-	position_offset = -get_anchored_position();
+	position_offset = -get_anchored_position() + get_position();
 
 	// Calculate the angle in a local XZ circle with Y angle
 	glm::vec2 difference_position = glm::vec2(a_position[0], a_position[2]);
@@ -232,7 +246,45 @@ void Transform_Object::update_animation()
 {
 	if (is_animation_playing() && get_animations()->size() > 0)
 	{
-		Transform_Animation animation = (*get_animations())[0];
+		Transform_Animation* animation = get_current_animation();
+
+		// Calculate new transform
+		float animation_purcentate = animation->state / animation->duration;
+		if (animation_purcentate < 1)
+		{
+			if (animation->modify_position) // Position modification
+			{
+				glm::vec3 position_difference = animation->final_position - animation->base_position;
+				glm::vec3 new_position = animation->base_position + position_difference * animation_purcentate;
+				set_position(new_position);
+			}
+
+			if (animation->modify_rotation) // Rotation modification
+			{
+				glm::vec3 rotation_difference = animation->final_rotation - animation->base_rotation;
+				glm::vec3 new_rotation = animation->base_rotation + rotation_difference * animation_purcentate;
+				set_rotation(new_rotation);
+			}
+
+			if (animation->modify_scale) // Scale modification
+			{
+				glm::vec3 scale_difference = animation->final_scale - animation->base_scale;
+				glm::vec3 new_scale = animation->base_scale + scale_difference * animation_purcentate;
+				set_scale(new_scale);
+			}
+		}
+		else
+		{
+			// Apply transform
+			if (animation->modify_position) set_position(animation->final_position);
+			if (animation->modify_rotation) set_rotation(animation->final_rotation);
+			if (animation->modify_scale) set_scale(animation->final_scale);
+
+			// Delete the finished element
+			std::cout << "Bis " << get_animations()->size() << std::endl;
+			get_animations()->pop_back();
+			std::cout << "Ter " << get_animations()->size() << std::endl;
+		}
 	}
 }
 

@@ -37,6 +37,7 @@ Ammo::~Ammo()
 Famas::Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
     game = (Game*)get_game_struct();
+    get_attached_transform()->start_animation();
 }
 
 // Shoot with the famas
@@ -64,6 +65,11 @@ void Famas::shoot()
     ammo->get_attached_physic_object()->get_collision()->set_width(0.1);
     ammo->get_attached_physic_object()->set_velocity(glm::vec3(ammo_speed, ammo_speed, ammo_speed) * forward);
 
+    // Apply the step back
+    glm::vec3 final_position = get_step_back_force();
+    get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position() - final_position, get_attached_transform()->get_position());
+    get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position(), get_attached_transform()->get_position() - final_position);
+
     // Update shoot datas
     ammo_shooted += 1;
     last_ammo_shooted = glfwGetTime();
@@ -72,6 +78,7 @@ void Famas::shoot()
 // Update the famas
 void Famas::update()
 {
+    // std::cout << "Absolute position " << get_attached_transform()->get_absolute_position()[0] << " " << get_attached_transform()->get_absolute_position()[1] << " " << get_attached_transform()->get_absolute_position()[2] << std::endl;
     if (get_game_struct()->get_left_mouse_button_state()) // If the left button is pressed
     {
         if (glfwGetTime() - last_ammo_shooted > 1.0f / (float)ammo_by_second)
