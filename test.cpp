@@ -67,6 +67,10 @@ void Famas::shoot()
 
     // Apply the step back
     glm::vec3 final_position = get_step_back_force();
+    float rand_x = ((final_position[0] * 1000) - (rand() % (int)(final_position[0] * 2000))) / 1000;
+    float rand_y = ((final_position[1] * 1000) - (rand() % (int)(final_position[1] * 2000))) / 1000;
+    final_position[0] = rand_x;
+    final_position[1] = rand_y;
     get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position() - final_position, get_attached_transform()->get_position());
     get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position(), get_attached_transform()->get_position() - final_position);
 

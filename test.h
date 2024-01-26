@@ -36,8 +36,8 @@ private:
     unsigned short ammo_by_second = 10; // Number of ammo shot by second
     unsigned int ammo_shooted = 0; // Time when the last ammo was shot
     float last_ammo_shooted = 0; // Time when the last-last ammo was shot
-    float step_back_duration = 1 / (10 * 2.01); // Duration of a step back
-    glm::vec3 step_back_force = glm::vec3(0, 0, 0.03); // Force of a step back
+    float step_back_duration = 1 / (10 * 2.1); // Duration of a step back
+    glm::vec3 step_back_force = glm::vec3(0.01, 0.01, 0.03); // Force of a step back
     unsigned short zoom_state = 0; // State of zoom of the weapon
 
     Game* game = 0;

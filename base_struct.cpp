@@ -281,9 +281,7 @@ void Transform_Object::update_animation()
 			if (animation->modify_scale) set_scale(animation->final_scale);
 
 			// Delete the finished element
-			std::cout << "Bis " << get_animations()->size() << std::endl;
 			get_animations()->pop_back();
-			std::cout << "Ter " << get_animations()->size() << std::endl;
 		}
 	}
 }
