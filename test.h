@@ -30,15 +30,23 @@ public:
 
     // Getters and setters
     inline unsigned short get_ammo_by_second() { return ammo_by_second; };
+    inline float get_ammo_speed() { return ammo_speed; };
     inline float get_step_back_duration() { return step_back_duration; };
     inline glm::vec3 get_step_back_force() { return step_back_force; };
+    inline float get_zoom_duration() { return zoom_duration; };
+    inline float get_zoom_fov() { return zoom_fov; };
+    inline float get_zoom_normal_fov() { return zoom_normal_fov; };
 private:
-    unsigned short ammo_by_second = 10; // Number of ammo shot by second
+    unsigned short ammo_by_second = 100; // Number of ammo shot by second
     unsigned int ammo_shooted = 0; // Time when the last ammo was shot
+    float ammo_speed = 150; // Spedd of an ammo
     float last_ammo_shooted = 0; // Time when the last-last ammo was shot
-    float step_back_duration = 1 / (10 * 2.1); // Duration of a step back
-    glm::vec3 step_back_force = glm::vec3(0.01, 0.01, 0.03); // Force of a step back
-    unsigned short zoom_state = 0; // State of zoom of the weapon
+    float step_back_duration = 1 / (100 * 2.1); // Duration of a step back
+    glm::vec3 step_back_force = glm::vec3(0.005, 0.005, 0.03); // Force of a step back
+    float zoom_duration = 0.05; // Duration of a zoom
+    float zoom_fov = 30; // FOV for the zoom at 2
+    float zoom_normal_fov = 45; // FOV for the normal zoom at 1
+    float zoom_state = 0; // State of zoom of the weapon
 
     Game* game = 0;
 };
@@ -70,6 +78,8 @@ public:
 private:
     float bottom_y = 0; // Bottom Y pos of the target
     bool deployed = false; // If the target is deployed or not
+    float deployement_space = 0.5; // Time between undeployment and deployement
+    float deployement_time = 0.2; // Length of the deployement
     glm::vec2 min_pos = glm::vec2(0, 0); // Minimum pos of the target
     glm::vec2 max_pos = glm::vec2(10, 10); // Maximum pos of the target
     float top_y = 0; // Top Y pos of the target

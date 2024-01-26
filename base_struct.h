@@ -43,6 +43,7 @@ public:
 	void move(glm::vec3 a_mouvement); // Move the object
 	void remove_child(Transform_Object* object); // Remove an object from the children
 	void rescale(glm::vec3 a_scale); // Rescale the object
+	void reset_animation(bool reset_position = true); // Reset the animation of the object
 	virtual void rotate(glm::vec3 a_rotation); // Rotate the object
 	void rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier); // Rotate the object around a point with eulers angle
 	void soft_reset(); // Reset softly the object
@@ -55,9 +56,9 @@ public:
 	{
 		if (get_parent() != 0)
 		{
-			return get_parent()->get_absolute_position() + position_offset;
+			return get_parent()->get_absolute_position() + get_position_animation() + position_offset;
 		}
-		return position_offset;
+		return get_position_animation() + position_offset;
 	};
 	inline glm::vec3 get_anchored_position() { return anchored_position; };
 	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
@@ -68,6 +69,7 @@ public:
 	inline Transform_Object* get_parent() { return parent; }
 	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
 	inline glm::vec3 get_position() { return position; };
+	inline glm::vec3 get_position_animation() { return position_animation; };
 	inline glm::vec3 get_position_move_multiplier() { return position_move_multiplier; };
 	inline glm::vec3 get_right() { return right; };
 	inline glm::vec3 get_rotation() { return rotation; };
@@ -81,6 +83,7 @@ public:
 	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
 	inline void set_position(glm::vec3 new_position) { position_offset -= get_position(); position = new_position; position_offset += get_position(); };
+	inline void set_position_animation(glm::vec3 new_position) { position_animation = new_position; };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
 	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };
@@ -103,6 +106,7 @@ private:
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f); // Movement of the object
 	glm::vec3 parent_rotation_multiplier = glm::vec3(1.0f, 1.0f, 1.0f); // Multiplier to apply to a rotation coming from a parent
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the object
+	glm::vec3 position_animation = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the animation of the object
 	glm::vec3 position_move_multiplier = glm::vec3(1.0, 1.0, 1.0); // Multiplier for the poisitions used in "move"
 	glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // Rotation of the object
 	glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f); // Scale of the object

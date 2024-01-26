@@ -58,7 +58,7 @@ void Famas::shoot()
     glm::vec3 scale = glm::vec3(0.1, 0.1, 0.3);
 
     // Create the ammo
-    float ammo_speed = 150;
+    float ammo_speed = get_ammo_speed();
     Ammo* ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, false, "../textures/shell.png", false);
     ammo->get_tags()->push_back("ammo");
     ammo->get_attached_physic_object()->get_collision()->set_height(0.1);
@@ -71,6 +71,7 @@ void Famas::shoot()
     float rand_y = ((final_position[1] * 1000) - (rand() % (int)(final_position[1] * 2000))) / 1000;
     final_position[0] = rand_x;
     final_position[1] = rand_y;
+    get_attached_transform()->reset_animation();
     get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position() - final_position, get_attached_transform()->get_position());
     get_attached_transform()->add_position_animation(get_step_back_duration(), get_attached_transform()->get_position(), get_attached_transform()->get_position() - final_position);
 
@@ -91,29 +92,45 @@ void Famas::update()
         }
     }
 
-    if (get_game_struct()->get_right_mouse_button_state()) // If the right button is pressed
+    if (get_game_struct()->get_right_mouse_button_state() == 0) // If the right button is pressed
     {
-        zoom_state = 0;
+        float delta_time = get_game_struct()->get_delta_time() * (1.0f / get_zoom_duration());
+        if (zoom_state - delta_time > 0)
+        {
+            zoom_state -= delta_time;
+        }
+        else
+        {
+            zoom_state = 0;
+        }
     }
     else
     {
-        zoom_state = 1;
+        float delta_time = get_game_struct()->get_delta_time() * (1.0f / get_zoom_duration());
+        if (zoom_state + delta_time < 1)
+        {
+            zoom_state += delta_time;
+        }
+        else
+        {
+            zoom_state = 1;
+        }
     }
+    std::cout << "Z " << zoom_state << " " << get_game_struct()->get_right_mouse_button_state() << std::endl;;
     zoom();
 }
 
 // Apply a zoom to the famas
 void Famas::zoom()
 {
-    if (zoom_state == 0)
+    get_game_struct()->get_camera()->set_fov(get_zoom_normal_fov() - (get_zoom_normal_fov() - get_zoom_fov()) * zoom_state);
+    if (zoom_state == 1)
     {
         get_attached_transform()->set_anchored_position(glm::vec3(-0.0, -0.15f, -0.5));
-        get_game_struct()->get_camera()->set_fov(30.0f);
     }
     else
     {
         get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
-        get_game_struct()->get_camera()->set_fov(45.0f);
     }
 }
 
@@ -162,6 +179,7 @@ void Target::new_texture(std::string texture)
 // Place randomly the target
 void Target::place_randomly()
 {
+    float multiplier = 1.5;
     int rand_texture = rand() % get_textures()->size();
     int rand_x = get_min_pos()[0] + (rand() % (int)(get_max_pos()[0] - get_min_pos()[0]));
     float rand_y = rand() % 2;
@@ -169,6 +187,7 @@ void Target::place_randomly()
 
     if (rand_y == 0)
     {
+        multiplier = -1.5;
         rand_y = get_bottom_y();
     }
     else{
@@ -178,7 +197,12 @@ void Target::place_randomly()
     deployed = true;
     set_map_pos(glm::vec2(rand_x, rand_z));
     get_attached_graphic_object()->set_texture(get_game_struct()->get_texture((*get_textures())[rand_texture]));
-    get_attached_transform()->set_position(glm::vec3(rand_x, rand_y, rand_z));
+    get_attached_transform()->set_position(glm::vec3(rand_x, rand_y + multiplier, rand_z));
+
+    // Play the animation
+    get_attached_transform()->reset_animation();
+    get_attached_transform()->start_animation();
+    get_attached_transform()->add_position_animation(deployement_time, glm::vec3(0, 0, 0), glm::vec3(0, -multiplier, 0));
 }
 
 // Undeploy the target
@@ -188,13 +212,18 @@ void Target::undeploy()
     {
         deployed = false;
         undeployed_time = glfwGetTime();
+
+        // Play the 
+        get_attached_transform()->reset_animation(false);
+        get_attached_transform()->start_animation();
+        get_attached_transform()->add_position_animation(deployement_time, get_attached_transform()->get_position_animation(), glm::vec3(0, 0, 0));
     }
 }
 
 // Update the target
 void Target::update()
 {
-    if (!is_deployed() && glfwGetTime() - undeployed_time >= 1)
+    if (!is_deployed() && glfwGetTime() - undeployed_time >= deployement_space)
     {
         place_randomly();
    }

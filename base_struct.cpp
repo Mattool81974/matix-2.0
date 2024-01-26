@@ -169,6 +169,16 @@ void Transform_Object::rescale(glm::vec3 a_scale)
 	set_scale(glm::vec3(get_scale()[0] * a_scale[0], get_scale()[1] * a_scale[1], get_scale()[2] * a_scale[2]));
 }
 
+// Reset animation in the object
+void Transform_Object::reset_animation(bool reset_position)
+{
+	get_animations()->clear();
+	if (reset_position)
+	{
+		set_position_animation(glm::vec3(0, 0, 0));
+	}
+}
+
 // Rotate the object
 void Transform_Object::rotate(glm::vec3 a_rotation)
 {
@@ -256,7 +266,7 @@ void Transform_Object::update_animation()
 			{
 				glm::vec3 position_difference = animation->final_position - animation->base_position;
 				glm::vec3 new_position = animation->base_position + position_difference * animation_purcentate;
-				set_position(new_position);
+				set_position_animation(new_position);
 			}
 
 			if (animation->modify_rotation) // Rotation modification
@@ -276,7 +286,7 @@ void Transform_Object::update_animation()
 		else
 		{
 			// Apply transform
-			if (animation->modify_position) set_position(animation->final_position);
+			if (animation->modify_position) set_position_animation(animation->final_position);
 			if (animation->modify_rotation) set_rotation(animation->final_rotation);
 			if (animation->modify_scale) set_scale(animation->final_scale);
 
