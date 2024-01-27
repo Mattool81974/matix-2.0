@@ -7,7 +7,7 @@
 #include <vector>
 
 // Cut a string where there are the "cut"
-std::vector<std::string> cut_string(std::string string, std::string cut)
+std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank)
 {
 	std::string last_string = ""; // String since the last cut
 	std::string last_string_cut = ""; // String of the "cut" size which allows to know where to cut
@@ -22,7 +22,18 @@ std::vector<std::string> cut_string(std::string string, std::string cut)
 
 		if (last_string_cut == cut) // If the string which allows to know where to cut is equal to the part to cut, do a cut
 		{
-			result.push_back(last_string);
+			std::string final_string = last_string.substr(0, last_string.size() - (cut.size() - 1));
+			if (erase_blank)
+			{
+				if (final_string != "")
+				{
+					result.push_back(final_string);
+				}
+			}
+			else
+			{
+				result.push_back(final_string);
+			}
 			last_string = "";
 			last_string_cut = "";
 		}

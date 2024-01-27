@@ -99,6 +99,7 @@ public:
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
 	inline std::vector<Collision_Result>* get_collisions() { return &collisions; };
 	inline glm::vec2 get_last_map_pos() { return last_map_pos; };
+	inline unsigned short get_map_level() { return map_level; };
 	inline glm::vec2 get_map_pos() { return map_pos; };
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
@@ -116,6 +117,7 @@ private:
 	std::vector<Collision_Result> collisions = std::vector<Collision_Result>(); // Collisions during this frame
 	Advanced_Struct* game_struct = 0; // Base struct in the game
 	glm::vec2 last_map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
+	unsigned short map_level = 0; // Map level of this object
 	glm::vec2 map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
 	std::vector<std::string> tags = std::vector<std::string>(); // Tags about the object
 };

@@ -7,6 +7,41 @@ import os
 import PIL.ImageDraw as id
 import PIL.Image as im
 
+big_delimitation = "<----------------------------------------------->"
+
+def construct_factory(path: str):
+    """Construct a simple factory map
+    """
+    # Define base variables for the map
+    content = ""
+    floor_part = 1
+    middle_part = 0
+    wall_part = 2
+    width, height = 50, 50
+
+    # Write the parts of the map
+    content += "l\n0 0 0 0 0 0 0 50 3 50\n" + big_delimitation + "\n"
+
+    # Write the floor of the map
+    content += "f 0;0\n"
+    for i in range(height):
+        for j in range(width):
+            content += str(floor_part) + ";"
+        content = content[:-1] + "\n"
+    content += big_delimitation + "\n"
+
+    # Write the middle of the map
+    content += "w 0;0\n"
+    for i in range(height):
+        for j in range(width):
+            if i % 2 == 0 or j == 0: content += str(wall_part) + ";"
+            else: content += str(middle_part) + ";"
+        content = content[:-1] + "\n"
+
+    file = open(path, "w")
+    file.write(content)
+    file.close()
+
 def construct_shooting_range(path: str):
     """Construct a simple shooting range map
     """
@@ -38,4 +73,4 @@ def construct_shooting_range(path: str):
     file.write(content)
     file.close()
 
-construct_shooting_range("maps/shooting_range.wad")
+construct_factory("maps/factory.wad")

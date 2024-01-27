@@ -10,6 +10,23 @@
 #include <string>
 #include <vector>
 
+struct Map_Level {
+	// Struct representing a level of a map
+	unsigned short id = 0;
+	glm::vec3 position = glm::vec3(0, 0, 0);
+	glm::vec3 rotation = glm::vec3(0, 0, 0);
+	glm::vec3 scale = glm::vec3(1, 1, 1);
+};
+struct Map_Level_Collection {
+	// Struct representing a collection of cutted part in level of a map
+	unsigned short part = 0;
+	glm::vec3 base_position = glm::vec3(0, 0, 0);
+	glm::vec3 final_position = glm::vec3(0, 0, 0);
+	glm::vec3 rotation = glm::vec3(0, 0, 0);
+	glm::vec3 scale = glm::vec3(1, 1, 1);
+};
+enum Map_Opening_Mode { Simple, Complex }; // Opening mode for the map
+
 class Graphic_Scene
 {
 	// Class representing a collection of graphic object
@@ -35,7 +52,7 @@ class Physic_Scene
 {
 	// Class representing a collection of physic object
 public:
-	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<Object*>>& a_objects_map); // Physic_Scene constructor
+	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::map<unsigned short, std::vector<std::vector<Object*>>>& a_objects_map); // Physic_Scene constructor
 	void check_collisions(); // Check the collisions in the system
 	Physic_Object* new_object(std::string name, Transform_Object& transform, bool static_object = true); // Create a new object into the scene and return it
 	void update(); // Update the objects in the scene
@@ -45,25 +62,28 @@ public:
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline std::string get_name() { return name; };
 	inline std::map<std::string, Object*>* get_objects() { return &objects; };
-	inline std::vector<std::vector<Object*>>* get_objects_map() { return &objects_map; };
+	inline std::vector<std::vector<Object*>>* get_objects_map(unsigned short level = 0) { return &objects_map[level]; };
 private:
 	std::string name; // Name of the scene
 
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	std::map<std::string, Object*>& objects; // Each objects, with their name at key, in the game
-	std::vector<std::vector<Object*>> &objects_map; // Each objects, arranged as a map, in the scene
+	std::map<unsigned short, std::vector<std::vector<Object*>>> &objects_map; // Each objects, arranged as a map, in the scene
 };
 
 class Scene: public Transform_Object
 {
 	// Class representing a collection of object
 public:
-	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true); // Scene constructor
+	std::string map_part_delimitation = "<----------------------------------------------->";
+
+	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
+	void construct_level(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a level from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene
-	void load_from_map(std::string); // Load the scene from a map
-	void load_from_file(std::string map_path); // Load the scene from a map file
+	void load_from_map(std::string, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map
+	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
 	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true); // Create a new object into the scene and return it
 	void update(); // Update the scene
@@ -75,7 +95,7 @@ public:
 	inline std::string get_name() { return name; };
 	inline Object* get_object(std::string name) { if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\": error : The object \"" << name << "\" you want to access does not exist." << std::endl; return 0; } return (*get_objects())[name]; };
 	inline std::map<std::string, Object*> *get_objects() { return &objects; };
-	inline std::vector<std::vector<Object*>>* get_objects_map() { return &objects_map; };
+	inline std::vector<std::vector<Object*>>* get_objects_map(unsigned short level = 0) { return &objects_map[level]; };
 	inline Physic_Scene* get_physic_scene() { return physic_scene; };
 	inline std::vector<std::map<std::string, Object*>::iterator>* get_to_destroy() { return &to_destroy; };
 	inline bool use_graphic() { return graphic; };
@@ -88,7 +108,7 @@ private:
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
-	std::vector<std::vector<Object*>> objects_map = std::vector<std::vector<Object*>>(); // Each objects, arranged as a map, in the scene
+	std::map<unsigned short, std::vector<std::vector<Object*>>> objects_map = std::map<unsigned short, std::vector<std::vector<Object*>>>(); // Each objects, arranged as a map, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
 	std::vector<std::map<std::string, Object*>::iterator> to_destroy = std::vector<std::map<std::string, Object*>::iterator>(); // Name of the objects to destroy at the end of the frame
 };

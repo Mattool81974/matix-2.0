@@ -195,8 +195,8 @@ def cube(face_pos = [(2/3, 1/4), (1/3, 3/4), (0, 1/4), (1/3, 1/4), (1/3, 1/2), (
                           (-1.0, 1.0, 0.0), (-1.0, 1.0, 0.0),
                           (0.0, 1.0, -1.0), (0.0, 1.0, -1.0),
                           (-1.0, 1.0, 0.0), (-1.0, 1.0, 0.0),
-                          (0.0, -1.0, 1.0), (0.0, -1.0, 1.0),
-                          (0.0, -1.0, 1.0), (0.0, -1.0, 1.0)]
+                          (1.0, -1.0, 0.0), (1.0, -1.0, 0.0),
+                          (1.0, -1.0, 0.0), (1.0, -1.0, 0.0)]
     vertices_unchanged = [(2, 2, 2), (2, 2, 2),
                           (0, 0, 0), (0, 0, 0),
                           (2, 2, 2), (2, 2, 2),
@@ -534,6 +534,13 @@ def construct_chair() -> None:
     constructor.add_content(cube(face_pos = [(0, 1286/1622), (10/11, 0), (0, 1000/1622), (10/11, 0), (10/11, 0), (10/11, 0)], face_size = [(10/11, 286/1622), (1/11, 500/1622), (10/11, 286/1622), (1/11, 500/1622), (1/11, 500/1622), (1/11, 500/1622)], position = (0.0, 0.3, -0.3), scale = (0.7, 0.4, 0.1)))
     constructor.save("vbos/chair.vbo")
 
+def construct_cube() -> None:
+    """Construct a simple cube
+    """
+    constructor = VBO_Constructor()
+    constructor.add_content(cube())
+    constructor.save("vbos/cube.vbo")
+
 def construct_famas() -> None:
     """Construct a FaMAS assault rifle
     """
@@ -616,4 +623,4 @@ def construct_table() -> None:
     constructor.add_content(cube(face_pos = [(10/11, 0), (10/11, 0), (10/11, 0), (10/11, 0), (10/11, 10/21), (10/11, 10/21)], face_size = [(1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 10/21), (1/11, 1/21), (1/11, 1/21)], position = (0.45, -0.05, 0.45), scale = (0.1, 0.9, 0.1)))
     constructor.save("vbos/table.vbo")
 
-construct_famas()
+construct_cube()
