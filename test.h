@@ -37,11 +37,11 @@ public:
     inline float get_zoom_fov() { return zoom_fov; };
     inline float get_zoom_normal_fov() { return zoom_normal_fov; };
 private:
-    unsigned short ammo_by_second = 100; // Number of ammo shot by second
+    unsigned short ammo_by_second = 6; // Number of ammo shot by second
     unsigned int ammo_shooted = 0; // Time when the last ammo was shot
     float ammo_speed = 150; // Spedd of an ammo
     float last_ammo_shooted = 0; // Time when the last-last ammo was shot
-    float step_back_duration = 1 / (100 * 2.1); // Duration of a step back
+    float step_back_duration = 1 / (6 * 2.1); // Duration of a step back
     glm::vec3 step_back_force = glm::vec3(0.005, 0.005, 0.03); // Force of a step back
     float zoom_duration = 0.05; // Duration of a zoom
     float zoom_fov = 30; // FOV for the zoom at 2

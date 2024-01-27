@@ -69,6 +69,59 @@ glm::vec3 normalize_rotation(glm::vec3 rotation)
 	return rotation;
 }
 
+// Rotate a vector around a rotating point
+glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier)
+{
+	glm::vec3 to_return = glm::vec3(0, 0, 0);
+	vector -= position;
+
+	// Calculate the angle in a local XZ circle with Y angle
+	glm::vec2 difference_position = glm::vec2(vector[0], vector[2]);
+	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[1] != 0)
+	{
+		// Calculate the angle of the position
+		float opposite = difference_position[0];
+		float adjacent = difference_position[1];
+		float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
+		glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
+
+		float angle = glm::atan(opposite / adjacent);
+
+		// Calculate the position in the local circle
+		float final_angle = angle + glm::radians(rotation[1] * rotation_multiplier[1]);
+		glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
+
+		// Calculate the final position
+		to_return[0] = final_position[0];
+		to_return[2] = final_position[1];
+	}
+
+	// Calculate the angle in a local YZ circle with X angle
+	if (!(vector[0] == 0 and vector[2] == 0) and rotation_multiplier[0] == 1)
+	{
+		// Calculate the angle of the position
+		float adjacent = glm::distance(difference_position, glm::vec2(0, 0));
+		float hypothenus = glm::distance(glm::vec3(difference_position[0], vector[1] - position[1], difference_position[1]), glm::vec3(0, 0, 0));
+		glm::vec2 opposite_normalized = glm::normalize(difference_position);
+
+		float angle = glm::acos(adjacent / hypothenus);
+		if (vector[1] - position[1] < 0)
+		{
+			angle = 3.1415 * 2 - glm::acos(adjacent / hypothenus);
+		}
+
+		// Calculate the position in the local circle
+		float final_angle = angle + glm::radians(rotation[0]);
+
+		// Calculate the final position
+		to_return[1] = glm::sin(final_angle) * hypothenus;
+		to_return[0] *= -glm::cos(final_angle);
+		to_return[2] *= -glm::cos(final_angle);
+	}
+
+	return to_return;
+}
+
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
