@@ -7,6 +7,12 @@ Ammo::Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a
     creation_time = glfwGetTime();
 }
 
+// Clone the ammo
+void* Ammo::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Ammo(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
+}
+
 // Late update the ammo
 void Ammo::late_update()
 {
@@ -38,6 +44,12 @@ Famas::Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string
 {
     game = (Game*)get_game_struct();
     get_attached_transform()->start_animation();
+}
+
+// Clone the famas
+void* Famas::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Famas(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
 }
 
 // Shoot with the famas
@@ -151,6 +163,12 @@ Target::Target(Advanced_Struct* a_advanced_struct, std::string a_name, std::stri
     get_textures()->push_back(get_attached_graphic_object()->get_texture()->get_texture_path());
 }
 
+// Clone the target
+void* Target::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Target(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
+}
+
 // Update lately the target
 void Target::late_update()
 {
@@ -235,6 +253,36 @@ void Target::update()
 
 // Target destructor
 Target::~Target()
+{
+    Object::~Object();
+}
+
+// Door constructor
+Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+{
+    if (get_attached_transform() != 0)
+    {
+        // get_attached_transform()->set_anchored_position(glm::vec3(0, 0, -0.5));
+    }
+}
+
+// Clone the door
+void* Door::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Door(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
+}
+
+// Update the door
+void Door::update()
+{
+    glm::vec3 rotation = glm::vec3(0, 90, 0) * glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime());
+    get_attached_transform()->rotate_around(get_attached_transform()->get_anchored_position(), rotation, glm::vec3(0, 1, 0));
+    get_attached_transform()->set_rotation(rotation);
+    Object::update();
+}
+
+// Door destructor
+Door::~Door()
 {
     Object::~Object();
 }

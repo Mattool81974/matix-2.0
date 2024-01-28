@@ -7,7 +7,8 @@ class Ammo : public Object
 {
     // Class representing an Ammo
 public:
-    Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
+    Ammo(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the ammo
     void late_update(); // Late update the ammo
     void update(); // Update the ammo
     ~Ammo(); // Ammo destructor
@@ -22,7 +23,8 @@ class Famas : public Object
 {
     // Class representing a Famas
 public:
-    Famas(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Famas constructor
+    Famas(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Famas constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the famas
     void shoot(); // Shoot with the famas
     void update(); // Update the famas
     void zoom(); // Apply a zoom to shoot
@@ -55,7 +57,8 @@ class Target : public Object
 {
     // Class representing a Targer
 public:
-    Target(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Target constructor
+    Target(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Target constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the target
     void late_update(); // Update lately the target
     void new_texture(std::string texture); // Add a texture to the target
     void place_randomly(); // Place randomly the target
@@ -86,4 +89,16 @@ private:
     float undeployed_time = glfwGetTime(); // Time at the last undeployement of the target
 
     std::vector<std::string> textures = std::vector<std::string>(); // Vector of all the possible texture for a target
+};
+
+class Door : public Object
+{
+    // Class representing a door
+public:
+    Door(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Door constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the door
+    void update(); // Update the door
+    ~Door(); // Door destructor
+private:
+
 };

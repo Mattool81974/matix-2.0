@@ -2,21 +2,25 @@
 #include <iostream>
 
 // Part constructor
-Part::Part(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale, std::string a_type, std::string a_texture_path) : position(a_position), rotation(a_rotation), scale(a_scale), type(a_type), texture_path(a_texture_path)
+Part::Part(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale, std::string a_type, std::string a_texture_path, void* a_base_object) : position(a_position), rotation(a_rotation), scale(a_scale), type(a_type), texture_path(a_texture_path), base_object(a_base_object)
 {
-
+	
 }
 
 // Part copy constructor
-Part::Part(const Part& copy) : Part(copy.position, copy.rotation, copy.scale, copy.type, copy.texture_path)
+Part::Part(const Part& copy) : Part(copy.position, copy.rotation, copy.scale, copy.type, copy.texture_path, copy.base_object)
 {
-
+	
 }
 
 // Part destructor
 Part::~Part()
 {
-
+	if (base_object != 0)
+	{
+		delete base_object;
+		base_object = 0;
+	}
 }
 
 // Advanced_Struct constructor
@@ -26,7 +30,7 @@ Advanced_Struct::Advanced_Struct(double& a_mouse_x, double& a_mouse_y): Base_Str
 }
 
 // Assign to a number a part
-void Advanced_Struct::assign_part(unsigned int number, Part part)
+void Advanced_Struct::assign_part(unsigned int number, Part* part)
 {
 	if (contains_part(number)) { std::cout << "Matrix game : error ! The part \"" << number << "\" you want to add already exist." << std::endl; return; }
 	(*get_parts())[number] = part;
@@ -35,8 +39,8 @@ void Advanced_Struct::assign_part(unsigned int number, Part part)
 // Returns if the struct contains a part
 bool Advanced_Struct::contains_part(unsigned int number)
 {
-	std::map<unsigned int, Part>* parts = get_parts();
-	for (std::map<unsigned int, Part>::iterator it = parts->begin(); it != parts->end(); it++)
+	std::map<unsigned int, Part*>* parts = get_parts();
+	for (std::map<unsigned int, Part*>::iterator it = parts->begin(); it != parts->end(); it++)
 	{
 		if (it->first == number) { return true; } // Verify each part name (first element of map)
 	}
@@ -70,7 +74,7 @@ Part* Advanced_Struct::get_part(unsigned int number)
 {
 	if (contains_part(number))
 	{
-		return &(*get_parts())[number];
+		return (*get_parts())[number];
 	}
 	else
 	{
@@ -117,17 +121,6 @@ void Advanced_Struct::load_VAOs()
 	all_vaos["triangle"] = new VAO("../shaders/default", "");
 }
 
-// Create a new part into the struct and return it
-Part Advanced_Struct::new_part(unsigned int number, std::string type, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, std::string texture_path)
-{
-	if (contains_part(number)) { std::cout << "Matrix game : error ! The part \"" << number << "\" you want to create already exist." << std::endl; }
-
-	// Create the part
-	Part part = Part(position, rotation, scale, type, texture_path);
-	assign_part(number, part);
-	return part;
-}
-
 // Create a new VAO into the game
 VAO* Advanced_Struct::new_vao(std::string path, std::string type, std::string shader_path)
 {
@@ -154,6 +147,13 @@ Advanced_Struct::~Advanced_Struct()
 		delete it->second; // Delete textures
 		it->second = 0;
 	}
+
+	std::map<unsigned int, Part*>* parts = get_parts();
+	for (std::map<unsigned int, Part*>::iterator it = parts->begin(); it != parts->end(); it++)
+	{
+		delete it->second; // Delete parts
+		it->second = 0;
+	}
 }
 
 // Clossion_Result constructor
@@ -177,7 +177,13 @@ Collision_Result::~Collision_Result()
 // Object constructor
 Object::Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), name(a_name), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name)
 {
+	
+}
 
+// Clone the object
+void* Object::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+	return new Object(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
 }
 
 // Returns if the object collides with an other object

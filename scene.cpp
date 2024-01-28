@@ -431,97 +431,110 @@ std::vector<Map_Level_Collection> Scene::construct_collections(std::vector<std::
 				unsigned int part_number = map[j][k];
 				if (part_number != 0)
 				{
-					glm::vec2 end_pos = glm::vec2(j, k);
-					glm::vec2 start_pos = glm::vec2(j, k);
-					unsigned short iter = 0;
-					while (j < map.size() && k < map[j].size()) // Browse the map in two sense to detect repetition in horizontal/vertical axis
+					if (get_game_struct()->get_part(part_number)->use_collection())
 					{
-						bool line_good_1 = true;
-
-						if (k < map[j].size() - 1)
+						glm::vec2 end_pos = glm::vec2(j, k);
+						glm::vec2 start_pos = glm::vec2(j, k);
+						unsigned short iter = 0;
+						while (j < map.size() && k < map[j].size()) // Browse the map in two sense to detect repetition in horizontal/vertical axis
 						{
-							for (int l = j; l >= start_pos[0]; l--) // Check if every part is good or not
-							{
-								unsigned int other_part_number = map[l][k + 1];
-								if (other_part_number != part_number)
-								{
-									end_pos[1] = k;
-									line_good_1 = false;
-									break;
-								}
-								else
-								{
-									end_pos[1] = k + 1;
-								}
-							}
+							bool line_good_1 = true;
 
-							if (line_good_1)
+							if (k < map[j].size() - 1)
 							{
-								iter++;
-								k++;
 								for (int l = j; l >= start_pos[0]; l--) // Check if every part is good or not
 								{
-									map_confirmation[l][k] = true;
+									unsigned int other_part_number = map[l][k + 1];
+									if (other_part_number != part_number)
+									{
+										end_pos[1] = k;
+										line_good_1 = false;
+										break;
+									}
+									else
+									{
+										end_pos[1] = k + 1;
+									}
+								}
+
+								if (line_good_1)
+								{
+									iter++;
+									k++;
+									for (int l = j; l >= start_pos[0]; l--) // Check if every part is good or not
+									{
+										map_confirmation[l][k] = true;
+									}
 								}
 							}
-						}
-						else
-						{
-							line_good_1 = false;
-						}
-
-						bool line_good_2 = true;
-
-						if (j < map.size() - 1)
-						{
-							for (int l = k; l >= start_pos[1]; l--) // Check if every part is good or not
+							else
 							{
-								unsigned int other_part_number = map[j + 1][l];
-								if (other_part_number != part_number)
-								{
-									end_pos[0] = j;
-									line_good_2 = false;
-									break;
-								}
-								else
-								{
-									end_pos[0] = j + 1;
-								}
+								line_good_1 = false;
 							}
 
-							if (line_good_2)
+							bool line_good_2 = true;
+
+							if (j < map.size() - 1)
 							{
-								iter++;
-								j++;
 								for (int l = k; l >= start_pos[1]; l--) // Check if every part is good or not
 								{
-									map_confirmation[j][l] = true;
+									unsigned int other_part_number = map[j + 1][l];
+									if (other_part_number != part_number)
+									{
+										end_pos[0] = j;
+										line_good_2 = false;
+										break;
+									}
+									else
+									{
+										end_pos[0] = j + 1;
+									}
+								}
+
+								if (line_good_2)
+								{
+									iter++;
+									j++;
+									for (int l = k; l >= start_pos[1]; l--) // Check if every part is good or not
+									{
+										map_confirmation[j][l] = true;
+									}
 								}
 							}
-						}
-						else
-						{
-							line_good_2 = false;
+							else
+							{
+								line_good_2 = false;
+							}
+
+							if (!line_good_1 && !line_good_2)
+							{
+								break;
+							}
 						}
 
-						if (!line_good_1 && !line_good_2)
+						if (iter > 0)
 						{
-							break;
+							map_confirmation[start_pos[0]][start_pos[1]] = true;
+							Map_Level_Collection collection = Map_Level_Collection(); // Create the collection
+							collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
+							collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
+							collection.set_orientation(Map_Level_Orientation::Horizontal);
+							collection.set_part(part_number);
+							collections.push_back(collection);
 						}
+						j = start_pos[0];
+						k = start_pos[1];
 					}
-
-					if (iter > 0)
+					else
 					{
-						map_confirmation[start_pos[0]][start_pos[1]] = true;
+						map_confirmation[j][k] = true;
 						Map_Level_Collection collection = Map_Level_Collection(); // Create the collection
-						collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
-						collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
+						collection.set_base_position(glm::vec3(j, 0, k));
+						collection.set_final_position(glm::vec3(j, 0, k));
 						collection.set_orientation(Map_Level_Orientation::Horizontal);
 						collection.set_part(part_number);
 						collections.push_back(collection);
 					}
-					j = start_pos[0];
-					k = start_pos[1];
 				}
 			}
 		}
@@ -574,15 +587,30 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, 
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			glm::vec3 scale = glm::vec3(difference[0] + 1, part->get_scale()[1], difference[2] + 1);
-
 			float x = middle[0] + level->position[0] + part->get_position()[0];
 			float y = middle[1] + level->position[1] + part->get_position()[1];
 			float z = middle[2] + level->position[2] + part->get_position()[2];
 
+			glm::vec3 scale = glm::vec3(part->get_scale()[0] * (difference[0] + 1), part->get_scale()[1] * (difference[1] + 1), part->get_scale()[2] * (difference[2] + 1));
+			if (part->get_scale_level_multiplier()[0] != 0)
+			{
+				scale[0] *= level->scale[0] * part->get_scale_level_multiplier()[0];
+				x += (level->scale[0] * part->get_scale_level_multiplier()[0]) / 2;
+			}
+			if (part->get_scale_level_multiplier()[1] != 0)
+			{
+				scale[1] *= level->scale[1] * part->get_scale_level_multiplier()[1];
+				y += (level->scale[1] * part->get_scale_level_multiplier()[1]) / 2;
+			}
+			if (part->get_scale_level_multiplier()[2] != 0)
+			{
+				scale[2] *= level->scale[2] * part->get_scale_level_multiplier()[2];
+				z += (level->scale[2] * part->get_scale_level_multiplier()[2]) / 2;
+			}
+
 			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
-			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path()); // Create the object
+			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
 			object->set_map_pos(glm::vec2(x, z));
 			objects_map[level->id][x][z] = object;
 		}

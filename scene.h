@@ -112,7 +112,7 @@ public:
 	void load_from_map(std::string, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
-	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true); // Create a new object into the scene and return it
+	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true, void* clone = 0); // Create a new object into the scene and return it
 	void update(); // Update the scene
 	~Scene(); // Scene destructor
 
@@ -142,7 +142,7 @@ private:
 
 // Create a new object into the scene and return it
 template <class O> // Template for adding a type of object
-O* Scene::new_object(std::string name, std::string type, Transform_Object* parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, bool static_object, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object)
+O* Scene::new_object(std::string name, std::string type, Transform_Object* parent, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, bool static_object, std::string texture_path, bool texture_resize, bool use_graphic_object, bool use_physic_object, void* clone)
 {
 	if (contains_object(name)) { std::cout << "Scene \"" << get_name() << "\" : error ! The object \"" << name << "\" you want to create already exist." << std::endl; return 0; }
 
@@ -174,7 +174,16 @@ O* Scene::new_object(std::string name, std::string type, Transform_Object* paren
 		physic_object = get_physic_scene()->new_object(name, *object, static_object);
 		physic_object->get_collision()->set_height(scale[1]);
 	}
-	O* final_object = new O(get_game_struct(), name, get_name(), object, graphic_object, physic_object);
+
+	O* final_object = 0;
+	if (clone == 0)
+	{
+		final_object = new O(get_game_struct(), name, get_name(), object, graphic_object, physic_object);
+	}
+	else
+	{
+		final_object = (O*)(((O*)clone)->clone(get_game_struct(), name, get_name(), object, graphic_object, physic_object));
+	}
 	add_object(name, final_object);
 
 	return final_object;

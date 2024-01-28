@@ -9,9 +9,15 @@ void warehouse()
     Camera* camera = game.get_camera();
     game.new_vao("../vbos/famas.vbo", "famas");
     game.new_vao("../vbos/shell.vbo", "ammo");
-    game.new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
-    game.new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
-    game.new_part(10, "one_faced_cube", glm::vec3(0, 5.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 10, 1), "../textures/warehouse/wall_exterior.png");
+    Part* floor_exterior = game.new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
+    Part* floor_interior = game.new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
+    Part* door = game.new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), "../textures/warehouse/door.png");
+    Part* wall_exterior = game.new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
+
+    // Configurate parts
+    door->set_resize_texture(false);
+    door->set_use_collection(false);
+    wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
     Scene* scene = game.new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
