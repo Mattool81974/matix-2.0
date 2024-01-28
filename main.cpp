@@ -2,22 +2,23 @@
 #include <iostream>
 #include "test.h"
 
-void factory()
+void warehouse()
 {
     // Construct game
     Game game(1600, 900);
     Camera* camera = game.get_camera();
     game.new_vao("../vbos/famas.vbo", "famas");
     game.new_vao("../vbos/shell.vbo", "ammo");
-    game.new_part(1, "square", glm::vec3(0, 0, 0), glm::vec3(90, 0, 0), glm::vec3(1, 1, 1), "../textures/floor.png");
-    game.new_part(2, "cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
+    game.new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
+    game.new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
+    game.new_part(10, "one_faced_cube", glm::vec3(0, 5.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 10, 1), "../textures/warehouse/wall_exterior.png");
 
     // Construct scene
-    Scene* scene = game.new_scene("factory", "../maps/factory.wad", Map_Opening_Mode::Complex);
-    game.set_current_scene("factory");
+    Scene* scene = game.new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
+    game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 3, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
     
     // Configurate some objects in the scene
@@ -129,7 +130,7 @@ int main()
 {
     srand(time(0));
 
-    factory();
+    warehouse();
 
     return 0;
 }

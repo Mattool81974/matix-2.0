@@ -393,8 +393,8 @@ void Scene::add_object(std::string name, Object *object)
 	(*get_objects())[name] = object;
 }
 
-// Construct a level from a vector of line
-void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, unsigned short level_count)
+// Construct the collections of a level from a vector of line
+std::vector<Map_Level_Collection> Scene::construct_collections(std::vector<std::string> lines, Map_Level* level, unsigned short level_count)
 {
 	std::vector<std::vector<unsigned short>> map = std::vector< std::vector<unsigned short>>();
 	std::vector<std::vector<bool>> map_horizontal_confirmation = std::vector< std::vector<bool>>();
@@ -526,31 +526,8 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 			}
 		}
 	}
-	
-	for (int i = 0; i < collections.size(); i++) // Construct each collections
-	{
-		Map_Level_Collection collection = collections[i];
-		unsigned int part_number = collection.get_part();
-		Part* part = get_game_struct()->get_part(part_number); // Get the part at the collection
-		if (part != 0)
-		{
-			glm::vec3 difference = collection.get_difference();
-			glm::vec3 middle = collection.get_middle();
 
-			glm::vec3 scale = glm::vec3(difference[0] + 1, part->get_scale()[1], difference[2] + 1);
-
-			float x = middle[0] + level->position[0] + part->get_position()[0];
-			float y = middle[1] + level->position[1] + part->get_position()[1];
-			float z = middle[2] + level->position[2] + part->get_position()[2];
-
-			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
-			
-			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), scale, true, part->get_texture_path()); // Create the object
-			object->set_map_pos(glm::vec2(x, z));
-			objects_map[level->id][x][z] = object;
-		}
-	}
-	std::cout << get_objects()->size() << " " << collections.size() << std::endl;
+	return collections;
 }
 
 // Returns if the scene contains an object
@@ -580,6 +557,34 @@ void Scene::destroy(std::string name)
 			}
 			to_destroy.push_back(it);
 			return;
+		}
+	}
+}
+
+// Load the scene from a vector of collections
+void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, Map_Level* level, unsigned short level_count)
+{
+	for (int i = 0; i < collections.size(); i++) // Construct each collections
+	{
+		Map_Level_Collection collection = collections[i];
+		unsigned int part_number = collection.get_part();
+		Part* part = get_game_struct()->get_part(part_number); // Get the part at the collection
+		if (part != 0)
+		{
+			glm::vec3 difference = collection.get_difference();
+			glm::vec3 middle = collection.get_middle();
+
+			glm::vec3 scale = glm::vec3(difference[0] + 1, part->get_scale()[1], difference[2] + 1);
+
+			float x = middle[0] + level->position[0] + part->get_position()[0];
+			float y = middle[1] + level->position[1] + part->get_position()[1];
+			float z = middle[2] + level->position[2] + part->get_position()[2];
+
+			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+
+			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path()); // Create the object
+			object->set_map_pos(glm::vec2(x, z));
+			objects_map[level->id][x][z] = object;
 		}
 	}
 }
@@ -633,7 +638,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			}
 		}
 	}
-	else if (mode == Map_Opening_Mode::Complex)
+	else if (mode == Map_Opening_Mode::Collections)
 	{
 		std::vector<std::string> parts = cut_string(map, map_part_delimitation); // Cut the map by parts
 
@@ -687,7 +692,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 
 			if (lines[0][0] == 'w')
 			{
-				construct_level(lines, level, level_count);
+				load_from_collection(construct_collections(lines, level, level_count), level, level_count);
 			}
 			else if (lines[0][0] == 'a')
 			{

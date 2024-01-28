@@ -31,7 +31,7 @@ public:
 	inline glm::vec3 get_difference() { return get_final_position() - get_base_position(); };
 	inline glm::vec3 get_final_position() { return final_position; };
 	inline glm::vec3 get_middle() { return get_base_position() + get_difference() / glm::vec3(2, 2, 2); };
-	inline std::string get_name() { return get_orientation_name()[get_orientation()]; };
+	inline std::string get_name() { return std::to_string(get_difference()[0]) + " " + std::to_string(get_difference()[1]) + " " + std::to_string(get_difference()[2]); };
 	inline Map_Level_Orientation get_orientation() { return orientation; };
 	static std::map<Map_Level_Orientation, std::string> get_orientation_name() { std::map<Map_Level_Orientation, std::string> orientation_name = std::map<Map_Level_Orientation, std::string>(); orientation_name[Map_Level_Orientation::Horizontal] = "horizontal"; orientation_name[Map_Level_Orientation::Vertical] = "vertical"; return orientation_name; };
 	inline glm::vec3 get_rotation() { return rotation; };
@@ -42,6 +42,7 @@ public:
 	inline void set_orientation(Map_Level_Orientation a_orientation) { orientation = a_orientation; };
 	inline void set_rotation(glm::vec3 a_rotation) { rotation = a_rotation; };
 	inline void set_scale(glm::vec3 a_scale) { scale = a_scale; };
+	inline std::string to_string() { return std::to_string(part) + ";" + std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[2]) + ";" + std::to_string(get_final_position()[2]); };
 private:
 	unsigned short part = 0;
 	glm::vec3 base_position = glm::vec3(0, 0, 0);
@@ -50,7 +51,7 @@ private:
 	glm::vec3 rotation = glm::vec3(0, 0, 0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);
 };
-enum Map_Opening_Mode { Simple, Complex }; // Opening mode for the map
+enum Map_Opening_Mode { Simple, Collections }; // Opening mode for the map
 
 class Graphic_Scene
 {
@@ -104,9 +105,10 @@ public:
 
 	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
-	void construct_level(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a level from a vector of line
+	std::vector<Map_Level_Collection> construct_collections(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a vector of collection from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene
+	void load_from_collection(std::vector<Map_Level_Collection> collections, Map_Level* level, unsigned short level_count); // Load the scene from a vector of collections
 	void load_from_map(std::string, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
