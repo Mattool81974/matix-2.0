@@ -376,7 +376,7 @@ Camera::Camera(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale): T
 glm::mat4 Camera::get_projection(int window_height, int window_width)
 {
 	glm::mat4 projection = glm::mat4(1.0f);
-	projection = glm::perspective(glm::radians(get_fov()), float(window_width) / float(window_height), 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(get_fov()), float(window_width) / float(window_height), 1.0f / get_far(), get_far());
 
 	return projection;
 }

@@ -17,11 +17,36 @@ struct Map_Level {
 	glm::vec3 rotation = glm::vec3(0, 0, 0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);
 };
-struct Map_Level_Collection {
-	// Struct representing a collection of cutted part in level of a map
+enum Map_Level_Orientation {Vertical, Horizontal}; // Differents orientations for a map lev collection
+class Map_Level_Collection {
+	// Class representing a collection of cutted part in level of a map
+public:
+	Map_Level_Collection(); // Map_Level_Collection constructor
+	Map_Level_Collection(const Map_Level_Collection& copy); // Map_Level_Collection copy constructor
+	~Map_Level_Collection(); // Map_Level_Collection destructor
+
+	// Getters and setters
+	inline unsigned short get_part() { return part; };
+	inline glm::vec3 get_base_position() { return base_position; };
+	inline glm::vec3 get_difference() { return get_final_position() - get_base_position(); };
+	inline glm::vec3 get_final_position() { return final_position; };
+	inline glm::vec3 get_middle() { return get_base_position() + get_difference() / glm::vec3(2, 2, 2); };
+	inline std::string get_name() { return get_orientation_name()[get_orientation()]; };
+	inline Map_Level_Orientation get_orientation() { return orientation; };
+	static std::map<Map_Level_Orientation, std::string> get_orientation_name() { std::map<Map_Level_Orientation, std::string> orientation_name = std::map<Map_Level_Orientation, std::string>(); orientation_name[Map_Level_Orientation::Horizontal] = "horizontal"; orientation_name[Map_Level_Orientation::Vertical] = "vertical"; return orientation_name; };
+	inline glm::vec3 get_rotation() { return rotation; };
+	inline glm::vec3 get_scale() { return scale; };
+	inline void set_part(unsigned short a_part) { part = a_part; };
+	inline void set_base_position(glm::vec3 a_base_position) { base_position = a_base_position; };
+	inline void set_final_position(glm::vec3 a_final_rotation) { final_position = a_final_rotation; };
+	inline void set_orientation(Map_Level_Orientation a_orientation) { orientation = a_orientation; };
+	inline void set_rotation(glm::vec3 a_rotation) { rotation = a_rotation; };
+	inline void set_scale(glm::vec3 a_scale) { scale = a_scale; };
+private:
 	unsigned short part = 0;
 	glm::vec3 base_position = glm::vec3(0, 0, 0);
 	glm::vec3 final_position = glm::vec3(0, 0, 0);
+	Map_Level_Orientation orientation = Map_Level_Orientation::Vertical;
 	glm::vec3 rotation = glm::vec3(0, 0, 0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);
 };

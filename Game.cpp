@@ -126,7 +126,7 @@ void Game::update_event()
 
     // Calculate delta time
     set_delta_time(glfwGetTime() - last_frame_time);
-    // std::cout << "FPS : " << 1 / get_delta_time() << std::endl;
+    std::cout << "FPS : " << 1 / get_delta_time() << std::endl;
     last_frame_time = glfwGetTime();
 
     // Calculate mouse move and button

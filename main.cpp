@@ -129,7 +129,7 @@ int main()
 {
     srand(time(0));
 
-    level0();
+    factory();
 
     return 0;
 }

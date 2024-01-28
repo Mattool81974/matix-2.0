@@ -6,6 +6,29 @@
 #include <sstream>
 #include <vector>
 
+// Map_Level_Collection constructor
+Map_Level_Collection::Map_Level_Collection()
+{
+
+}
+
+// Map_Level_Collection copy constructor
+Map_Level_Collection::Map_Level_Collection(const Map_Level_Collection& copy) : Map_Level_Collection()
+{
+	part = copy.part;
+	base_position = copy.base_position;
+	final_position = copy.final_position;
+	orientation = copy.orientation;
+	rotation = copy.rotation;
+	scale = copy.scale;
+}
+
+// Map_Level_Collection destructor
+Map_Level_Collection::~Map_Level_Collection()
+{
+
+}
+
 // Graphic_Scene constructor
 Graphic_Scene::Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects): game_struct(a_game_struct), name(a_name), objects(a_objects)
 {
@@ -386,7 +409,7 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 		{
 			map_horizontal_line.push_back(false);
 			map_line.push_back(std::stoi(line[k]));
-			map_vertical_line.push_back(true);
+			map_vertical_line.push_back(false);
 		}
 		map_horizontal_confirmation.push_back(map_horizontal_line);
 		map.push_back(map_line);
@@ -424,16 +447,64 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 						iter++;
 					}
 
-					if (iter >= 0)
+					if (iter > 0)
 					{
 						map_horizontal_confirmation[start_pos[0]][start_pos[1]] = true;
 						Map_Level_Collection collection; // Create the collection
-						collection.base_position = glm::vec3(start_pos[0], 0, start_pos[1]);
-						collection.final_position = glm::vec3(end_pos[0], 0, end_pos[1]);
-						collection.part = part_number;
+						collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
+						collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
+						collection.set_orientation(Map_Level_Orientation::Horizontal);
+						collection.set_part(part_number);
 						collections.push_back(collection);
-						k--;
 					}
+					k--;
+				}
+			}
+		}
+	}
+
+	// Search for repeated part scalable, for perormance
+	for (int j = 0; j < map.size(); j++) // Browse the map char by char
+	{
+		for (int k = 0; k < map[j].size() - 1; k++) // Browse the map char by char
+		{
+			if (!map_vertical_confirmation[j][k])
+			{
+				unsigned int part_number = map[j][k];
+				if (part_number != 0)
+				{
+					glm::vec2 end_pos = glm::vec2(j, k);
+					glm::vec2 start_pos = glm::vec2(j, k);
+					unsigned short iter = 0;
+					j++;
+					while (j < map.size()) // Browse the map in one sense to detect repetition in vertical axis
+					{
+						unsigned int other_part_number = map[j][k];
+						if (other_part_number != part_number)
+						{
+							break;
+						}
+						else
+						{
+							end_pos = glm::vec2(j, k);
+							map_vertical_confirmation[j][k] = true;
+							j++;
+						}
+						iter++;
+					}
+
+					if (iter > 0)
+					{
+						map_vertical_confirmation[start_pos[0]][start_pos[1]] = true;
+						Map_Level_Collection collection; // Create the collection
+						collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
+						collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
+						collection.set_orientation(Map_Level_Orientation::Vertical);
+						collection.set_part(part_number);
+						collections.push_back(collection);
+					}
+					j = start_pos[0];
+					k = start_pos[1];
 				}
 			}
 		}
@@ -442,12 +513,12 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 	for (int i = 0; i < collections.size(); i++) // Construct each collections
 	{
 		Map_Level_Collection collection = collections[i];
-		unsigned int part_number = collection.part;
+		unsigned int part_number = collection.get_part();
 		Part* part = get_game_struct()->get_part(part_number); // Get the part at the collection
 		if (part != 0)
 		{
-			glm::vec3 difference = collection.final_position - collection.base_position;
-			glm::vec3 middle = collection.base_position + (difference) / glm::vec3(2, 2, 2);
+			glm::vec3 difference = collection.get_difference();
+			glm::vec3 middle = collection.get_middle();
 
 			glm::vec3 scale = glm::vec3(difference[0] + 1, part->get_scale()[1], difference[2] + 1);
 
@@ -455,7 +526,7 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 			float y = middle[1] + level->position[1] + part->get_position()[1];
 			float z = middle[2] + level->position[2] + part->get_position()[2];
 
-			std::string name = "level" + std::to_string(level->id) + ";w;" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 			
 			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), scale, true, part->get_texture_path()); // Create the object
 			object->set_map_pos(glm::vec2(x, z));
