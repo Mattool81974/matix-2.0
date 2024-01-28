@@ -81,11 +81,11 @@ bool Game::contains_scene(std::string name)
 }
 
 // Create a scene into the game and return it
-Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode mode)
+Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode mode, bool use_graphic, bool use_physic)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to create already exists." << std::endl; return 0; }
 
-    Scene* new_scene = new Scene(this, name, map_path, true, true, mode);
+    Scene* new_scene = new Scene(this, name, map_path, use_graphic, use_physic, mode);
     add_scene(name, new_scene);
     return new_scene;
 }
@@ -126,7 +126,6 @@ void Game::update_event()
 
     // Calculate delta time
     set_delta_time(glfwGetTime() - last_frame_time);
-    std::cout << "FPS : " << 1 / get_delta_time() << std::endl;
     last_frame_time = glfwGetTime();
 
     // Calculate mouse move and button

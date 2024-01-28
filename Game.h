@@ -23,7 +23,7 @@ public:
 	Game(int a_window_width, int a_window_height); // Game constructor
 	void add_scene(std::string name, Scene* scene); // Add an existing scene to the game
 	bool contains_scene(std::string name); // Returns if the game contains a scene
-	Scene* new_scene(std::string name, std::string map_path = "", Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Create a scene into the game and return it
+	Scene* new_scene(std::string name, std::string map_path = "", Map_Opening_Mode mode = Map_Opening_Mode::Simple, bool use_graphic = true, bool use_physic = true); // Create a scene into the game and return it
 	bool run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game
 	void update_event(); // Update the event of the game during this frame

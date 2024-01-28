@@ -17,7 +17,7 @@ def construct_factory(path: str):
     floor_part = 1
     middle_part = 0
     wall_part = 2
-    width, height = 1000, 1000
+    width, height = 50, 50
 
     # Write the parts of the map
     content += "l\n0 0 0 0 0 0 0 " + str(width) + " 3 " + str(height) + "\n" + big_delimitation + "\n"
@@ -34,7 +34,7 @@ def construct_factory(path: str):
     content += "w 0;0\n"
     for i in range(height):
         for j in range(width):
-            if i % 20 == 0 or j == 0: content += str(wall_part) + ";"
+            if i != -1: content += str(wall_part) + ";"
             else: content += str(middle_part) + ";"
         content = content[:-1] + "\n"
 

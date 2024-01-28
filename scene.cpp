@@ -398,31 +398,35 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 {
 	std::vector<std::vector<unsigned short>> map = std::vector< std::vector<unsigned short>>();
 	std::vector<std::vector<bool>> map_horizontal_confirmation = std::vector< std::vector<bool>>();
+	std::vector<std::vector<bool>> map_confirmation = std::vector< std::vector<bool>>();
 	std::vector<std::vector<bool>> map_vertical_confirmation = std::vector< std::vector<bool>>();
 	for (int j = 0; j < lines.size() - 1; j++) // Fill a temporary generation map
 	{
 		std::vector<std::string> line = cut_string(lines[j + 1], ";");
 		std::vector<bool> map_horizontal_line = std::vector<bool>();
 		std::vector<unsigned short> map_line = std::vector<unsigned short>();
+		std::vector<bool> map_confirmation_line = std::vector<bool>();
 		std::vector<bool> map_vertical_line = std::vector<bool>();
 		for (int k = 0; k < line.size(); k++)
 		{
 			map_horizontal_line.push_back(false);
 			map_line.push_back(std::stoi(line[k]));
+			map_confirmation_line.push_back(false);
 			map_vertical_line.push_back(false);
 		}
 		map_horizontal_confirmation.push_back(map_horizontal_line);
 		map.push_back(map_line);
+		map_confirmation.push_back(map_confirmation_line);
 		map_vertical_confirmation.push_back(map_vertical_line);
 	}
 
-	// Search for repeated part scalable, for perormance
+	// Search for repeated part scalable, for performance
 	std::vector<Map_Level_Collection> collections = std::vector<Map_Level_Collection>();
 	for (int j = 0; j < map.size(); j++) // Browse the map char by char
 	{
-		for (int k = 0; k < map[j].size() - 1; k++) // Browse the map char by char
+		for (int k = 0; k < map[j].size(); k++) // Browse the map char by char
 		{
-			if (!map_horizontal_confirmation[j][k])
+			if (!map_confirmation[j][k])
 			{
 				unsigned int part_number = map[j][k];
 				if (part_number != 0)
@@ -430,76 +434,89 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 					glm::vec2 end_pos = glm::vec2(j, k);
 					glm::vec2 start_pos = glm::vec2(j, k);
 					unsigned short iter = 0;
-					k++;
-					while (k < map[j].size() - 1) // Browse the map in one sense to detect repetition in horizontal axis
+					while (j < map.size() && k < map[j].size()) // Browse the map in two sense to detect repetition in horizontal/vertical axis
 					{
-						unsigned int other_part_number = map[j][k];
-						if (other_part_number != part_number)
+						bool line_good_1 = true;
+
+						if (k < map[j].size() - 1)
 						{
-							break;
+							for (int l = j; l >= start_pos[0]; l--) // Check if every part is good or not
+							{
+								unsigned int other_part_number = map[l][k + 1];
+								if (other_part_number != part_number)
+								{
+									end_pos[1] = k;
+									line_good_1 = false;
+									break;
+								}
+								else
+								{
+									end_pos[1] = k + 1;
+								}
+							}
+
+							if (line_good_1)
+							{
+								iter++;
+								k++;
+								for (int l = j; l >= start_pos[0]; l--) // Check if every part is good or not
+								{
+									map_confirmation[l][k] = true;
+								}
+							}
 						}
 						else
 						{
-							end_pos = glm::vec2(j, k);
-							map_horizontal_confirmation[j][k] = true;
-							k++;
+							line_good_1 = false;
 						}
-						iter++;
+
+						bool line_good_2 = true;
+
+						if (j < map.size() - 1)
+						{
+							for (int l = k; l >= start_pos[1]; l--) // Check if every part is good or not
+							{
+								unsigned int other_part_number = map[j + 1][l];
+								if (other_part_number != part_number)
+								{
+									end_pos[0] = j;
+									line_good_2 = false;
+									break;
+								}
+								else
+								{
+									end_pos[0] = j + 1;
+								}
+							}
+
+							if (line_good_2)
+							{
+								iter++;
+								j++;
+								for (int l = k; l >= start_pos[1]; l--) // Check if every part is good or not
+								{
+									map_confirmation[j][l] = true;
+								}
+							}
+						}
+						else
+						{
+							line_good_2 = false;
+						}
+
+						if (!line_good_1 && !line_good_2)
+						{
+							break;
+						}
 					}
 
 					if (iter > 0)
 					{
-						map_horizontal_confirmation[start_pos[0]][start_pos[1]] = true;
-						Map_Level_Collection collection; // Create the collection
+						map_confirmation[start_pos[0]][start_pos[1]] = true;
+						Map_Level_Collection collection = Map_Level_Collection(); // Create the collection
 						collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
 						collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
 						collection.set_orientation(Map_Level_Orientation::Horizontal);
-						collection.set_part(part_number);
-						collections.push_back(collection);
-					}
-					k--;
-				}
-			}
-		}
-	}
-
-	// Search for repeated part scalable, for perormance
-	for (int j = 0; j < map.size(); j++) // Browse the map char by char
-	{
-		for (int k = 0; k < map[j].size() - 1; k++) // Browse the map char by char
-		{
-			if (!map_vertical_confirmation[j][k])
-			{
-				unsigned int part_number = map[j][k];
-				if (part_number != 0)
-				{
-					glm::vec2 end_pos = glm::vec2(j, k);
-					glm::vec2 start_pos = glm::vec2(j, k);
-					unsigned short iter = 0;
-					j++;
-					while (j < map.size()) // Browse the map in one sense to detect repetition in vertical axis
-					{
-						unsigned int other_part_number = map[j][k];
-						if (other_part_number != part_number)
-						{
-							break;
-						}
-						else
-						{
-							end_pos = glm::vec2(j, k);
-							map_vertical_confirmation[j][k] = true;
-							j++;
-						}
-						iter++;
-					}
-
-					if (iter > 0)
-					{
-						map_vertical_confirmation[start_pos[0]][start_pos[1]] = true;
-						Map_Level_Collection collection; // Create the collection
-						collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
-						collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
-						collection.set_orientation(Map_Level_Orientation::Vertical);
 						collection.set_part(part_number);
 						collections.push_back(collection);
 					}
@@ -509,7 +526,7 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 			}
 		}
 	}
-
+	
 	for (int i = 0; i < collections.size(); i++) // Construct each collections
 	{
 		Map_Level_Collection collection = collections[i];
@@ -533,7 +550,7 @@ void Scene::construct_level(std::vector<std::string> lines, Map_Level* level, un
 			objects_map[level->id][x][z] = object;
 		}
 	}
-	std::cout << get_objects()->size() << std::endl;
+	std::cout << get_objects()->size() << " " << collections.size() << std::endl;
 }
 
 // Returns if the scene contains an object
@@ -766,7 +783,7 @@ void Scene::update()
 		}
 	}
 
-	if (use_physic())
+	if (use_physic() && get_physic_scene() != 0)
 	{
 		get_physic_scene()->update();
 	}

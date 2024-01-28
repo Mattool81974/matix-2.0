@@ -10,7 +10,7 @@ void factory()
     game.new_vao("../vbos/famas.vbo", "famas");
     game.new_vao("../vbos/shell.vbo", "ammo");
     game.new_part(1, "square", glm::vec3(0, 0, 0), glm::vec3(90, 0, 0), glm::vec3(1, 1, 1), "../textures/floor.png");
-    game.new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
+    game.new_part(2, "cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
 
     // Construct scene
     Scene* scene = game.new_scene("factory", "../maps/factory.wad", Map_Opening_Mode::Complex);
