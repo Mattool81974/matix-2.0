@@ -20,6 +20,7 @@ public:
 
 	// Getters and setters
 	inline void* get_base_object() { return base_object; };
+	inline std::string get_description() { return description; };
 	inline glm::vec3 get_position() { return position; };
 	inline bool get_resize_texture() { return resize_texture; };
 	inline glm::vec3 get_rotation() { return rotation; };
@@ -27,11 +28,13 @@ public:
 	inline glm::vec3 get_scale_level_multiplier() { return scale_level_multiplier; };
 	inline std::string get_texture_path() { return texture_path; };
 	inline std::string get_type() { return type; };
+	inline void set_description(std::string a_description) { description = a_description; };
 	inline void set_resize_texture(bool a_resize_texture) { resize_texture = a_resize_texture; };
 	inline void set_scale_level_multiplier(glm::vec3 a_scale_level_multiplier) { scale_level_multiplier = a_scale_level_multiplier; };
 	inline void set_use_collection(bool a_use_collection) { collection = a_use_collection; };
 	inline bool use_collection() { return collection; };
 private:
+	std::string description = "1"; // Little description of the object, usefull for debug
 	bool resize_texture = true; // If the texture should be resized or not
 	bool collection = true; // If the part can use collection
 
@@ -103,26 +106,30 @@ public:
 	virtual void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the object
 	virtual Collision_Result collides_with(Object* object); // Returns if the object collides with an other object
 	virtual void late_update() { get_collisions()->clear(); last_map_pos = map_pos; }; // Update the object after physic modification
+	std::vector<glm::vec2> set_map_pos(glm::vec2 a_map_pos); // Change the middle pos of the object in the map and return the list of pos in the map
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
 
 	// Getters and setters
 	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
+	std::vector<glm::vec2> get_all_map_pos();
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
 	inline std::vector<Collision_Result>* get_collisions() { return &collisions; };
+	inline std::string get_description() { return description; };
 	inline glm::vec2 get_last_map_pos() { return last_map_pos; };
 	inline unsigned short get_map_level() { return map_level; };
 	inline glm::vec2 get_map_pos() { return map_pos; };
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
 	inline std::vector<std::string>* get_tags() { return &tags; };
-	inline void set_map_pos(glm::vec2 a_map_pos) { map_pos = a_map_pos; };
+	inline void set_description(std::string a_description) { description = a_description; };
 	inline bool use_graphic() { return get_attached_graphic_object() != 0; };
 	inline bool use_physic() { return get_attached_physic_object() != 0; };
 private:
+	std::string description = "1"; // Little description of the object, usefull for debug
 	std::string name; // Name of the object
 	std::string scene_name; // Name of the scene of the object
 

@@ -264,6 +264,7 @@ Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a
     {
         get_attached_transform()->set_anchored_position(glm::vec3(0.5, 0, 0.0));
     }
+    set_description("2");
 }
 
 // Clone the door

@@ -213,6 +213,50 @@ Collision_Result Object::collides_with(Object *object)
 	return result;
 }
 
+// Return the list of pos in the map
+std::vector<glm::vec2> Object::get_all_map_pos()
+{
+	std::vector<glm::vec2> positions = std::vector<glm::vec2>();
+
+	int scale0 = (int)glm::floor(get_attached_transform()->get_scale()[0]);
+	if (scale0 % 2 == 0 || scale0 % 2 == 1) // Ajdust the horizontal part
+	{
+		positions.push_back(get_map_pos());
+		for (int i = 0; i < glm::floor((scale0 + 1) / 2); i++)
+		{
+			positions.push_back(glm::vec2(get_map_pos()[0] - i, get_map_pos()[1]));
+			if (i != 0)
+			{
+				positions.push_back(glm::vec2(get_map_pos()[0] + i, get_map_pos()[1]));
+			}
+		}
+	}
+
+	int scale2 = (int)glm::floor(get_attached_transform()->get_scale()[2]);
+	if (scale2 % 2 == 0 || scale2 % 2 == 1) // Ajdust the horizontal part
+	{
+		positions.push_back(get_map_pos());
+		for (int i = 0; i < glm::floor((scale2 + 1) / 2); i++)
+		{
+			positions.push_back(glm::vec2(get_map_pos()[0], get_map_pos()[1] - i));
+			if (i != 0)
+			{
+				positions.push_back(glm::vec2(get_map_pos()[0], get_map_pos()[1] + i));
+			}
+		}
+	}
+
+	return positions;
+}
+
+// Change the middle pos of the object in the map and return the list of pos in the map
+std::vector<glm::vec2> Object::set_map_pos(glm::vec2 a_map_pos)
+{
+	map_pos = a_map_pos;
+
+	return get_all_map_pos();
+}
+
 // Object destructor
 Object::~Object()
 {

@@ -105,6 +105,38 @@ public:
 
 	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
+	inline void assign_map_pos(std::vector<glm::vec2> positions, unsigned short level_id, Object *object) // Put the positions into the map pos
+	{
+		if (object->get_map_pos()[0] == -1 || object->get_map_pos()[1] == -1) { return; }
+
+		for (int i = 0; i < positions.size(); i++)
+		{
+			glm::vec2 position = positions[i];
+			objects_map[level_id][position[0]][position[1]] = object;
+		}
+	};
+	inline void clear_objects_map() // Clear a the objects map
+	{
+		for (std::map<unsigned short, std::vector<std::vector<Object*>>>::iterator it = objects_map.begin(); it != objects_map.end();it++) // Full the map with 0
+		{
+			unsigned int length = 0;
+			if (it->second.size() > 0) { length = it->second[0].size(); }
+			clear_objects_map_level(it->first, it->second.size(), length); // Clear every level
+		}
+	};
+	inline void clear_objects_map_level(unsigned short level, unsigned int width, unsigned int length) // Clear a level in the objects map
+	{
+		objects_map[level].clear();
+		for (int i = 0; i < width; i++) // Full the map with 0
+		{
+			std::vector<Object*> line = std::vector<Object*>();
+			for (int j = 0; j < length; j++)
+			{
+				line.push_back(0);
+			}
+			objects_map[level].push_back(line);
+		}
+	};
 	std::vector<Map_Level_Collection> construct_collections(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a vector of collection from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene
@@ -113,6 +145,7 @@ public:
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
 	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true, void* clone = 0); // Create a new object into the scene and return it
+	std::string objects_map_to_string(unsigned short level = 0); // Return the objects map to string to debug
 	void update(); // Update the scene
 	~Scene(); // Scene destructor
 

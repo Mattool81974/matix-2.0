@@ -15,8 +15,12 @@ void warehouse()
     Part* wall_exterior = game.new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
 
     // Configurate parts
+    door->set_description("2");
     door->set_resize_texture(false);
     door->set_use_collection(false);
+    floor_exterior->set_description("4");
+    floor_interior->set_description("5");
+    wall_exterior->set_description("3");
     wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
@@ -35,6 +39,8 @@ void warehouse()
     player->get_attached_physic_object()->get_collision()->set_height(2);
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
+
+    std::cout << scene->objects_map_to_string() << std::endl;
 
     while (game.run())
     {
