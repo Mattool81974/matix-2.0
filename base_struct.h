@@ -9,7 +9,7 @@
 
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
-glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
+glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
 
 struct Transform_Animation {
 	// Struct representing a transform object animation
@@ -45,8 +45,8 @@ public:
 	void remove_child(Transform_Object* object); // Remove an object from the children
 	void rescale(glm::vec3 a_scale); // Rescale the object
 	void reset_animation(bool reset_position = true); // Reset the animation of the object
-	virtual void rotate(glm::vec3 a_rotation); // Rotate the object
-	void rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier); // Rotate the object around a point with eulers angle
+	virtual void rotate(glm::vec3 a_rotation); // Rotate the object around the anchored point
+	void set_rotation(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Set the rotation around the anchord point
 	void soft_reset(); // Reset softly the object
 	virtual void update() { update_animation(); }; // Update the object
 	void update_animation(); // Update the animations for the object
@@ -72,6 +72,7 @@ public:
 	inline glm::vec3 get_position() { return position; };
 	inline glm::vec3 get_position_animation() { return position_animation; };
 	inline glm::vec3 get_position_move_multiplier() { return position_move_multiplier; };
+	inline glm::vec3 get_position_offset() { return position_offset; };
 	inline glm::vec3 get_right() { return right; };
 	inline glm::vec3 get_rotation() { return rotation; };
 	inline glm::vec3 get_scale() { return scale; };
@@ -86,7 +87,6 @@ public:
 	inline void set_position(glm::vec3 new_position) { position = new_position; };
 	inline void set_position_animation(glm::vec3 new_position) { position_animation = new_position; };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
-	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };
 	inline void start_animation() { animation_playing = true; };
 	inline void stop_animation() { animation_playing = false; };

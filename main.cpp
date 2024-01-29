@@ -30,7 +30,7 @@ void warehouse()
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
     camera->set_position(glm::vec3(0, 0.75, 0));
-    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
+    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
     player->get_attached_physic_object()->get_collision()->set_height(2);
     player->get_attached_physic_object()->get_collision()->set_width(0.65);

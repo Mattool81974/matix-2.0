@@ -136,7 +136,6 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
-	position_offset = a_position;
 	set_parent(a_parent);
 	calculate_direction();
 }
@@ -246,7 +245,7 @@ void Transform_Object::reset_animation(bool reset_position)
 // Rotate the object
 void Transform_Object::rotate(glm::vec3 a_rotation)
 {
-	rotation += a_rotation;
+	set_rotation(get_rotation() + a_rotation);
 	calculate_direction();
 	std::vector<Transform_Object*>* children = get_children();
 	for (int i = 0; i < children->size(); i++)
@@ -254,11 +253,10 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 		Transform_Object* child = (*children)[i];
 		a_rotation *= child->get_parent_rotation_multiplier();
 		child->rotate(a_rotation);
-		child->rotate_around(child->get_anchored_position(), get_rotation(), glm::vec3(1, 1, 0));
 	}
 }
 
-// Rotate the object around a point with euler angle
+/*// Rotate the object around a point with euler angle
 void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
 {
 	position_offset = -get_anchored_position();
@@ -307,6 +305,22 @@ void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation,
 		position_offset[2] *= -glm::cos(final_angle);
 	}
 }
+//*/
+
+// Set the rotation
+void Transform_Object::set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier)
+{
+	if (rotation_multiplier[0] == 1)
+		rotation[0] = new_rotation[0];
+	if (rotation_multiplier[1] == 1)
+		rotation[1] = new_rotation[1];
+	if (rotation_multiplier[2] == 1)
+		rotation[2] = new_rotation[2];
+
+	position_offset = (rotate_vector(-get_anchored_position(), get_rotation() * glm::vec3(1, -1, 1), glm::vec3(0, 0, 0), rotation_multiplier));
+
+	calculate_direction();
+};
 
 // Reset softly the object
 void Transform_Object::soft_reset()

@@ -142,11 +142,11 @@ void Famas::zoom()
     get_game_struct()->get_camera()->set_fov(get_zoom_normal_fov() - (get_zoom_normal_fov() - get_zoom_fov()) * zoom_state);
     if (zoom_state == 1)
     {
-        get_attached_transform()->set_anchored_position(glm::vec3(-0.0, -0.15f, -0.5));
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.0));
     }
     else
     {
-        get_attached_transform()->set_anchored_position(glm::vec3(-0.3, -0.15f, -0.45));
+        get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     }
 }
 
@@ -262,7 +262,7 @@ Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a
 {
     if (get_attached_transform() != 0)
     {
-        get_attached_transform()->set_anchored_position(glm::vec3(0, 0, -0.5));
+        get_attached_transform()->set_anchored_position(glm::vec3(0.5, 0, 0.0));
     }
 }
 
@@ -276,9 +276,7 @@ void* Door::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
 void Door::update()
 {
     glm::vec3 rotation = glm::vec3(0, 90, 0) * glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime());
-    get_attached_transform()->rotate_around(get_attached_transform()->get_anchored_position(), rotation, glm::vec3(0, 1, 0));
     get_attached_transform()->set_rotation(rotation);
-    std::cout << get_attached_transform()->get_absolute_position()[0] << " " << get_attached_transform()->get_absolute_position()[1] << " " << get_attached_transform()->get_absolute_position()[2] << std::endl;
     Object::update();
 }
 
