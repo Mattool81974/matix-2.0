@@ -261,7 +261,7 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 // Rotate the object around a point with euler angle
 void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
 {
-	position_offset = -get_anchored_position() + get_position();
+	position_offset = -get_anchored_position();
 
 	// Calculate the angle in a local XZ circle with Y angle
 	glm::vec2 difference_position = glm::vec2(a_position[0], a_position[2]);

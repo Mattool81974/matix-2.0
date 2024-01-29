@@ -57,9 +57,9 @@ public:
 	{
 		if (get_parent() != 0)
 		{
-			return get_parent()->get_absolute_position() + get_position_animation() + position_offset;
+			return get_parent()->get_absolute_position() + get_position() + get_position_animation() + position_offset;
 		}
-		return get_position_animation() + position_offset;
+		return get_position() + get_position_animation() + position_offset;
 	};
 	inline glm::vec3 get_anchored_position() { return anchored_position; };
 	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
@@ -79,11 +79,11 @@ public:
 	inline bool is_animation_playing() { return animation_playing; };
 
 	// Setters
-	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position + get_position(); };
+	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset = -a_anchored_position; };
 	inline void set_parent(Transform_Object* new_parent) { if (get_parent() != 0) { get_parent()->remove_child(this); } parent = new_parent; if (new_parent != 0) { new_parent->get_children()->push_back(this); } };
 	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
-	inline void set_position(glm::vec3 new_position) { position_offset -= get_position(); position = new_position; position_offset += get_position(); };
+	inline void set_position(glm::vec3 new_position) { position = new_position; };
 	inline void set_position_animation(glm::vec3 new_position) { position_animation = new_position; };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
 	inline void set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)) { if(rotation_multiplier[0] == 1)rotation[0] = new_rotation[0]; if (rotation_multiplier[1] == 1)rotation[1] = new_rotation[1]; if (rotation_multiplier[2] == 1)rotation[2] = new_rotation[2]; calculate_direction(); };
