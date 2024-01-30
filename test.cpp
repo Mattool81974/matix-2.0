@@ -16,11 +16,12 @@ void* Ammo::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
 // Late update the ammo
 void Ammo::late_update()
 {
-    if (get_collisions()->size() > 0)
+    if (get_collisions_result()->size() > 0)
     {
         Scene* scene = (*game->get_scenes())[get_scene_name()];
         scene->destroy(get_name());
     }
+    Object::late_update();
 }
 
 // Update the ammo
@@ -172,10 +173,10 @@ void* Target::clone(Advanced_Struct* a_game_struct, std::string a_name, std::str
 // Update lately the target
 void Target::late_update()
 {
-    for (int i = 0; i < get_collisions()->size(); i++)
+    for (int i = 0; i < get_collisions_result()->size(); i++)
     {
-        Object* object1 = (Object *)(*get_collisions())[i].get_object1();
-        Object* object2 = (Object*)(*get_collisions())[i].get_object2();
+        Object* object1 = (Object *)get_collisions_result()->at(i)->object1;
+        Object* object2 = (Object*)get_collisions_result()->at(i)->object2;
 
         Object* collider = object1;
         if (object1 == this)

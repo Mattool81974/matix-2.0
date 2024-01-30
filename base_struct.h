@@ -10,6 +10,7 @@
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
+float sign(float number); // Return the sign of a number
 
 struct Transform_Animation {
 	// Struct representing a transform object animation

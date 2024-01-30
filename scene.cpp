@@ -115,7 +115,7 @@ void Physic_Scene::check_collisions()
 	{
 		Object* object = dynamic_objects[i];
 
-		std::vector<glm::vec3> map_positions = object->get_all_map_pos();
+		std::vector<glm::vec3> map_positions = object->get_all_map_pos(true); // Check each part of the map the object is
 		for (int i = 0; i < map_positions.size(); i++)
 		{
 			glm::vec3 position = map_positions[i];
@@ -131,236 +131,17 @@ void Physic_Scene::check_collisions()
 						Object* target = (*get_objects_map())[x][y][z];
 						if (target != 0 && object != target)
 						{
-							// std::cout << "Collision " << target->get_description() << " - " << object->get_description() << " " << x << " " << y << " " << z << std::endl;
+							One_Collision result = target->collides_with(object);
+							if (result.collide) // If the object collides with the target
+							{
+								object->get_collisions_result()->add_collision(result);
+								object->get_collisions_result()->add_collision(result);
+							}
 						}
 					}
 				}
 			}
 		}
-
-		/*glm::vec2 pos = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f, object->get_attached_transform()->get_position()[2] + 0.5f); // Calculate max and min pos
-		glm::vec2 pos_movement = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f + object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_position()[2] + 0.5f + object->get_attached_transform()->get_movement()[2]); // Calculate max and min pos
-		glm::vec2 max_pos = glm::vec2(glm::floor(pos[0] + object->get_attached_physic_object()->get_collision()->get_width()), glm::floor(pos[1] + object->get_attached_physic_object()->get_collision()->get_width()));
-		glm::vec2 min_pos = glm::vec2(glm::floor(pos[0] - object->get_attached_physic_object()->get_collision()->get_width()), glm::floor(pos[1] - object->get_attached_physic_object()->get_collision()->get_width()));
-		glm::vec2 max_pos_movement = glm::vec2(glm::floor(pos[0] + object->get_attached_physic_object()->get_collision()->get_width() + object->get_attached_transform()->get_movement()[0]), glm::floor(pos[1] + object->get_attached_physic_object()->get_collision()->get_width() + object->get_attached_transform()->get_movement()[2]));
-		glm::vec2 min_pos_movement = glm::vec2(glm::floor(pos[0] - object->get_attached_physic_object()->get_collision()->get_width() + object->get_attached_transform()->get_movement()[0]), glm::floor(pos[1] - object->get_attached_physic_object()->get_collision()->get_width() + object->get_attached_transform()->get_movement()[2]));
-		
-		if (max_pos[0] >= 0 and max_pos[0] < get_objects_map()->size()) // Check max position X collision
-		{
-			if (max_pos_movement[1] >= 0 and max_pos_movement[1] < (*get_objects_map())[max_pos[0]].size())
-			{
-				if ((*get_objects_map())[max_pos[0]][max_pos_movement[1]] != 0) // Check max position X with max position Y collision
-				{
-					Object* collide_object = (*get_objects_map())[max_pos[0]][max_pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (pos_movement[1] >= 0 and pos_movement[1] < (*get_objects_map())[max_pos[0]].size()) // Check max position X with position Y collision
-			{
-				if ((*get_objects_map())[max_pos[0]][pos_movement[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[max_pos[0]][pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (min_pos_movement[1] >= 0 and min_pos_movement[1] < (*get_objects_map())[max_pos[0]].size()) // Check max position X with min position Y collision
-			{
-				if ((*get_objects_map())[max_pos[0]][min_pos_movement[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[max_pos[0]][min_pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-		}
-
-		if (max_pos_movement[0] >= 0 and max_pos_movement[0] < get_objects_map()->size()) // Check max position X collision
-		{
-			if (max_pos[1] >= 0 and max_pos[1] < (*get_objects_map())[max_pos_movement[0]].size())
-			{
-				if ((*get_objects_map())[max_pos_movement[0]][max_pos[1]] != 0) // Check max position Y with max position X collision
-				{
-					Object* collide_object = (*get_objects_map())[max_pos_movement[0]][max_pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (pos[1] >= 0 and pos[1] < (*get_objects_map())[max_pos_movement[0]].size()) // Check position Y with max position X collision
-			{
-				if ((*get_objects_map())[max_pos_movement[0]][pos[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[max_pos_movement[0]][pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (min_pos[1] >= 0 and min_pos[1] < (*get_objects_map())[max_pos_movement[0]].size()) // Check min position Y with max position X collision
-			{
-				if ((*get_objects_map())[max_pos_movement[0]][min_pos[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[max_pos_movement[0]][min_pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-		}
-
-		if (min_pos[0] >= 0 and min_pos[0] < get_objects_map()->size()) // Check min position X collision
-		{
-			if (max_pos_movement[1] >= 0 and max_pos_movement[1] < (*get_objects_map())[min_pos[0]].size())
-			{
-				if ((*get_objects_map())[min_pos[0]][max_pos_movement[1]] != 0) // Check max position X with max position Y collision
-				{
-					Object* collide_object = (*get_objects_map())[min_pos[0]][max_pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (pos_movement[1] >= 0 and pos_movement[1] < (*get_objects_map())[min_pos[0]].size()) // Check max position X with position Y collision
-			{
-				if ((*get_objects_map())[min_pos[0]][pos_movement[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[min_pos[0]][pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (min_pos_movement[1] >= 0 and min_pos_movement[1] < (*get_objects_map())[min_pos[0]].size()) // Check max position X with min position Y collision
-			{
-				if ((*get_objects_map())[min_pos[0]][min_pos_movement[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[min_pos[0]][min_pos_movement[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[2] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-		}
-
-		if (min_pos_movement[0] >= 0 and min_pos_movement[0] < get_objects_map()->size()) // Check max position X collision
-		{
-			if (max_pos[1] >= 0 and max_pos[1] < (*get_objects_map())[min_pos_movement[0]].size())
-			{
-				if ((*get_objects_map())[min_pos_movement[0]][max_pos[1]] != 0) // Check max position Y with max position X collision
-				{
-					Object* collide_object = (*get_objects_map())[min_pos_movement[0]][max_pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (pos[1] >= 0 and pos[1] < (*get_objects_map())[min_pos_movement[0]].size()) // Check position Y with max position X collision
-			{
-				if ((*get_objects_map())[min_pos_movement[0]][pos[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[min_pos_movement[0]][pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-
-			if (min_pos[1] >= 0 and min_pos[1] < (*get_objects_map())[min_pos_movement[0]].size()) // Check min position Y with max position X collision
-			{
-				if ((*get_objects_map())[min_pos_movement[0]][min_pos[1]] != 0)
-				{
-					Object* collide_object = (*get_objects_map())[min_pos_movement[0]][min_pos[1]];
-					Collision_Result result = collide_object->collides_with(object);
-					if (result.is_colliding())
-					{
-						glm::vec3 new_movement = glm::vec3(object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_movement()[1], object->get_attached_transform()->get_movement()[2]);
-						new_movement[0] = 0;
-						object->get_attached_transform()->set_movement(new_movement);
-						object->get_collisions()->push_back(Collision_Result(object, collide_object));
-						collide_object->get_collisions()->push_back(Collision_Result(object, collide_object));
-					}
-				}
-			}
-		}
-		//*/
 	}
 }
 

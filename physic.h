@@ -6,18 +6,21 @@ class Collision
 {
 	// Class representing a physic collision
 public:
-	Collision(unsigned short a_type = 1, float a_width = 1, float a_height = 1); // Collision constructor
+	Collision(unsigned short a_type = 1, float a_width = 1, float a_height = 1, float a_length = 1); // Collision constructor
 	Collision(Collision& copy); // Collision copy constructor
 	~Collision(); // Collision destructor
 
 	// Getters and setters
 	inline float get_height() { return height; };
+	inline float get_length() { return length; };
 	inline unsigned short get_type() { return type; };
 	inline float get_width() { return width; };
 	inline void set_height(float a_height) { height = a_height; };
+	inline void set_length(float a_length) { length = a_length; };
 	inline void set_width(float a_width) { width = a_width; };
 private:
 	float height; // Height of the collision
+	float length; // Length of the collision
 	unsigned short type; // 1 = square
 	float width; // Width of the collision
 };

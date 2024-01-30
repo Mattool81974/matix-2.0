@@ -28,7 +28,7 @@ void warehouse()
     game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(0.5, 1.75, 0.5), false, "", false, false, true);
+    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(0.65 * 2, 1.75, 0.65 * 2), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
     
     // Configurate some objects in the scene
@@ -36,7 +36,8 @@ void warehouse()
     camera->set_position(glm::vec3(0, 0.75, 0));
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
-    player->get_attached_physic_object()->get_collision()->set_height(2);
+    player->get_attached_physic_object()->get_collision()->set_height(1.75);
+    player->get_attached_physic_object()->get_collision()->set_length(0.65);
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
     player->set_map_pos(glm::vec3(2, 1, 2));
@@ -49,6 +50,17 @@ void warehouse()
     while (game.run())
     {
         game.update_event();
+
+        std::vector<glm::vec3> positions = player->get_all_map_pos(true);
+        std::cout << positions.size() << " " << player->get_map_pos()[0] << " " << player->get_map_pos()[1] << " " << player->get_map_pos()[2] << " " << player->get_attached_transform()->get_scale()[0] << " " << player->get_attached_transform()->get_scale()[1] << " " << player->get_attached_transform()->get_scale()[2] << std::endl;
+        for (int i = 0; i < positions.size(); i++)
+        {
+            // std::cout << positions[i][0] << " " << positions[i][1] << " " << positions[i][2] << std::endl;
+            if (positions[i][0] == 0 || positions[i][2] == 0)
+            {
+                std::cout << "AA" << std::endl;
+            }
+        }
 
         game.update();
     }

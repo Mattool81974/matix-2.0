@@ -133,6 +133,9 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 	return to_return;
 }
 
+// Return the size of a number
+float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
+
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {

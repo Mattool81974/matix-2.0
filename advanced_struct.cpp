@@ -157,13 +157,13 @@ Advanced_Struct::~Advanced_Struct()
 }
 
 // Clossion_Result constructor
-Collision_Result::Collision_Result(void* a_object1, void* a_object2) : object1(a_object1), object2(a_object2)
+Collision_Result::Collision_Result(void* a_parent) : parent(a_parent)
 {
 
 }
 
 // Collision_Result copy constructor
-Collision_Result::Collision_Result(const Collision_Result& copy) : Collision_Result(copy.object1, copy.object2)
+Collision_Result::Collision_Result(const Collision_Result& copy) : Collision_Result(copy.parent)
 {
 	collide = copy.collide;
 }
@@ -175,7 +175,7 @@ Collision_Result::~Collision_Result()
 }
 
 // Object constructor
-Object::Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), name(a_name), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name)
+Object::Object(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : game_struct(a_game_struct), name(a_name), attached_transform(a_attached_transform), attached_graphic(a_attached_graphic), attached_physic(a_attached_physic), scene_name(a_scene_name), collision_result(this)
 {
 	
 }
@@ -187,34 +187,16 @@ void* Object::clone(Advanced_Struct* a_game_struct, std::string a_name, std::str
 }
 
 // Returns if the object collides with an other object
-Collision_Result Object::collides_with(Object *object)
+One_Collision Object::collides_with(Object *object)
 {
-	Collision_Result result(this, object);
-
-	float object_height = object->get_attached_physic_object()->get_collision()->get_height() / 2.0; // Calculate if the objects collides on the Y axis
-	float object_y = object->get_attached_transform()->get_absolute_position()[1];
-	float height = get_attached_physic_object()->get_collision()->get_height() / 2.0;
-	float y = get_attached_transform()->get_absolute_position()[1];
-	if (object_y < y)
-	{
-		if (y - height > object_y + object_height)
-		{
-			result.set_colliding(false);
-		}
-	}
-	else
-	{
-		if (y + height < object_y - object_height)
-		{
-			result.set_colliding(false);
-		}
-	}
-
+	One_Collision result;
+	result.object1 = this;
+	result.object2 = object;
 	return result;
 }
 
 // Return the list of pos in the map
-std::vector<glm::vec3> Object::get_all_map_pos()
+std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 {
 	std::vector<glm::vec3> positions = std::vector<glm::vec3>();
 
@@ -230,6 +212,51 @@ std::vector<glm::vec3> Object::get_all_map_pos()
 	int min_z = (int)glm::floor(map_pos[2] - scale2 / 2.0);
 	int max_z = (int)glm::ceil(map_pos[2] + scale2 / 2.0);
 
+	if (get_description() == "player")
+	{
+		// std::cout << "Player " << min_y << " " << max_y << " " << map_pos[1] << " " << scale1 << std::endl;
+	}
+
+	if (use_movement) // If the movement is used
+	{
+		min_x = (int)glm::floor(map_pos[0] - scale0 / 2.0 + get_attached_transform()->get_movement()[0]);
+		max_x = (int)glm::ceil(map_pos[0] + scale0 / 2.0 + get_attached_transform()->get_movement()[0]);
+		
+		for (int i = min_x; i < max_x; i++) // Create each positions with x movement
+		{
+			for (int j = min_y; j < max_y; j++)
+			{
+				for (int k = min_z; k < max_z; k++)
+				{
+					glm::vec3 vector = glm::vec3(i + 1, j + 1, k + 1);
+					positions.push_back(vector);
+				}
+			}
+		}
+
+		min_x = (int)glm::floor(map_pos[0] - scale0 / 2.0);
+		max_x = (int)glm::ceil(map_pos[0] + scale0 / 2.0);
+		min_y = (int)glm::floor(map_pos[1] - scale1 / 2.0 + get_attached_transform()->get_movement()[1]);
+		max_y = (int)glm::ceil(map_pos[1] + scale1 / 2.0 + get_attached_transform()->get_movement()[1]);
+
+		for (int i = min_x; i < max_x; i++) // Create each positions with y movement
+		{
+			for (int j = min_y; j < max_y; j++)
+			{
+				for (int k = min_z; k < max_z; k++)
+				{
+					glm::vec3 vector = glm::vec3(i + 1, j + 1, k + 1);
+					positions.push_back(vector);
+				}
+			}
+		}
+
+		min_y = (int)glm::floor(map_pos[1] - scale1 / 2.0);
+		max_y = (int)glm::ceil(map_pos[1] + scale1 / 2.0);
+		min_z = (int)glm::floor(map_pos[2] - scale2 / 2.0 + get_attached_transform()->get_movement()[2]);
+		max_z = (int)glm::ceil(map_pos[2] + scale2 / 2.0 + get_attached_transform()->get_movement()[2]);
+	}
+	
 	for (int i = min_x; i < max_x; i++) // Create each positions
 	{
 		for (int j = min_y; j < max_y; j++)
@@ -244,6 +271,71 @@ std::vector<glm::vec3> Object::get_all_map_pos()
 
 	return positions;
 }
+
+// Update the object after physic modification
+void  Object::late_update()
+{
+	for (int i = 0; i < get_collisions_result()->size(); i++) // Check each collisions
+	{
+		One_Collision* collision = get_collisions_result()->at(i);
+		Object* other = (Object*)collision->object1;
+		if(other == this) {other = (Object*)collision->object2;}
+
+		// Calculate the differences
+		float difference_collision_height = glm::abs(get_attached_physic_object()->get_collision()->get_height() / 2 + other->get_attached_physic_object()->get_collision()->get_height() / 2);
+		float difference_collision_length = glm::abs(get_attached_physic_object()->get_collision()->get_length() + other->get_attached_physic_object()->get_collision()->get_length());
+		float difference_collision_width = glm::abs(get_attached_physic_object()->get_collision()->get_width() + other->get_attached_physic_object()->get_collision()->get_width());
+		float difference_x = (get_attached_transform()->get_absolute_position()[0]) - other->get_attached_transform()->get_absolute_position()[0];
+		float difference_y = (get_attached_transform()->get_absolute_position()[1]) - other->get_attached_transform()->get_absolute_position()[1];
+		float difference_z = (get_attached_transform()->get_absolute_position()[2]) - other->get_attached_transform()->get_absolute_position()[2];
+		float difference_x_movement = (get_attached_transform()->get_absolute_position()[0] + get_attached_transform()->get_movement()[0]) - other->get_attached_transform()->get_absolute_position()[0];
+		float difference_y_movement = (get_attached_transform()->get_absolute_position()[1] + get_attached_transform()->get_movement()[1]) - other->get_attached_transform()->get_absolute_position()[1];
+		float difference_z_movement = (get_attached_transform()->get_absolute_position()[2] + get_attached_transform()->get_movement()[2]) - other->get_attached_transform()->get_absolute_position()[2];
+
+		glm::vec3 new_movement = get_attached_transform()->get_movement();
+		if (glm::abs(difference_x_movement) <= glm::abs(difference_collision_width) && sign(difference_x_movement) != sign(new_movement[0]))
+		{
+			if (sign(difference_x) == 1)
+			{
+				new_movement[0] = glm::abs(glm::abs(difference_collision_width) - glm::abs(difference_x)) - 0.5;
+			}
+			else
+			{
+				new_movement[0] = 0.5 - glm::abs(glm::abs(difference_collision_width) - glm::abs(difference_x));
+			}
+		}
+
+		if (glm::abs(difference_y_movement) <= glm::abs(difference_collision_height) && sign(difference_y_movement) != sign(new_movement[1]))
+		{
+			if (sign(difference_y) == 1)
+			{
+				new_movement[1] = 0;
+			}
+			else
+			{
+				new_movement[1] = 0;
+			}
+		}
+
+		if (glm::abs(difference_z_movement) <= glm::abs(difference_collision_length) && sign(difference_z_movement) != sign(new_movement[2]))
+		{
+			if (sign(difference_z) == 1)
+			{
+				new_movement[2] = glm::abs(glm::abs(difference_collision_length) - glm::abs(difference_z)) - 0.5;
+			}
+			else
+			{
+				new_movement[2] = 0.5 - glm::abs(glm::abs(difference_collision_length) - glm::abs(difference_z));
+			}
+		}
+
+		get_attached_transform()->set_movement(new_movement * glm::vec3(0.99, 0.99, 0.99));
+		// std::cout << "F " << get_attached_transform()->get_movement()[0] << " " << get_attached_transform()->get_movement()[1] << " " << get_attached_transform()->get_movement()[2] << std::endl;
+	}
+
+	get_collisions_result()->clear(); // Clear the object
+	last_map_pos = map_pos;
+};
 
 // Change the middle pos of the object in the map and return the list of pos in the map
 std::vector<glm::vec3> Object::set_map_pos(glm::vec3 a_map_pos)

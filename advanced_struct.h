@@ -78,24 +78,35 @@ private:
 	std::map<std::string, VAO*> all_vaos = std::map<std::string, VAO*>(); // Each vaos, with their type as key, in the game
 };
 
+struct One_Collision
+{
+	// Struct representing data about a collision
+	bool collide = true; // If there is a collision or not
+	void* object1 = 0; // Pointer to the first object
+	void* object2 = 0; // Pointer to the second object
+	glm::vec3 position = glm::vec3(0, 0, 0); // Position of the collision
+};
+
 class Collision_Result
 {
 	// Class representing the result of a detected collision
 public:
-	Collision_Result(void* a_object1 = 0, void* a_object2 = 0); // Collision_Result contructor
+	Collision_Result(void* a_parent = 0); // Collision_Result contructor
 	Collision_Result(const Collision_Result& copy); // Collision_Result copy constructor
+	inline void clear() { positions.clear(); }; // Clear the collision result
 	~Collision_Result(); // Collision_Result destructor
 
 	// Getters
-	inline void* get_object1() { return object1; };
-	inline void* get_object2() { return object2; };
+	inline void add_collision(One_Collision collision) { positions.push_back(collision); };
+	inline One_Collision* at(unsigned short pos) { return &positions[pos]; };
 	inline bool is_colliding() { return collide; };
 	inline void set_colliding(bool colliding) { collide = colliding; };
+	inline unsigned short size() { return positions.size(); };
 private:
 	bool collide = true; // If the 2 objects are colliding or not
+	void* parent = 0; // Pointer to the parent of the collision result
 
-	void* object1 = 0; // Pointer to the first object
-	void* object2 = 0; // Pointer to the second object
+	std::vector<One_Collision> positions = std::vector<One_Collision>(); // Positions of the collisions
 };
 
 class Object
@@ -104,8 +115,8 @@ class Object
 public:
 	Object(Advanced_Struct* a_game_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
 	virtual void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the object
-	virtual Collision_Result collides_with(Object* object); // Returns if the object collides with an other object
-	virtual void late_update() { get_collisions()->clear(); last_map_pos = map_pos; }; // Update the object after physic modification
+	virtual One_Collision collides_with(Object* object); // Returns if the object collides with an other object
+	virtual void late_update(); // Update the object after physic modification
 	std::vector<glm::vec3> set_map_pos(glm::vec3 a_map_pos); // Change the middle pos of the object in the map and return the list of pos in the map
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
@@ -113,11 +124,11 @@ public:
 	// Getters and setters
 	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
-	std::vector<glm::vec3> get_all_map_pos();
+	std::vector<glm::vec3> get_all_map_pos(bool use_movement = false);
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
-	inline std::vector<Collision_Result>* get_collisions() { return &collisions; };
+	inline Collision_Result* get_collisions_result() { return &collision_result; };
 	inline std::string get_description() { return description; };
 	inline glm::vec3 get_last_map_pos() { return last_map_pos; };
 	inline unsigned short get_map_level() { return map_level; };
@@ -136,7 +147,7 @@ private:
 	Graphic_Object* attached_graphic = 0; // Graphic object attached
 	Physic_Object* attached_physic = 0; // Physic object attached
 	Transform_Object* attached_transform = 0; // Transform object attached
-	std::vector<Collision_Result> collisions = std::vector<Collision_Result>(); // Collisions during this frame
+	Collision_Result collision_result;
 	Advanced_Struct* game_struct = 0; // Base struct in the game
 	glm::vec3 last_map_pos = glm::vec3(-1, -1, -1); // The pos of the object in the physic map, or -1 if not in it
 	unsigned short map_level = 0; // Map level of this object
