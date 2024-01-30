@@ -94,7 +94,7 @@ Graphic_Scene::~Graphic_Scene()
 }
 
 // Physic_Scene constructor
-Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::map<unsigned short, std::vector<std::vector<Object*>>>& a_objects_map): game_struct(a_game_struct), name(a_name), objects(a_objects), objects_map(a_objects_map)
+Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<std::vector<Object*>>>& a_objects_map): game_struct(a_game_struct), name(a_name), objects(a_objects), objects_map(a_objects_map)
 {
 
 }
@@ -114,7 +114,31 @@ void Physic_Scene::check_collisions()
 	for (int i = 0; i < dynamic_objects.size(); i++)
 	{
 		Object* object = dynamic_objects[i];
-		glm::vec2 pos = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f, object->get_attached_transform()->get_position()[2] + 0.5f); // Calculate max and min pos
+
+		std::vector<glm::vec3> map_positions = object->get_all_map_pos();
+		for (int i = 0; i < map_positions.size(); i++)
+		{
+			glm::vec3 position = map_positions[i];
+			if (position[0] >= 0 && position[0] < get_objects_map()->size())
+			{
+				float x = position[0];
+				if (position[1] >= 0 && position[1] < (*get_objects_map())[x].size())
+				{
+					float y = position[1];
+					if (position[2] >= 0 && position[2] < (*get_objects_map())[x][y].size())
+					{
+						float z = position[2];
+						Object* target = (*get_objects_map())[x][y][z];
+						if (target != 0 && object != target)
+						{
+							// std::cout << "Collision " << target->get_description() << " - " << object->get_description() << " " << x << " " << y << " " << z << std::endl;
+						}
+					}
+				}
+			}
+		}
+
+		/*glm::vec2 pos = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f, object->get_attached_transform()->get_position()[2] + 0.5f); // Calculate max and min pos
 		glm::vec2 pos_movement = glm::vec2(object->get_attached_transform()->get_position()[0] + 0.5f + object->get_attached_transform()->get_movement()[0], object->get_attached_transform()->get_position()[2] + 0.5f + object->get_attached_transform()->get_movement()[2]); // Calculate max and min pos
 		glm::vec2 max_pos = glm::vec2(glm::floor(pos[0] + object->get_attached_physic_object()->get_collision()->get_width()), glm::floor(pos[1] + object->get_attached_physic_object()->get_collision()->get_width()));
 		glm::vec2 min_pos = glm::vec2(glm::floor(pos[0] - object->get_attached_physic_object()->get_collision()->get_width()), glm::floor(pos[1] - object->get_attached_physic_object()->get_collision()->get_width()));
@@ -336,6 +360,7 @@ void Physic_Scene::check_collisions()
 				}
 			}
 		}
+		//*/
 	}
 }
 
@@ -357,6 +382,8 @@ void Physic_Scene::update()
 		{
 			it->second->get_attached_physic_object()->update(); // Update each object one by one
 		}
+
+		it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
 	}
 	check_collisions();
 }
@@ -611,7 +638,7 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, 
 			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
 			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
-			assign_map_pos(object->set_map_pos(glm::vec2(x, z)), level->id, object);
+			assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
 			object->set_description(part->get_description());
 		}
 	}
@@ -621,7 +648,6 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, 
 void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 {
 	// Reset the scene map
-	objects_map.clear();
 
 	if (mode == Map_Opening_Mode::Simple)
 	{
@@ -630,6 +656,8 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		std::vector<std::string> first_line = cut_string(lines[0], ";");
 		unsigned short width = std::stoi(first_line[0]); // Get the size of the map
 		unsigned short height = std::stoi(first_line[1]);
+
+		clear_objects_map(width, 1, height);
 
 		for (int i = 0; i < width; i++) // Full the map with 0
 		{
@@ -659,7 +687,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 						std::string name = std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
 						Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z) + part->get_position(), part->get_rotation(), part->get_scale(), true, part->get_texture_path()); // Create the object
-						object->set_map_pos(glm::vec2(x, z));
+						object->set_map_pos(glm::vec3(x, y, z));
 						objects_map[0][x][z] = object;
 					}
 				}
@@ -691,14 +719,19 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			level.scale = glm::vec3(length, height, width);
 			levels[level_id] = level;
 
+			float x = level.position[0];
+			float y = level.position[1];
+			float z = level.position[2];
+
 			std::string object_name = "level" + level_str[0]; // Configurate the level Object
-			Transform_Object* level_transform = new Transform_Object(this, level.position, level.rotation, level.scale);
+			Transform_Object* level_transform = new Transform_Object(this, glm::vec3(x, y, z), level.rotation, level.scale);
 			// Object* level_object = new Object(get_game_struct(), object_name, get_name(), level_transform);
 			// add_object(object_name, level_object);
-
-			objects_map[level_id] = std::vector<std::vector<Object*>>();
-			clear_objects_map_level(level_id, width, length);
 		}
+
+		total_size = glm::vec3(60, 5, 60);
+
+		clear_objects_map();
 
 		for (int i = 1; i < parts.size(); i++)
 		{
@@ -750,21 +783,21 @@ void Scene::load_from_file(std::string map_path, Map_Opening_Mode mode)
 }
 
 // Return the objects map to string to debug
-std::string Scene::objects_map_to_string(unsigned short level)
+std::string Scene::objects_map_to_string(int y)
 {
 	std::string result = "";
-	for (int i = 0; i < objects_map[level].size(); i++)
+	for (int i = 0; i < objects_map.size(); i++)
 	{
 		std::string line = "";
-		for (int j = 0; j < objects_map[level][i].size(); j++)
+		for (int j = 0; j < objects_map[i][y].size(); j++)
 		{
-			if (objects_map[level][i][j] == 0)
+			if (objects_map[i][y][j] == 0)
 			{
 				line += "0";
 			}
 			else
 			{
-				line += objects_map[level][i][j]->get_description();
+				line += objects_map[i][y][j]->get_description();
 			}
 			line += ";";
 		}
@@ -789,7 +822,10 @@ void Scene::update()
 		it->second->update(); // Update every objects
 		it->second->get_attached_transform()->update(); // Update every transform objects
 
-		assign_map_pos(it->second->get_all_map_pos(), it->second->get_map_level(), it->second);
+		if (it->second->use_physic() && it->second->get_attached_physic_object()->is_static())
+		{
+			assign_map_pos(it->second->get_all_map_pos(), it->second);
+		}
 	}
 
 	if (use_physic() && get_physic_scene() != 0)
@@ -818,7 +854,6 @@ void Scene::update()
 		std::map<std::string, Object*>::iterator it = (*get_to_destroy())[i];
 		if (it->second != 0)
 		{
-			if (it->second->get_map_pos()[0] != -1) { (*get_objects_map())[it->second->get_map_pos()[0]][it->second->get_map_pos()[1]] = 0; }
 			delete it->second;
 			it->second = 0;
 		}

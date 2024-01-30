@@ -106,22 +106,22 @@ public:
 	virtual void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the object
 	virtual Collision_Result collides_with(Object* object); // Returns if the object collides with an other object
 	virtual void late_update() { get_collisions()->clear(); last_map_pos = map_pos; }; // Update the object after physic modification
-	std::vector<glm::vec2> set_map_pos(glm::vec2 a_map_pos); // Change the middle pos of the object in the map and return the list of pos in the map
+	std::vector<glm::vec3> set_map_pos(glm::vec3 a_map_pos); // Change the middle pos of the object in the map and return the list of pos in the map
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
 
 	// Getters and setters
 	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
-	std::vector<glm::vec2> get_all_map_pos();
+	std::vector<glm::vec3> get_all_map_pos();
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };
 	inline std::vector<Collision_Result>* get_collisions() { return &collisions; };
 	inline std::string get_description() { return description; };
-	inline glm::vec2 get_last_map_pos() { return last_map_pos; };
+	inline glm::vec3 get_last_map_pos() { return last_map_pos; };
 	inline unsigned short get_map_level() { return map_level; };
-	inline glm::vec2 get_map_pos() { return map_pos; };
+	inline glm::vec3 get_map_pos() { return map_pos; };
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
 	inline std::vector<std::string>* get_tags() { return &tags; };
@@ -138,9 +138,9 @@ private:
 	Transform_Object* attached_transform = 0; // Transform object attached
 	std::vector<Collision_Result> collisions = std::vector<Collision_Result>(); // Collisions during this frame
 	Advanced_Struct* game_struct = 0; // Base struct in the game
-	glm::vec2 last_map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
+	glm::vec3 last_map_pos = glm::vec3(-1, -1, -1); // The pos of the object in the physic map, or -1 if not in it
 	unsigned short map_level = 0; // Map level of this object
-	glm::vec2 map_pos = glm::vec2(-1, -1); // The pos of the object in the physic map, or -1 if not in it
+	glm::vec3 map_pos = glm::vec3(-1, -1, -1); // The pos of the object in the physic map, or -1 if not in it
 	std::vector<std::string> tags = std::vector<std::string>(); // Tags about the object
 };
 

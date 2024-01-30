@@ -78,7 +78,7 @@ class Physic_Scene
 {
 	// Class representing a collection of physic object
 public:
-	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::map<unsigned short, std::vector<std::vector<Object*>>>& a_objects_map); // Physic_Scene constructor
+	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<std::vector<Object*>>>& a_objects_map); // Physic_Scene constructor
 	void check_collisions(); // Check the collisions in the system
 	Physic_Object* new_object(std::string name, Transform_Object& transform, bool static_object = true); // Create a new object into the scene and return it
 	void update(); // Update the objects in the scene
@@ -88,13 +88,13 @@ public:
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline std::string get_name() { return name; };
 	inline std::map<std::string, Object*>* get_objects() { return &objects; };
-	inline std::vector<std::vector<Object*>>* get_objects_map(unsigned short level = 0) { return &objects_map[level]; };
+	inline std::vector<std::vector<std::vector<Object*>>>* get_objects_map() { return &objects_map; };
 private:
 	std::string name; // Name of the scene
 
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	std::map<std::string, Object*>& objects; // Each objects, with their name at key, in the game
-	std::map<unsigned short, std::vector<std::vector<Object*>>> &objects_map; // Each objects, arranged as a map, in the scene
+	std::vector<std::vector<std::vector<Object*>>> &objects_map; // Each objects, arranged as a map, in the scene
 };
 
 class Scene: public Transform_Object
@@ -105,37 +105,50 @@ public:
 
 	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
-	inline void assign_map_pos(std::vector<glm::vec2> positions, unsigned short level_id, Object *object) // Put the positions into the map pos
+	inline void assign_map_pos(std::vector<glm::vec3> positions, Object *object) // Put the positions into the map pos
 	{
-		if (object->get_map_pos()[0] == -1 || object->get_map_pos()[1] == -1) { return; }
+		if (object->get_map_pos()[0] == -1 || object->get_map_pos()[1] == -1 || object->get_map_pos()[2] == -1) { return; }
 
 		for (int i = 0; i < positions.size(); i++)
 		{
-			glm::vec2 position = positions[i];
-			objects_map[level_id][position[0]][position[1]] = object;
+			glm::vec3 position = positions[i];
+			if (position[0] >= 0 && position[0] < get_objects_map()->size())
+			{
+				float x = position[0];
+				if (position[1] >= 0 && position[1] < (*get_objects_map())[x].size())
+				{
+					float y = position[1];
+					if (position[2] >= 0 && position[2] < (*get_objects_map())[x][y].size())
+					{
+						float z = position[2];
+						objects_map[x][y][z] = object;
+					}
+				}
+			}
 		}
+	};
+	inline void clear_objects_map(unsigned int width, unsigned int height, unsigned int length) // Clear a the objects map
+	{
+		objects_map.clear();
+		for (int i = 0; i < width;i++)
+		{
+			std::vector<std::vector<Object*>> line_x = std::vector<std::vector<Object*>>();
+			for (int j = 0; j < height; j++)
+			{
+				std::vector<Object*> line_y = std::vector<Object*>();
+				for (int k = 0; k < length; k++) { line_y.push_back(0); }
+				line_x.push_back(line_y);
+			}
+			objects_map.push_back(line_x);
+		}
+	};
+	inline void clear_objects_map(glm::vec3 size) // Clear a the objects map
+	{
+		clear_objects_map(size[0], size[1], size[2]);
 	};
 	inline void clear_objects_map() // Clear a the objects map
 	{
-		for (std::map<unsigned short, std::vector<std::vector<Object*>>>::iterator it = objects_map.begin(); it != objects_map.end();it++) // Full the map with 0
-		{
-			unsigned int length = 0;
-			if (it->second.size() > 0) { length = it->second[0].size(); }
-			clear_objects_map_level(it->first, it->second.size(), length); // Clear every level
-		}
-	};
-	inline void clear_objects_map_level(unsigned short level, unsigned int width, unsigned int length) // Clear a level in the objects map
-	{
-		objects_map[level].clear();
-		for (int i = 0; i < width; i++) // Full the map with 0
-		{
-			std::vector<Object*> line = std::vector<Object*>();
-			for (int j = 0; j < length; j++)
-			{
-				line.push_back(0);
-			}
-			objects_map[level].push_back(line);
-		}
+		clear_objects_map(get_total_size());
 	};
 	std::vector<Map_Level_Collection> construct_collections(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a vector of collection from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
@@ -145,7 +158,7 @@ public:
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
 	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true, void* clone = 0); // Create a new object into the scene and return it
-	std::string objects_map_to_string(unsigned short level = 0); // Return the objects map to string to debug
+	std::string objects_map_to_string(int y = 0); // Return the objects map to string to debug
 	void update(); // Update the scene
 	~Scene(); // Scene destructor
 
@@ -155,8 +168,9 @@ public:
 	inline std::string get_name() { return name; };
 	inline Object* get_object(std::string name) { if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\": error : The object \"" << name << "\" you want to access does not exist." << std::endl; return 0; } return (*get_objects())[name]; };
 	inline std::map<std::string, Object*> *get_objects() { return &objects; };
-	inline std::vector<std::vector<Object*>>* get_objects_map(unsigned short level = 0) { return &objects_map[level]; };
+	inline std::vector<std::vector<std::vector<Object*>>>* get_objects_map() { return &objects_map; };
 	inline Physic_Scene* get_physic_scene() { return physic_scene; };
+	inline glm::vec3 get_total_size() { return total_size; };
 	inline std::vector<std::map<std::string, Object*>::iterator>* get_to_destroy() { return &to_destroy; };
 	inline bool use_graphic() { return graphic; };
 	inline bool use_physic() { return physic; };
@@ -168,8 +182,9 @@ private:
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
-	std::map<unsigned short, std::vector<std::vector<Object*>>> objects_map = std::map<unsigned short, std::vector<std::vector<Object*>>>(); // Each objects, arranged as a map, in the scene
+	std::vector<std::vector<std::vector<Object*>>> objects_map = std::vector<std::vector<std::vector<Object*>>>(); // Each objects, arranged as a map, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
+	glm::vec3 total_size = glm::vec3(0, 0, 0); // Total size of the level
 	std::vector<std::map<std::string, Object*>::iterator> to_destroy = std::vector<std::map<std::string, Object*>::iterator>(); // Name of the objects to destroy at the end of the frame
 };
 

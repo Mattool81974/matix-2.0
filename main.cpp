@@ -28,7 +28,7 @@ void warehouse()
     game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(0.5, 1.75, 0.5), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
     
     // Configurate some objects in the scene
@@ -39,8 +39,12 @@ void warehouse()
     player->get_attached_physic_object()->get_collision()->set_height(2);
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
+    player->set_map_pos(glm::vec3(2, 1, 2));
+    player->set_description("player");
 
-    std::cout << scene->objects_map_to_string() << std::endl;
+    std::cout << scene->objects_map_to_string(0) << std::endl << std::endl << scene->objects_map_to_string(1) << std::endl;
+    float last_size = player->get_all_map_pos().size();
+    std::vector<glm::vec3> positions = player->get_all_map_pos();
 
     while (game.run())
     {

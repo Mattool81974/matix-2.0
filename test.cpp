@@ -217,7 +217,7 @@ void Target::place_randomly()
     }
 
     deployed = true;
-    set_map_pos(glm::vec2(rand_x, rand_z));
+    set_map_pos(glm::vec3(rand_x, rand_y, rand_z));
     get_attached_graphic_object()->set_texture(get_game_struct()->get_texture((*get_textures())[rand_texture]));
     get_attached_transform()->set_position(glm::vec3(rand_x, rand_y + multiplier, rand_z));
 
