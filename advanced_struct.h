@@ -81,6 +81,7 @@ private:
 struct One_Collision
 {
 	// Struct representing data about a collision
+	glm::vec3 axis_multiplier = glm::vec3(0, 0, 0); // Multiplier for each axis
 	bool collide = true; // If there is a collision or not
 	void* object1 = 0; // Pointer to the first object
 	void* object2 = 0; // Pointer to the second object

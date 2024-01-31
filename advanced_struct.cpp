@@ -212,15 +212,16 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 	int min_z = (int)glm::floor(map_pos[2] - scale2 / 2.0);
 	int max_z = (int)glm::ceil(map_pos[2] + scale2 / 2.0);
 
-	if (get_description() == "player")
-	{
-		// std::cout << "Player " << min_y << " " << max_y << " " << map_pos[1] << " " << scale1 << std::endl;
-	}
-
 	if (use_movement) // If the movement is used
 	{
-		min_x = (int)glm::floor(map_pos[0] - scale0 / 2.0 + get_attached_transform()->get_movement()[0]);
-		max_x = (int)glm::ceil(map_pos[0] + scale0 / 2.0 + get_attached_transform()->get_movement()[0]);
+		if (get_attached_transform()->get_movement()[0] < 0)
+		{
+			min_x = (int)glm::floor((map_pos[0] - scale0 / 2.0) + get_attached_transform()->get_movement()[0]);
+		}
+		else
+		{
+			max_x = (int)glm::ceil((map_pos[0] + scale0 / 2.0) + get_attached_transform()->get_movement()[0]);
+		}
 		
 		for (int i = min_x; i < max_x; i++) // Create each positions with x movement
 		{
@@ -229,6 +230,7 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 				for (int k = min_z; k < max_z; k++)
 				{
 					glm::vec3 vector = glm::vec3(i + 1, j + 1, k + 1);
+					positions.push_back(glm::vec3(1, 0, 0));
 					positions.push_back(vector);
 				}
 			}
@@ -236,9 +238,15 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 
 		min_x = (int)glm::floor(map_pos[0] - scale0 / 2.0);
 		max_x = (int)glm::ceil(map_pos[0] + scale0 / 2.0);
-		min_y = (int)glm::floor(map_pos[1] - scale1 / 2.0 + get_attached_transform()->get_movement()[1]);
-		max_y = (int)glm::ceil(map_pos[1] + scale1 / 2.0 + get_attached_transform()->get_movement()[1]);
-
+		if (get_attached_transform()->get_movement()[1] < 0)
+		{
+			min_y = (int)glm::floor((map_pos[1] - scale1 / 2.0) + get_attached_transform()->get_movement()[1]);
+		}
+		else
+		{
+			max_y = (int)glm::ceil((map_pos[1] + scale1 / 2.0) + get_attached_transform()->get_movement()[1]);
+		}
+		
 		for (int i = min_x; i < max_x; i++) // Create each positions with y movement
 		{
 			for (int j = min_y; j < max_y; j++)
@@ -246,6 +254,7 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 				for (int k = min_z; k < max_z; k++)
 				{
 					glm::vec3 vector = glm::vec3(i + 1, j + 1, k + 1);
+					positions.push_back(glm::vec3(0, 1, 0));
 					positions.push_back(vector);
 				}
 			}
@@ -253,8 +262,14 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 
 		min_y = (int)glm::floor(map_pos[1] - scale1 / 2.0);
 		max_y = (int)glm::ceil(map_pos[1] + scale1 / 2.0);
-		min_z = (int)glm::floor(map_pos[2] - scale2 / 2.0 + get_attached_transform()->get_movement()[2]);
-		max_z = (int)glm::ceil(map_pos[2] + scale2 / 2.0 + get_attached_transform()->get_movement()[2]);
+		if (get_attached_transform()->get_movement()[2] < 0)
+		{
+			min_z = (int)glm::floor((map_pos[2] - scale2 / 2.0) + get_attached_transform()->get_movement()[2]);
+		}
+		else
+		{
+			max_z = (int)glm::ceil((map_pos[2] + scale2 / 2.0) + get_attached_transform()->get_movement()[2]);
+		}
 	}
 	
 	for (int i = min_x; i < max_x; i++) // Create each positions
@@ -264,6 +279,7 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 			for (int k = min_z; k < max_z; k++)
 			{
 				glm::vec3 vector = glm::vec3(i + 1, j + 1, k + 1);
+				if (use_movement) positions.push_back(glm::vec3(0, 0, 1));
 				positions.push_back(vector);
 			}
 		}
@@ -273,7 +289,7 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 }
 
 // Update the object after physic modification
-void  Object::late_update()
+void Object::late_update()
 {
 	for (int i = 0; i < get_collisions_result()->size(); i++) // Check each collisions
 	{
@@ -293,44 +309,24 @@ void  Object::late_update()
 		float difference_z_movement = (get_attached_transform()->get_absolute_position()[2] + get_attached_transform()->get_movement()[2]) - other->get_attached_transform()->get_absolute_position()[2];
 
 		glm::vec3 new_movement = get_attached_transform()->get_movement();
-		if (glm::abs(difference_x_movement) <= glm::abs(difference_collision_width) && sign(difference_x_movement) != sign(new_movement[0]))
+		if (collision->axis_multiplier[0] != 0 && glm::abs(difference_x_movement) < glm::abs(difference_collision_width) && sign(difference_x_movement) != sign(new_movement[0]))
 		{
-			if (sign(difference_x) == 1)
-			{
-				new_movement[0] = glm::abs(glm::abs(difference_collision_width) - glm::abs(difference_x)) - 0.5;
-			}
-			else
-			{
-				new_movement[0] = 0.5 - glm::abs(glm::abs(difference_collision_width) - glm::abs(difference_x));
-			}
+			new_movement[0] = 0;
 		}
 
-		if (glm::abs(difference_y_movement) <= glm::abs(difference_collision_height) && sign(difference_y_movement) != sign(new_movement[1]))
+		// std::cout << "T " << difference_y_movement << " " << difference_y << " " << difference_collision_height << " " << other->get_description() << " " << new_movement[1] << " " << collision->axis_multiplier[1] << std::endl;
+		if (collision->axis_multiplier[1] != 0 && new_movement[1] != 0 && glm::abs(difference_y_movement) < glm::abs(difference_collision_height) && sign(difference_y_movement) != sign(new_movement[1]))
 		{
-			if (sign(difference_y) == 1)
-			{
-				new_movement[1] = 0;
-			}
-			else
-			{
-				new_movement[1] = 0;
-			}
+			// std::cout << "G " << other->get_description() << std::endl;
+			new_movement[1] = 0;
 		}
 
-		if (glm::abs(difference_z_movement) <= glm::abs(difference_collision_length) && sign(difference_z_movement) != sign(new_movement[2]))
+		if (collision->axis_multiplier[2] != 0 && glm::abs(difference_z_movement) < glm::abs(difference_collision_length) && sign(difference_z_movement) != sign(new_movement[2]))
 		{
-			if (sign(difference_z) == 1)
-			{
-				new_movement[2] = glm::abs(glm::abs(difference_collision_length) - glm::abs(difference_z)) - 0.5;
-			}
-			else
-			{
-				new_movement[2] = 0.5 - glm::abs(glm::abs(difference_collision_length) - glm::abs(difference_z));
-			}
+			new_movement[2] = 0;
 		}
 
-		get_attached_transform()->set_movement(new_movement * glm::vec3(0.99, 0.99, 0.99));
-		// std::cout << "F " << get_attached_transform()->get_movement()[0] << " " << get_attached_transform()->get_movement()[1] << " " << get_attached_transform()->get_movement()[2] << std::endl;
+		get_attached_transform()->set_movement(new_movement);
 	}
 
 	get_collisions_result()->clear(); // Clear the object

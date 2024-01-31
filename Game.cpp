@@ -147,6 +147,8 @@ void Game::update_event()
     }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         (*get_keys_state())["a"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        (*get_keys_state())["e"] = 1;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         (*get_keys_state())["z"] = 1;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

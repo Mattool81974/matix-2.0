@@ -8,7 +8,7 @@ Collision::Collision(unsigned short a_type, float a_width, float a_height, float
 }
 
 // Collision copy constructor
-Collision::Collision(Collision& copy): Collision(copy.type, copy.width)
+Collision::Collision(Collision& copy): Collision(copy.type, copy.width, copy.length)
 {
 
 }

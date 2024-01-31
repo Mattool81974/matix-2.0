@@ -116,9 +116,9 @@ void Physic_Scene::check_collisions()
 		Object* object = dynamic_objects[i];
 
 		std::vector<glm::vec3> map_positions = object->get_all_map_pos(true); // Check each part of the map the object is
-		for (int i = 0; i < map_positions.size(); i++)
+		for (int j = 0; j < map_positions.size() / 2; j++)
 		{
-			glm::vec3 position = map_positions[i];
+			glm::vec3 position = map_positions[j * 2 + 1];
 			if (position[0] >= 0 && position[0] < get_objects_map()->size())
 			{
 				float x = position[0];
@@ -134,8 +134,11 @@ void Physic_Scene::check_collisions()
 							One_Collision result = target->collides_with(object);
 							if (result.collide) // If the object collides with the target
 							{
+								int side = glm::floor((3.0f / map_positions.size()) * j);
+								result.axis_multiplier = map_positions[j * 2];
+
 								object->get_collisions_result()->add_collision(result);
-								object->get_collisions_result()->add_collision(result);
+								target->get_collisions_result()->add_collision(result);
 							}
 						}
 					}
@@ -163,8 +166,6 @@ void Physic_Scene::update()
 		{
 			it->second->get_attached_physic_object()->update(); // Update each object one by one
 		}
-
-		it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
 	}
 	check_collisions();
 }
@@ -595,6 +596,11 @@ void Scene::update()
 	std::map<std::string, Object *> *objects_to_update = get_objects();
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
+		if (it->second->use_physic() && it->second->get_attached_physic_object()->is_static())
+		{
+			assign_map_pos(it->second->get_all_map_pos(), it->second);
+		}
+
 		// Update every animations
 		if (it->second->get_attached_transform()->is_animation_playing() && it->second->get_attached_transform()->get_animations()->size() > 0)
 		{
@@ -602,11 +608,6 @@ void Scene::update()
 		}
 		it->second->update(); // Update every objects
 		it->second->get_attached_transform()->update(); // Update every transform objects
-
-		if (it->second->use_physic() && it->second->get_attached_physic_object()->is_static())
-		{
-			assign_map_pos(it->second->get_all_map_pos(), it->second);
-		}
 	}
 
 	if (use_physic() && get_physic_scene() != 0)
@@ -622,6 +623,7 @@ void Scene::update()
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
 		it->second->get_attached_transform()->soft_reset(); // Reset every objects
+		it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
 	}
 
 	if (use_graphic()) // Update graphic scene
