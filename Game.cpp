@@ -100,6 +100,20 @@ bool Game::run()
     return !to_return;
 }
 
+// Set the current scene in the game
+void Game::set_current_scene(std::string a_name)
+{
+    if (contains_scene(a_name))
+    {
+        current_scene = a_name;
+        get_current_scene()->load();
+    }
+    else
+    {
+        std::cout << "Matrix game : error ! The current scene \"" << a_name << "\" does not exist." << std::endl;
+    }
+};
+
 // Update one frame of the game
 void Game::update()
 {

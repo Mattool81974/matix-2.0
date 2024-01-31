@@ -115,6 +115,7 @@ class Object
 	// Class representing an object into a scene
 public:
 	Object(Advanced_Struct* a_game_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Object constructor
+	virtual void after_loading() {}; // Function called after loading, usefull for heritage
 	virtual void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the object
 	virtual One_Collision collides_with(Object* object); // Returns if the object collides with an other object
 	virtual void late_update(); // Update the object after physic modification
@@ -137,14 +138,16 @@ public:
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
 	inline std::vector<std::string>* get_tags() { return &tags; };
+	inline std::string get_type() { return type; };
 	inline void set_description(std::string a_description) { description = a_description; };
 	inline bool use_graphic() { return get_attached_graphic_object() != 0; };
 	inline bool use_physic() { return get_attached_physic_object() != 0; };
+protected:
+	std::string type = ""; // Type of the object
 private:
 	std::string description = "1"; // Little description of the object, usefull for debug
 	std::string name; // Name of the object
 	std::string scene_name; // Name of the scene of the object
-
 	Graphic_Object* attached_graphic = 0; // Graphic object attached
 	Physic_Object* attached_physic = 0; // Physic object attached
 	Transform_Object* attached_transform = 0; // Transform object attached

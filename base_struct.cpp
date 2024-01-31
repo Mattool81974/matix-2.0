@@ -246,9 +246,9 @@ void Transform_Object::reset_animation(bool reset_position)
 }
 
 // Rotate the object
-void Transform_Object::rotate(glm::vec3 a_rotation)
+void Transform_Object::rotate(glm::vec3 a_rotation, bool rotate_around)
 {
-	set_rotation(get_rotation() + a_rotation);
+	set_rotation(get_rotation() + a_rotation, glm::vec3(1, 1, 1), rotate_around);
 	calculate_direction();
 	std::vector<Transform_Object*>* children = get_children();
 	for (int i = 0; i < children->size(); i++)
@@ -259,59 +259,13 @@ void Transform_Object::rotate(glm::vec3 a_rotation)
 	}
 }
 
-/*// Rotate the object around a point with euler angle
-void Transform_Object::rotate_around(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
+void Transform_Object::rotate_around_anchor(glm::vec3 a_rotation, glm::vec3 rotation_multiplier)
 {
-	position_offset = -get_anchored_position();
-
-	// Calculate the angle in a local XZ circle with Y angle
-	glm::vec2 difference_position = glm::vec2(a_position[0], a_position[2]);
-	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[1] == 1)
-	{
-		// Calculate the angle of the position
-		float opposite = difference_position[0] - get_position()[0];
-		float adjacent = difference_position[1] - get_position()[2];
-		float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
-		glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
-	
-		float angle = glm::atan(opposite / adjacent);
-
-		// Calculate the position in the local circle
-		float final_angle = angle + glm::radians(a_rotation[1]);
-		glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
-
-		// Calculate the final position
-		position_offset[0] = final_position[0];
-		position_offset[2] = final_position[1];
-	}
-
-	// Calculate the angle in a local YZ circle with X angle
-	if (!(a_position[0] == 0 and a_position[2] == 0) and rotation_multiplier[0] == 1)
-	{
-		// Calculate the angle of the position
-		float adjacent = glm::distance(difference_position, glm::vec2(0, 0));
-		float hypothenus = glm::distance(glm::vec3(difference_position[0], a_position[1] - get_position()[1], difference_position[1]), glm::vec3(0, 0, 0));
-		glm::vec2 opposite_normalized = glm::normalize(difference_position);
-
-		float angle = glm::acos(adjacent / hypothenus);
-		if (a_position[1] - get_position()[1] < 0)
-		{
-			angle = 3.1415 * 2 - glm::acos(adjacent / hypothenus);
-		}
-
-		// Calculate the position in the local circle
-		float final_angle = angle + glm::radians(a_rotation[0]);
-
-		// Calculate the final position
-		position_offset[1] = glm::sin(final_angle) * hypothenus;
-		position_offset[0] *= -glm::cos(final_angle);
-		position_offset[2] *= -glm::cos(final_angle);
-	}
+	position_offset = (rotate_vector(-get_anchored_position(), a_rotation * glm::vec3(1, -1, 1), glm::vec3(0, 0, 0), rotation_multiplier));
 }
-//*/
 
 // Set the rotation
-void Transform_Object::set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier)
+void Transform_Object::set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier, bool rotate_around)
 {
 	if (rotation_multiplier[0] == 1)
 		rotation[0] = new_rotation[0];
@@ -320,7 +274,8 @@ void Transform_Object::set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_m
 	if (rotation_multiplier[2] == 1)
 		rotation[2] = new_rotation[2];
 
-	position_offset = (rotate_vector(-get_anchored_position(), get_rotation() * glm::vec3(1, -1, 1), glm::vec3(0, 0, 0), rotation_multiplier));
+	if (rotate_around)
+		rotate_around_anchor(new_rotation, rotation_multiplier);
 
 	calculate_direction();
 };

@@ -153,6 +153,9 @@ Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& tran
 {
 	// Create and add the object
 	Physic_Object* object = new Physic_Object(get_game_struct(), transform, static_object);
+	object->get_collision()->set_width(transform.get_scale()[0]);
+	object->get_collision()->set_height(transform.get_scale()[1]);
+	object->get_collision()->set_length(transform.get_scale()[2]);
 	return object;
 }
 
@@ -380,6 +383,15 @@ void Scene::destroy(std::string name)
 			to_destroy.push_back(it);
 			return;
 		}
+	}
+}
+
+// Load the scene
+void Scene::load()
+{
+	for (std::map<std::string, Object*>::iterator it = get_objects()->begin(); it != get_objects()->end(); it++) // After release each objects
+	{
+		it->second->after_loading();
 	}
 }
 

@@ -46,8 +46,9 @@ public:
 	void remove_child(Transform_Object* object); // Remove an object from the children
 	void rescale(glm::vec3 a_scale); // Rescale the object
 	void reset_animation(bool reset_position = true); // Reset the animation of the object
-	virtual void rotate(glm::vec3 a_rotation); // Rotate the object around the anchored point
-	void set_rotation(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Set the rotation around the anchord point
+	virtual void rotate(glm::vec3 a_rotation, bool rotate_around = true); // Rotate the object
+	void rotate_around_anchor(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate the object around the anchored point
+	void set_rotation(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1), bool rotate_around = true); // Set the rotation around the anchord point
 	void soft_reset(); // Reset softly the object
 	virtual void update() { update_animation(); }; // Update the object
 	void update_animation(); // Update the animations for the object

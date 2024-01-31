@@ -28,22 +28,17 @@ void warehouse()
     game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(0.65 * 2, 1.75, 0.65 * 2), false, "", false, false, true);
+    Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
-    Object* test = scene->new_object("test", "one_faced_cube", 0, glm::vec3(10, 5, 10), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/floor_exterior.png", true, true, true);
     
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
     camera->set_position(glm::vec3(0, 0.75, 0));
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
-    player->get_attached_physic_object()->get_collision()->set_height(1.75);
-    player->get_attached_physic_object()->get_collision()->set_length(0.65);
-    player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
     player->set_map_pos(glm::vec3(2, 1, 2));
     player->set_description("player");
-    test->set_map_pos(glm::vec3(10, 5, 10));
 
     float last_size = player->get_all_map_pos().size();
     std::vector<glm::vec3> positions = player->get_all_map_pos();

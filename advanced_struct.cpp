@@ -298,9 +298,9 @@ void Object::late_update()
 		if(other == this) {other = (Object*)collision->object2;}
 
 		// Calculate the differences
-		float difference_collision_height = glm::abs(get_attached_physic_object()->get_collision()->get_height() / 2 + other->get_attached_physic_object()->get_collision()->get_height() / 2);
-		float difference_collision_length = glm::abs(get_attached_physic_object()->get_collision()->get_length() + other->get_attached_physic_object()->get_collision()->get_length());
-		float difference_collision_width = glm::abs(get_attached_physic_object()->get_collision()->get_width() + other->get_attached_physic_object()->get_collision()->get_width());
+		float difference_collision_height = glm::abs(get_attached_physic_object()->get_collision()->get_height() / 2.0 + other->get_attached_physic_object()->get_collision()->get_height() / 2.0);
+		float difference_collision_length = glm::abs(get_attached_physic_object()->get_collision()->get_length() / 2.0 + other->get_attached_physic_object()->get_collision()->get_length() / 2.0);
+		float difference_collision_width = glm::abs(get_attached_physic_object()->get_collision()->get_width() / 2.0 + other->get_attached_physic_object()->get_collision()->get_width() / 2.0);
 		float difference_x = (get_attached_transform()->get_absolute_position()[0]) - other->get_attached_transform()->get_absolute_position()[0];
 		float difference_y = (get_attached_transform()->get_absolute_position()[1]) - other->get_attached_transform()->get_absolute_position()[1];
 		float difference_z = (get_attached_transform()->get_absolute_position()[2]) - other->get_attached_transform()->get_absolute_position()[2];

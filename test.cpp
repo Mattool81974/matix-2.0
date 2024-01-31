@@ -261,11 +261,108 @@ Target::~Target()
 // Door constructor
 Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
-    if (get_attached_transform() != 0)
-    {
-        get_attached_transform()->set_anchored_position(glm::vec3(0.5, 0, 0.0));
-    }
+    game = (Game*)get_game_struct();
     set_description("2");
+    type = "door";
+}
+
+// Function called after the loading of the scene
+void Door::after_loading()
+{
+    if (!is_linked())
+    {
+        glm::vec3 position = get_map_pos();
+        Door* other_door = 0;
+        glm::vec3 other_position = position;
+        std::vector<std::vector<std::vector<Object*>>>& map = (*game->get_scene(get_scene_name())->get_objects_map());
+
+        if (position[0] + 1 < map.size() && map[position[0] + 1][position[1]][position[2]] != 0 && map[position[0] + 1][position[1]][position[2]]->get_type() == get_type())
+        {
+            other_door = (Door*)map[position[0] + 1][position[1]][position[2]];
+            other_position = position + glm::vec3(1, 0, 0);
+        }
+        else if (position[0] - 1 >= 0 && map[position[0] - 1][position[1]][position[2]] != 0 && map[position[0] - 1][position[1]][position[2]]->get_type() == get_type())
+        {
+            other_door = (Door*)map[position[0] - 1][position[1]][position[2]];
+            other_position = position - glm::vec3(1, 0, 0);
+        }
+        else if (position[2] + 1 < map[position[0]][position[1]].size() && map[position[0]][position[1]][position[2] + 1] != 0 && map[position[0]][position[1]][position[2] + 1]->get_type() == get_type())
+        {
+            other_door = (Door*)map[position[0]][position[1]][position[2] + 1];
+            other_position = position + glm::vec3(0, 0, 1);
+        }
+        else if (position[2] - 1 >= 0 && map[position[0]][position[1]][position[2] - 1] != 0 && map[position[0]][position[1]][position[2] - 1]->get_type() == get_type())
+        {
+            other_door = (Door*)map[position[0]][position[1]][position[2] - 1];
+            other_position = position - glm::vec3(0, 0, 1);
+        }
+
+        if (other_door != 0)
+        {
+            if (position[2] == other_position[2])
+            {
+                glm::vec3 anchor = glm::vec3(-0.5, 0, 0);
+                if (position[0] < other_position[0])
+                {
+                    anchor = -anchor;
+                }
+
+                get_attached_transform()->set_position(get_attached_transform()->get_position() + glm::vec3(0, 0, wall_offset) - anchor);
+                other_door->get_attached_transform()->set_position(other_door->get_attached_transform()->get_position() + glm::vec3(0, 0, wall_offset) + anchor);
+
+                get_attached_transform()->rotate(glm::vec3(0, 90, 0), false);
+                other_door->get_attached_transform()->rotate(glm::vec3(0, 90, 0), false);
+
+                if (position[0] > other_position[0])
+                {
+                    other_door->get_attached_transform()->rotate(glm::vec3(0, 180, 0), false);
+                    first_door = false;
+                }
+                else
+                {
+                    get_attached_transform()->rotate(glm::vec3(0, 180, 0), false);
+                    other_door->first_door = false;
+                }
+
+                get_attached_transform()->set_anchored_position(anchor); // Set the anchor of each door
+                other_door->get_attached_transform()->set_anchored_position(-anchor);
+            }
+            else
+            {
+                glm::vec3 anchor = glm::vec3(0, 0, -0.5);
+                if (position[2] < other_position[2])
+                {
+                    anchor = -anchor;
+                }
+
+                get_attached_transform()->set_position(get_attached_transform()->get_position() + glm::vec3(wall_offset, 0, 0) - anchor);
+                other_door->get_attached_transform()->set_position(other_door->get_attached_transform()->get_position() + glm::vec3(wall_offset, 0, 0) + anchor);
+                
+                if (position[2] > other_position[2])
+                {
+                    other_door->get_attached_transform()->rotate(glm::vec3(0, 180, 0), false);
+                    first_door = false;
+                }
+                else
+                {
+                    get_attached_transform()->rotate(glm::vec3(0, 180, 0), false);
+                    other_door->first_door = false;
+                }
+
+                anchor = glm::vec3(-0.5, 0, 0);
+                if (position[2] < other_position[2])
+                {
+                    anchor = -anchor;
+                }
+
+                get_attached_transform()->set_anchored_position(anchor); // Set the anchor of each door
+                other_door->get_attached_transform()->set_anchored_position(-anchor);
+            }
+
+            linked = true; // Set the link to true
+            other_door->linked = true;
+        }
+    }
 }
 
 // Clone the door
@@ -277,8 +374,9 @@ void* Door::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
 // Update the door
 void Door::update()
 {
-    glm::vec3 rotation = glm::vec3(0, 90, 0) * glm::vec3(glfwGetTime(), glfwGetTime(), glfwGetTime());
-    get_attached_transform()->set_rotation(rotation);
+    float multiplier = -1;
+    if (first_door) multiplier = 1;
+    get_attached_transform()->rotate(glm::vec3(0, 90 * multiplier, 0) * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time()));
     Object::update();
 }
 

@@ -32,10 +32,11 @@ public:
 	// Getters and setters
 	inline Scene* get_current_scene() { return (*get_scenes())[get_current_scene_name()]; };
 	inline std::string get_current_scene_name() { return current_scene; };
+	inline Scene* get_scene(std::string name) { if (contains_scene(name)) { return scenes[name]; } std::cout << "Matrix game : error ! The scene \"" << name << "\" does not exist." << std::endl; return 0; }
 	inline std::map<std::string, Scene*> *get_scenes() { return &scenes; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
-	inline void set_current_scene(std::string a_name) { current_scene = a_name; };
+	void set_current_scene(std::string a_name);
 private:
 	std::string current_scene = ""; // Name of the current scene loaded
 	float last_frame_time = 0; // Time when the last frame occurs, for calculating delta_time and FPS

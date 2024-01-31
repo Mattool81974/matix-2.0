@@ -153,6 +153,7 @@ public:
 	std::vector<Map_Level_Collection> construct_collections(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a vector of collection from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene
+	void load(); // Load the scene
 	void load_from_collection(std::vector<Map_Level_Collection> collections, Map_Level* level, unsigned short level_count); // Load the scene from a vector of collections
 	void load_from_map(std::string, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file

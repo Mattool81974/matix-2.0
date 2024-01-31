@@ -96,9 +96,19 @@ class Door : public Object
     // Class representing a door
 public:
     Door(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Door constructor
+    void after_loading(); // Function called after the loading of the scene
     void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the door
     void update(); // Update the door
     ~Door(); // Door destructor
-private:
 
+    // Getters and setters
+    inline bool is_first_door() { return first_door; };
+    inline bool is_linked() { return linked; };
+    inline float get_wall_offset() { return wall_offset; };
+private:
+    bool first_door = true;
+    bool linked = false;
+    float wall_offset = 0.45f;
+
+    Game* game = 0;
 };
