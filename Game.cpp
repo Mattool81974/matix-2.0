@@ -86,31 +86,38 @@ bool Game::contains_scene(std::string name)
 // Load the keys in the game
 void Game::load_keys()
 {
+    // Alphabet
     keys["a"] = GLFW_KEY_Q;
-    keys["b"] = GLFW_KEY_Q;
-    keys["c"] = GLFW_KEY_Q;
-    keys["d"] = GLFW_KEY_Q;
-    keys["e"] = GLFW_KEY_Q;
-    keys["f"] = GLFW_KEY_Q;
-    keys["g"] = GLFW_KEY_Q;
-    keys["h"] = GLFW_KEY_Q;
-    keys["i"] = GLFW_KEY_Q;
-    keys["j"] = GLFW_KEY_Q;
-    keys["k"] = GLFW_KEY_Q;
-    keys["l"] = GLFW_KEY_Q;
-    keys["m"] = GLFW_KEY_Q;
-    keys["n"] = GLFW_KEY_Q;
-    keys["o"] = GLFW_KEY_Q;
-    keys["p"] = GLFW_KEY_Q;
-    keys["r"] = GLFW_KEY_Q;
-    keys["s"] = GLFW_KEY_Q;
-    keys["t"] = GLFW_KEY_Q;
-    keys["u"] = GLFW_KEY_Q;
-    keys["v"] = GLFW_KEY_Q;
-    keys["w"] = GLFW_KEY_Q;
-    keys["x"] = GLFW_KEY_Q;
-    keys["y"] = GLFW_KEY_Q;
-    keys["z"] = GLFW_KEY_Q;
+    keys["b"] = GLFW_KEY_B;
+    keys["c"] = GLFW_KEY_C;
+    keys["d"] = GLFW_KEY_D;
+    keys["e"] = GLFW_KEY_E;
+    keys["f"] = GLFW_KEY_F;
+    keys["g"] = GLFW_KEY_G;
+    keys["h"] = GLFW_KEY_H;
+    keys["i"] = GLFW_KEY_I;
+    keys["j"] = GLFW_KEY_J;
+    keys["k"] = GLFW_KEY_K;
+    keys["l"] = GLFW_KEY_L;
+    keys["m"] = GLFW_KEY_SEMICOLON;
+    keys["n"] = GLFW_KEY_N;
+    keys["o"] = GLFW_KEY_O;
+    keys["p"] = GLFW_KEY_P;
+    keys["q"] = GLFW_KEY_A;
+    keys["r"] = GLFW_KEY_R;
+    keys["s"] = GLFW_KEY_S;
+    keys["t"] = GLFW_KEY_T;
+    keys["u"] = GLFW_KEY_U;
+    keys["v"] = GLFW_KEY_V;
+    keys["w"] = GLFW_KEY_Z;
+    keys["x"] = GLFW_KEY_X;
+    keys["y"] = GLFW_KEY_Y;
+    keys["z"] = GLFW_KEY_W;
+
+    // Other
+    keys["left shift"] = GLFW_KEY_LEFT_SHIFT;
+    keys["space"] = GLFW_KEY_SPACE;
+    keys["tab"] = GLFW_KEY_TAB;
 }
 
 // Create a scene into the game and return it
@@ -193,69 +200,11 @@ void Game::update_event()
         it->second = 0; // Reset keys
     }
 
-    // First line of qwerty
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        (*get_keys_state())["a"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        (*get_keys_state())["z"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        (*get_keys_state())["e"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        (*get_keys_state())["r"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-        (*get_keys_state())["t"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
-        (*get_keys_state())["y"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
-        (*get_keys_state())["u"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-        (*get_keys_state())["i"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-        (*get_keys_state())["o"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-        (*get_keys_state())["p"] = 1;
-
-    // Second line of qwerty
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        (*get_keys_state())["q"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        (*get_keys_state())["s"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        (*get_keys_state())["d"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        (*get_keys_state())["f"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
-        (*get_keys_state())["g"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-        (*get_keys_state())["h"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-        (*get_keys_state())["j"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-        (*get_keys_state())["k"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-        (*get_keys_state())["l"] = 1;
-
-    // Third line of qwerty
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-        (*get_keys_state())["w"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-        (*get_keys_state())["x"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        (*get_keys_state())["c"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-        (*get_keys_state())["v"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
-        (*get_keys_state())["b"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
-        (*get_keys_state())["n"] = 1;
-
-    // Other
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        (*get_keys_state())["space"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        (*get_keys_state())["left shift"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
-        (*get_keys_state())["tab"] = 1;
+    for (std::map<std::string, unsigned int>::iterator it = keys.begin(); it != keys.end(); it++)
+    {
+        if (glfwGetKey(window, it->second) == GLFW_PRESS)
+            (*get_keys_state())[it->first] = 1;
+    }
 
     // Update key frame
     unsigned short limit = 65000;
