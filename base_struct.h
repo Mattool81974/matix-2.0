@@ -187,7 +187,9 @@ public:
 	inline Camera* get_camera() { return &camera; };
 	inline float get_delta_time() { return delta_time; };
 	inline unsigned short get_key_state(std::string name) { return (*get_keys_state())[name]; };
+	inline unsigned short get_key_state_frame(std::string name) { return (*get_keys_state_frame())[name]; };
 	inline std::map<std::string, unsigned short>* get_keys_state() { return &keys_state; };
+	inline std::map<std::string, unsigned short>* get_keys_state_frame() { return &keys_state_frame; };
 	inline double get_last_mouse_x() { return last_mouse_x; };
 	inline double get_last_mouse_y() { return last_mouse_y; };
 	inline unsigned short get_left_mouse_button_state() { return left_mouse_button_state; };
@@ -221,5 +223,6 @@ private:
 	int window_width = 0; // Width of the graphic window
 
 	Camera camera; // Camera of the game
-	std::map<std::string, unsigned short> keys_state = std::map<std::string, unsigned short>();
+	std::map<std::string, unsigned short> keys_state = std::map<std::string, unsigned short>(); // Current state of the key
+	std::map<std::string, unsigned short> keys_state_frame = std::map<std::string, unsigned short>(); // State of the key if changed during this frame
 };

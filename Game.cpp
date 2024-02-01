@@ -7,6 +7,7 @@
 
 double global_mouse_x = 500; // Global variable representing the X pos of the mouse
 double global_mouse_y = 500; // Global variable representing the Y pos of the mouse
+std::map<std::string, unsigned int> keys = std::map<std::string, unsigned int>(); // Map of each keys in the game
 
 // Callback function for window resizing
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -24,6 +25,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 // Game constructor
 Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mouse_x, global_mouse_y), window_height(a_window_height), window_width(a_window_width)
 {
+    load_keys();
+
     // Configurate base_struct
     get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
     get_camera()->set_rotation(glm::vec3(0.0, 0.0, 0.0));
@@ -78,6 +81,36 @@ bool Game::contains_scene(std::string name)
         if (it->first == name) { return true; } // Verify each scene name (first element of map)
     }
     return false;
+}
+
+// Load the keys in the game
+void Game::load_keys()
+{
+    keys["a"] = GLFW_KEY_Q;
+    keys["b"] = GLFW_KEY_Q;
+    keys["c"] = GLFW_KEY_Q;
+    keys["d"] = GLFW_KEY_Q;
+    keys["e"] = GLFW_KEY_Q;
+    keys["f"] = GLFW_KEY_Q;
+    keys["g"] = GLFW_KEY_Q;
+    keys["h"] = GLFW_KEY_Q;
+    keys["i"] = GLFW_KEY_Q;
+    keys["j"] = GLFW_KEY_Q;
+    keys["k"] = GLFW_KEY_Q;
+    keys["l"] = GLFW_KEY_Q;
+    keys["m"] = GLFW_KEY_Q;
+    keys["n"] = GLFW_KEY_Q;
+    keys["o"] = GLFW_KEY_Q;
+    keys["p"] = GLFW_KEY_Q;
+    keys["r"] = GLFW_KEY_Q;
+    keys["s"] = GLFW_KEY_Q;
+    keys["t"] = GLFW_KEY_Q;
+    keys["u"] = GLFW_KEY_Q;
+    keys["v"] = GLFW_KEY_Q;
+    keys["w"] = GLFW_KEY_Q;
+    keys["x"] = GLFW_KEY_Q;
+    keys["y"] = GLFW_KEY_Q;
+    keys["z"] = GLFW_KEY_Q;
 }
 
 // Create a scene into the game and return it
@@ -159,22 +192,92 @@ void Game::update_event()
     {
         it->second = 0; // Reset keys
     }
+
+    // First line of qwerty
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         (*get_keys_state())["a"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        (*get_keys_state())["e"] = 1;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         (*get_keys_state())["z"] = 1;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        (*get_keys_state())["s"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        (*get_keys_state())["e"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+        (*get_keys_state())["r"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+        (*get_keys_state())["t"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+        (*get_keys_state())["y"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+        (*get_keys_state())["u"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+        (*get_keys_state())["i"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        (*get_keys_state())["o"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        (*get_keys_state())["p"] = 1;
+
+    // Second line of qwerty
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         (*get_keys_state())["q"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        (*get_keys_state())["s"] = 1;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         (*get_keys_state())["d"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        (*get_keys_state())["f"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        (*get_keys_state())["g"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+        (*get_keys_state())["h"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+        (*get_keys_state())["j"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+        (*get_keys_state())["k"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        (*get_keys_state())["l"] = 1;
+
+    // Third line of qwerty
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        (*get_keys_state())["w"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+        (*get_keys_state())["x"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        (*get_keys_state())["c"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+        (*get_keys_state())["v"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS)
+        (*get_keys_state())["b"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS)
+        (*get_keys_state())["n"] = 1;
+
+    // Other
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         (*get_keys_state())["space"] = 1;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         (*get_keys_state())["left shift"] = 1;
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+        (*get_keys_state())["tab"] = 1;
+
+    // Update key frame
+    unsigned short limit = 65000;
+    for (std::map<std::string, unsigned short>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
+    {
+        unsigned short state = it->second;
+        if (state != 0)
+        {
+            if ((*get_keys_state_frame())[it->first] != state && (*get_keys_state_frame())[it->first] != limit)
+            {
+                (*get_keys_state_frame())[it->first] = state;
+            }
+            else
+            {
+                (*get_keys_state_frame())[it->first] = limit;
+            }
+        }
+        else
+        {
+            (*get_keys_state_frame())[it->first] = 0; // Reset keys
+        }
+    }
 
     // Update last mouse pos for future mouse pos calcul
     set_last_mouse_x(get_mouse_x());
