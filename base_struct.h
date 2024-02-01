@@ -40,6 +40,7 @@ public:
 	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object
 	void add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object with base transform
 	void add_position_animation(float duration, glm::vec3 base_position, glm::vec3 final_position); // Add an animation to the object with the position
+	void add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation); // Add an animation to the object with the rotation
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
@@ -67,6 +68,45 @@ public:
 	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
 	inline std::vector<Transform_Object*> *get_children() { return &children; };
 	inline Transform_Animation* get_current_animation() { if (get_animations()->size() <= 0) return 0; return &((*get_animations())[get_animations()->size() - 1]); };
+	inline glm::vec3 get_current_animation_position() {
+		Transform_Animation* animation = get_current_animation();
+		glm::vec3 new_position = animation->final_position;
+
+		// Calculate new transform
+		float animation_purcentate = animation->state / animation->duration;
+		if (animation_purcentate < 1)
+		{
+			glm::vec3 position_difference = animation->final_position - animation->base_position;
+			new_position = animation->base_position + position_difference * animation_purcentate;
+		}
+		return new_position;
+	};
+	inline glm::vec3 get_current_animation_rotation() {
+		Transform_Animation* animation = get_current_animation();
+		glm::vec3 new_rotation = animation->final_rotation;
+
+		// Calculate new transform
+		float animation_purcentate = animation->state / animation->duration;
+		if (animation_purcentate < 1)
+		{
+			glm::vec3 rotation_difference = animation->final_rotation - animation->base_rotation;
+			new_rotation = animation->base_rotation + rotation_difference * animation_purcentate;
+		}
+		return new_rotation;
+	};
+	inline glm::vec3 get_current_animation_scale() {
+		Transform_Animation* animation = get_current_animation();
+		glm::vec3 new_scale = animation->final_scale;
+
+		// Calculate new transform
+		float animation_purcentate = animation->state / animation->duration;
+		if (animation_purcentate < 1)
+		{
+			glm::vec3 scale_difference = animation->final_scale - animation->base_scale;
+			new_scale = animation->base_scale + scale_difference * animation_purcentate;
+		}
+		return new_scale;
+	};
 	inline glm::vec3 get_forward() { return forward; };
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }

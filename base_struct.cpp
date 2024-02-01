@@ -182,6 +182,18 @@ void Transform_Object::add_position_animation(float duration, glm::vec3 base_pos
 	(*get_animations()).push_back(animation);
 }
 
+// Add an animation to the object with the  rotation
+void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation)
+{
+	Transform_Animation animation;
+	animation.base_rotation = base_rotation;
+	animation.duration = duration;
+	animation.final_rotation = final_rotation;
+	animation.modify_position = false;
+	animation.modify_scale = false;
+	(*get_animations()).push_back(animation);
+}
+
 // Calculate the direction vector of the transform object
 void Transform_Object::calculate_direction()
 {
@@ -294,39 +306,14 @@ void Transform_Object::update_animation()
 	{
 		Transform_Animation* animation = get_current_animation();
 
+		if (animation->modify_position) set_position_animation(get_current_animation_position());
+		if (animation->modify_rotation) set_rotation(get_current_animation_rotation());
+		if (animation->modify_scale) set_scale(get_current_animation_scale());
+
 		// Calculate new transform
 		float animation_purcentate = animation->state / animation->duration;
-		if (animation_purcentate < 1)
+		if (animation_purcentate >= 1)
 		{
-			if (animation->modify_position) // Position modification
-			{
-				glm::vec3 position_difference = animation->final_position - animation->base_position;
-				glm::vec3 new_position = animation->base_position + position_difference * animation_purcentate;
-				set_position_animation(new_position);
-			}
-
-			if (animation->modify_rotation) // Rotation modification
-			{
-				glm::vec3 rotation_difference = animation->final_rotation - animation->base_rotation;
-				glm::vec3 new_rotation = animation->base_rotation + rotation_difference * animation_purcentate;
-				set_rotation(new_rotation);
-			}
-
-			if (animation->modify_scale) // Scale modification
-			{
-				glm::vec3 scale_difference = animation->final_scale - animation->base_scale;
-				glm::vec3 new_scale = animation->base_scale + scale_difference * animation_purcentate;
-				set_scale(new_scale);
-			}
-		}
-		else
-		{
-			// Apply transform
-			if (animation->modify_position) set_position_animation(animation->final_position);
-			if (animation->modify_rotation) set_rotation(animation->final_rotation);
-			if (animation->modify_scale) set_scale(animation->final_scale);
-
-			// Delete the finished element
 			get_animations()->pop_back();
 		}
 	}

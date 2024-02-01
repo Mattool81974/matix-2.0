@@ -201,9 +201,11 @@ std::vector<glm::vec3> Object::get_all_map_pos(bool use_movement)
 	std::vector<glm::vec3> positions = std::vector<glm::vec3>();
 
 	glm::vec3 map_pos = get_map_pos() - glm::vec3(0.5, 0.5, 0.5);
-	float scale0 = get_attached_transform()->get_scale()[0];
-	float scale1 = get_attached_transform()->get_scale()[1];
-	float scale2 = get_attached_transform()->get_scale()[2];
+
+	if (!use_physic() || !get_attached_physic_object()->use_collision()) { return positions; }
+	float scale0 = get_attached_physic_object()->get_collision()->get_width();
+	float scale1 = get_attached_physic_object()->get_collision()->get_height();
+	float scale2 = get_attached_physic_object()->get_collision()->get_length();
 
 	int min_x = (int)glm::floor(map_pos[0] - scale0 / 2.0); // Calculate minimum and maximum pos
 	int max_x = (int)glm::ceil(map_pos[0] + scale0 / 2.0);
@@ -301,12 +303,12 @@ void Object::late_update()
 		float difference_collision_height = glm::abs(get_attached_physic_object()->get_collision()->get_height() / 2.0 + other->get_attached_physic_object()->get_collision()->get_height() / 2.0);
 		float difference_collision_length = glm::abs(get_attached_physic_object()->get_collision()->get_length() / 2.0 + other->get_attached_physic_object()->get_collision()->get_length() / 2.0);
 		float difference_collision_width = glm::abs(get_attached_physic_object()->get_collision()->get_width() / 2.0 + other->get_attached_physic_object()->get_collision()->get_width() / 2.0);
-		float difference_x = (get_attached_transform()->get_absolute_position()[0]) - other->get_attached_transform()->get_absolute_position()[0];
-		float difference_y = (get_attached_transform()->get_absolute_position()[1]) - other->get_attached_transform()->get_absolute_position()[1];
-		float difference_z = (get_attached_transform()->get_absolute_position()[2]) - other->get_attached_transform()->get_absolute_position()[2];
-		float difference_x_movement = (get_attached_transform()->get_absolute_position()[0] + get_attached_transform()->get_movement()[0]) - other->get_attached_transform()->get_absolute_position()[0];
-		float difference_y_movement = (get_attached_transform()->get_absolute_position()[1] + get_attached_transform()->get_movement()[1]) - other->get_attached_transform()->get_absolute_position()[1];
-		float difference_z_movement = (get_attached_transform()->get_absolute_position()[2] + get_attached_transform()->get_movement()[2]) - other->get_attached_transform()->get_absolute_position()[2];
+		float difference_x = (get_map_pos()[0]) - other->get_map_pos()[0];
+		float difference_y = (get_map_pos()[1]) - other->get_map_pos()[1];
+		float difference_z = (get_map_pos()[2]) - other->get_map_pos()[2];
+		float difference_x_movement = (get_map_pos()[0] + get_attached_transform()->get_movement()[0]) - other->get_map_pos()[0];
+		float difference_y_movement = (get_map_pos()[1] + get_attached_transform()->get_movement()[1]) - other->get_map_pos()[1];
+		float difference_z_movement = (get_map_pos()[2] + get_attached_transform()->get_movement()[2]) - other->get_map_pos()[2];
 
 		glm::vec3 new_movement = get_attached_transform()->get_movement();
 		if (collision->axis_multiplier[0] != 0 && glm::abs(difference_x_movement) < glm::abs(difference_collision_width) && sign(difference_x_movement) != sign(new_movement[0]))

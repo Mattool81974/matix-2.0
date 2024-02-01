@@ -635,7 +635,7 @@ void Scene::update()
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
 		it->second->get_attached_transform()->soft_reset(); // Reset every objects
-		it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
+		if(it->second->can_reset_map_pos())it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
 	}
 
 	if (use_graphic()) // Update graphic scene

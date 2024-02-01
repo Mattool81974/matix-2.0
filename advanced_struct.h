@@ -124,6 +124,7 @@ public:
 	~Object(); // Object destructor
 
 	// Getters and setters
+	inline bool can_reset_map_pos() { return reset_map_pos; };
 	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	std::vector<glm::vec3> get_all_map_pos(bool use_movement = false);
@@ -133,7 +134,6 @@ public:
 	inline Collision_Result* get_collisions_result() { return &collision_result; };
 	inline std::string get_description() { return description; };
 	inline glm::vec3 get_last_map_pos() { return last_map_pos; };
-	inline unsigned short get_map_level() { return map_level; };
 	inline glm::vec3 get_map_pos() { return map_pos; };
 	inline std::string get_name() { return name; };
 	inline std::string get_scene_name() { return scene_name; };
@@ -143,6 +143,7 @@ public:
 	inline bool use_graphic() { return get_attached_graphic_object() != 0; };
 	inline bool use_physic() { return get_attached_physic_object() != 0; };
 protected:
+	bool reset_map_pos = true; // If the map pos should be reset at each frame
 	std::string type = ""; // Type of the object
 private:
 	std::string description = "1"; // Little description of the object, usefull for debug
@@ -154,7 +155,6 @@ private:
 	Collision_Result collision_result;
 	Advanced_Struct* game_struct = 0; // Base struct in the game
 	glm::vec3 last_map_pos = glm::vec3(-1, -1, -1); // The pos of the object in the physic map, or -1 if not in it
-	unsigned short map_level = 0; // Map level of this object
 	glm::vec3 map_pos = glm::vec3(-1, -1, -1); // The pos of the object in the physic map, or -1 if not in it
 	std::vector<std::string> tags = std::vector<std::string>(); // Tags about the object
 };

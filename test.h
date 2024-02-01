@@ -98,17 +98,54 @@ public:
     Door(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Door constructor
     void after_loading(); // Function called after the loading of the scene
     void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the door
+    void close(); // Close the door
+    void open(); // Open the door
     void update(); // Update the door
     ~Door(); // Door destructor
 
     // Getters and setters
+    inline float get_animation_time() { return animation_time; };
     inline bool is_first_door() { return first_door; };
+    inline bool is_horizontal() { return horizontal; };
     inline bool is_linked() { return linked; };
+    inline bool is_opened() { return opened; };
+    inline float get_close_y_rotation()
+    {
+        float multiplier = 1; // Calculate the multiplier for the rotation
+        if (first_door) multiplier = -1;
+
+        float value = 90; // Calculate the value of the rotation
+        if (!is_horizontal()) { value = 180; if (multiplier == 1) multiplier = 0; }
+
+        float final_value_rotation = value * multiplier;
+        if (!is_horizontal()) final_value_rotation = normalize_rotation(glm::vec3(0, final_value_rotation, 0))[1];
+
+        return final_value_rotation;
+    };
+    inline float get_open_multiplier() { return open_multiplier; };
+    inline float get_open_y_rotation()
+    {
+        float multiplier = get_open_multiplier(); // Calculate the multiplier for the rotation
+
+        float value = 90; // Calculate the value of the rotation
+        if (is_horizontal()) { value = 180; if (multiplier == 1) multiplier = 0; }
+
+        float final_value_rotation = value * multiplier;
+        if (!is_horizontal()) final_value_rotation = normalize_rotation(glm::vec3(0, final_value_rotation, 0))[1];
+
+        return final_value_rotation;
+    };
+    inline Door* get_other_door() { return other_door; };
     inline float get_wall_offset() { return wall_offset; };
 private:
-    bool first_door = true;
-    bool linked = false;
-    float wall_offset = 0.45f;
+    float animation_time = 0.2; // Length of the animation
+    bool first_door = true; // If this door is the first door or not
+    bool horizontal = true; // If the door system is horizontal or not
+    bool linked = false; // If the door is linked with another or not
+    bool opened = true; // If the door is open or not
+    float open_multiplier = 1; // Multiplier for the opening rotation
+    float wall_offset = 0.45f; // Offset of the door to the wall
 
-    Game* game = 0;
+    Game* game = 0; // Pointer to the game
+    Door* other_door = 0; // Door linked with this door
 };

@@ -262,6 +262,7 @@ Target::~Target()
 Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
     game = (Game*)get_game_struct();
+    reset_map_pos = false;
     set_description("2");
     type = "door";
 }
@@ -269,10 +270,12 @@ Door::Door(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a
 // Function called after the loading of the scene
 void Door::after_loading()
 {
+    get_attached_physic_object()->get_collision()->set_length(1); // Set the collisions values
+    get_attached_physic_object()->get_collision()->set_width(1);
+
     if (!is_linked())
     {
         glm::vec3 position = get_map_pos();
-        Door* other_door = 0;
         glm::vec3 other_position = position;
         std::vector<std::vector<std::vector<Object*>>>& map = (*game->get_scene(get_scene_name())->get_objects_map());
 
@@ -299,6 +302,12 @@ void Door::after_loading()
 
         if (other_door != 0)
         {
+            set_map_pos(get_attached_transform()->get_absolute_position());
+            other_door->set_map_pos(other_door->get_attached_transform()->get_absolute_position());
+
+            get_attached_transform()->start_animation();
+            other_door->get_attached_transform()->start_animation();
+
             if (position[2] == other_position[2])
             {
                 glm::vec3 anchor = glm::vec3(-0.5, 0, 0);
@@ -357,10 +366,16 @@ void Door::after_loading()
 
                 get_attached_transform()->set_anchored_position(anchor); // Set the anchor of each door
                 other_door->get_attached_transform()->set_anchored_position(-anchor);
+
+                horizontal = false;
+                other_door->horizontal = false;
             }
 
             linked = true; // Set the link to true
             other_door->linked = true;
+
+            close();
+            other_door->close();
         }
     }
 }
@@ -371,12 +386,54 @@ void* Door::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
     return new Door(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
 }
 
+// Close the door
+void Door::close()
+{
+    if (is_opened())
+    {
+        glm::vec3 base_position = glm::vec3(0, get_open_y_rotation(), 0);
+        float duration = get_animation_time();
+        if (get_attached_transform()->get_current_animation() != 0) // Calculate the duration of the previous animations
+        {
+            base_position = get_attached_transform()->get_current_animation_rotation();
+            duration = get_attached_transform()->get_current_animation()->state;
+        }
+        get_attached_transform()->reset_animation();
+
+        get_attached_transform()->add_rotation_animation(duration, base_position, glm::vec3(0, get_close_y_rotation(), 0));
+        get_attached_physic_object()->set_use_collision(true);
+
+        opened = false;
+    }
+}
+
+// Open the door
+void Door::open()
+{
+    if (!is_opened())
+    {
+        glm::vec3 base_position = glm::vec3(0, get_close_y_rotation(), 0);
+        float duration = get_animation_time();
+        if (get_attached_transform()->get_current_animation() != 0) // Calculate the duration of the previous animations
+        {
+            base_position = get_attached_transform()->get_current_animation_rotation();
+            duration = get_attached_transform()->get_current_animation()->state;
+        }
+        get_attached_transform()->reset_animation();
+
+        get_attached_transform()->add_rotation_animation(duration, base_position, glm::vec3(0, get_open_y_rotation(), 0));
+        get_attached_physic_object()->set_use_collision(false);
+
+        opened = true;
+    }
+}
+
 // Update the door
 void Door::update()
 {
-    float multiplier = -1;
-    if (first_door) multiplier = 1;
-    get_attached_transform()->rotate(glm::vec3(0, 90 * multiplier, 0) * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time()));
+    if (game->get_key_state("e")) open();
+    else close();
+
     Object::update();
 }
 
