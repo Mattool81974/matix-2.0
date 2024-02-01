@@ -99,6 +99,21 @@ Physic_Scene::Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, s
 
 }
 
+// Apply the gravity to the objects
+void Physic_Scene::apply_gravity()
+{
+	std::map<std::string, Object*>* objects = get_objects();
+	for (std::map<std::string, Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+	{
+		if (it->second->use_physic() && !it->second->get_attached_physic_object()->is_static())
+		{
+			// Calculate the gravity force
+			glm::vec3 gravity = get_game_struct()->get_gravity_force() * it->second->get_attached_physic_object()->get_gravity_value() * glm::vec3(get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time());
+			it->second->get_attached_physic_object()->apply_force(gravity, true); // Update each object one by one
+		}
+	}
+}
+
 // Check the collisions in the system
 void Physic_Scene::check_collisions()
 {
@@ -114,38 +129,51 @@ void Physic_Scene::check_collisions()
 	for (int i = 0; i < dynamic_objects.size(); i++)
 	{
 		Object* object = dynamic_objects[i];
+		(*object->get_collisions_result()) = check_collision(object, glm::vec3(1, 1, 1), true);
+	}
+}
 
-		std::vector<glm::vec3> map_positions = object->get_all_map_pos(true); // Check each part of the map the object is
-		for (int j = 0; j < map_positions.size() / 2; j++)
+// Check the collision of an object
+Collision_Result Physic_Scene::check_collision(Object* object, glm::vec3 direction, bool apply_to_target)
+{
+	Collision_Result collision_result = Collision_Result(object);
+	std::vector<glm::vec3> map_positions = object->get_all_map_pos(direction, true); // Check each part of the map the object is
+	for (int j = 0; j < map_positions.size() / 2; j++)
+	{
+		glm::vec3 position = map_positions[j * 2 + 1];
+		if (position[0] >= 0 && position[0] < get_objects_map()->size())
 		{
-			glm::vec3 position = map_positions[j * 2 + 1];
-			if (position[0] >= 0 && position[0] < get_objects_map()->size())
+			float x = position[0];
+			if (position[1] >= 0 && position[1] < (*get_objects_map())[x].size())
 			{
-				float x = position[0];
-				if (position[1] >= 0 && position[1] < (*get_objects_map())[x].size())
+				float y = position[1];
+				if (position[2] >= 0 && position[2] < (*get_objects_map())[x][y].size())
 				{
-					float y = position[1];
-					if (position[2] >= 0 && position[2] < (*get_objects_map())[x][y].size())
+					float z = position[2];
+					Object* target = (*get_objects_map())[x][y][z];
+					if (target != 0 && object != target)
 					{
-						float z = position[2];
-						Object* target = (*get_objects_map())[x][y][z];
-						if (target != 0 && object != target)
+						One_Collision result = target->collides_with(object);
+						if (result.collide) // If the object collides with the target
 						{
-							One_Collision result = target->collides_with(object);
-							if (result.collide) // If the object collides with the target
-							{
-								int side = glm::floor((3.0f / map_positions.size()) * j);
-								result.axis_multiplier = map_positions[j * 2];
+							int side = glm::floor((3.0f / map_positions.size()) * j);
+							result.axis_multiplier = map_positions[j * 2];
 
-								object->get_collisions_result()->add_collision(result);
-								target->get_collisions_result()->add_collision(result);
-							}
+							collision_result.add_collision(result);
+							if(apply_to_target) target->get_collisions_result()->add_collision(result);
 						}
 					}
 				}
 			}
 		}
 	}
+	return collision_result;
+}
+
+// Update before everything
+void Physic_Scene::early_update()
+{
+	
 }
 
 // Create a new object into the scene and return it
@@ -165,12 +193,11 @@ void Physic_Scene::update()
 	std::map<std::string, Object*>* objects = get_objects();
 	for (std::map<std::string, Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
-		if (it->second->use_physic())
+		if (it->second->use_physic() && !it->second->get_attached_physic_object()->is_static())
 		{
 			it->second->get_attached_physic_object()->update(); // Update each object one by one
 		}
 	}
-	check_collisions();
 }
 
 // Physic_Scene destructor
@@ -605,6 +632,11 @@ void Scene::update()
 {
 	clear_objects_map();
 
+	if (use_physic() && get_physic_scene() != 0)
+	{
+		get_physic_scene()->early_update();
+	}
+
 	std::map<std::string, Object *> *objects_to_update = get_objects();
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
@@ -624,12 +656,23 @@ void Scene::update()
 
 	if (use_physic() && get_physic_scene() != 0)
 	{
-		get_physic_scene()->update();
+		get_physic_scene()->apply_gravity();
 	}
 
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
 	{
 		it->second->late_update(); // Late update every objects
+	}
+
+	if (use_physic() && get_physic_scene() != 0)
+	{
+		get_physic_scene()->update();
+		get_physic_scene()->check_collisions();
+	}
+
+	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->last_update(); // Last update every objects
 	}
 
 	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)

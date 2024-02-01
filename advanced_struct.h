@@ -118,7 +118,8 @@ public:
 	virtual void after_loading() {}; // Function called after loading, usefull for heritage
 	virtual void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the object
 	virtual One_Collision collides_with(Object* object); // Returns if the object collides with an other object
-	virtual void late_update(); // Update the object after physic modification
+	virtual void last_update(); // Update the object after physic collision
+	virtual void late_update() {}; // Update the object after physic modification beforce physic collision
 	std::vector<glm::vec3> set_map_pos(glm::vec3 a_map_pos); // Change the middle pos of the object in the map and return the list of pos in the map
 	virtual void update() { }; // Update the object
 	~Object(); // Object destructor
@@ -127,7 +128,7 @@ public:
 	inline bool can_reset_map_pos() { return reset_map_pos; };
 	inline bool contains_tag(std::string tag) { for (int i = 0; i < tags.size(); i++) { if (tags[i] == tag) { return true; } } return false; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
-	std::vector<glm::vec3> get_all_map_pos(bool use_movement = false);
+	std::vector<glm::vec3> get_all_map_pos(glm::vec3 movement_use = glm::vec3(0, 0, 0), bool add_movement = false);
 	inline Graphic_Object* get_attached_graphic_object() { return attached_graphic; };
 	inline Physic_Object* get_attached_physic_object() { return attached_physic; };
 	inline Transform_Object* get_attached_transform() { return attached_transform; };

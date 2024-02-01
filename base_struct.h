@@ -186,6 +186,7 @@ public:
 	// Getters and setters
 	inline Camera* get_camera() { return &camera; };
 	inline float get_delta_time() { return delta_time; };
+	inline glm::vec3 get_gravity_force() { return gravity_force; };
 	inline unsigned short get_key_state(std::string name) { return (*get_keys_state())[name]; };
 	inline unsigned short get_key_state_frame(std::string name) { return (*get_keys_state_frame())[name]; };
 	inline std::map<std::string, unsigned short>* get_keys_state() { return &keys_state; };
@@ -201,6 +202,7 @@ public:
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
 	inline void set_delta_time(float new_delta_time) { delta_time = new_delta_time; };
+	inline void set_gravity_force(glm::vec3 a_gravity_force) { gravity_force = a_gravity_force; };
 	inline void set_last_mouse_x(double a_last_mouse_x) { last_mouse_x = a_last_mouse_x; };
 	inline void set_last_mouse_y(double a_last_mouse_y) { last_mouse_y = a_last_mouse_y; };
 	inline void set_left_mouse_button_state(unsigned short new_state) { left_mouse_button_state = new_state; };
@@ -223,6 +225,7 @@ private:
 	int window_width = 0; // Width of the graphic window
 
 	Camera camera; // Camera of the game
+	glm::vec3 gravity_force = glm::vec3(0, -9.80665, 0); // Value of the gravity
 	std::map<std::string, unsigned short> keys_state = std::map<std::string, unsigned short>(); // Current state of the key
 	std::map<std::string, unsigned short> keys_state_frame = std::map<std::string, unsigned short>(); // State of the key if changed during this frame
 };

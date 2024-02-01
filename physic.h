@@ -30,6 +30,7 @@ class Physic_Object
 	// Class representing a physic object
 public:
 	Physic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, bool a_static_object = true, unsigned short type = 1); // Physic_Object constructor
+	void apply_force(glm::vec3 force, bool directly_apply = false); // Apply a force to the object
 	void update(); // Update the physic object
 	void update_velocity(); // Update the velocity of the object
 	~Physic_Object(); // Physic_Object destructor
@@ -37,8 +38,12 @@ public:
 	// Getters and setters
 	inline Base_Struct* get_base_struct() { return base_struct; };
 	inline Collision* get_collision() { return &collision; };
+	inline glm::vec3 get_gravity_value() { return gravity_value; };
+	inline float get_mass() { return mass; };
 	inline glm::vec3 get_velocity() { return velocity; };
 	inline bool is_static() { return static_object; };
+	inline void set_gravity_value(glm::vec3 a_gravity_value) { gravity_value = a_gravity_value; };
+	inline void set_mass(float a_mass) { mass = a_mass; };
 	inline void set_use_collision(bool a_use_collision) { is_using_collision = a_use_collision; };
 	inline void set_velocity(glm::vec3 a_velocity) { velocity = a_velocity; };
 	inline bool use_collision() { return is_using_collision; };
@@ -50,5 +55,6 @@ private:
 	Transform_Object& attached_transform; // Reference to the attached transform object
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
 	Collision collision; // Collision of the object
+	glm::vec3 gravity_value = glm::vec3(0, 1, 0); // Multiplier for the gravity force
 	glm::vec3 velocity = glm::vec3(0, 0, 0); // Velocity of the object
 };

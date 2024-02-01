@@ -1,5 +1,81 @@
 #include "test.h"
 
+// Entity constructor
+Entity::Entity(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+{
+
+}
+
+// Clone the entity
+void* Entity::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Entity(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
+}
+
+// Entity destructor
+Entity::~Entity()
+{
+
+}
+
+// Player constructor
+Player::Player(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Entity(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+{
+    game = (Game*)get_game_struct();
+}
+
+// Player the entity
+void* Player::clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic)
+{
+    return new Player(a_game_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic);
+}
+
+// Late update the player
+void Player::late_update()
+{
+    update_move();
+}
+
+// Update the moving of the player
+void Player::update_move()
+{
+    float delta_time = get_game_struct()->get_delta_time();
+    float speed = get_speed();
+    speed *= delta_time;
+
+    // Rotate and move camera
+    float jump_force = 10;
+    float rotate_speed = 45;
+    float sensitivity = get_game_struct()->get_camera()->get_sensitivity();
+    get_attached_transform()->rotate(glm::vec3(0.0, sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));
+    get_game_struct()->get_camera()->rotate(glm::vec3(-sensitivity * get_game_struct()->get_delta_time() * get_game_struct()->get_mouse_move_y(), 0.0, 0.0));
+
+    // Move the player
+    if (get_game_struct()->get_key_state("z") == 1)
+        get_attached_transform()->move(glm::vec3(speed) * get_attached_transform()->get_forward());
+    if (get_game_struct()->get_key_state("s") == 1)
+        get_attached_transform()->move(glm::vec3(speed) * -get_attached_transform()->get_forward());
+    if (get_game_struct()->get_key_state("q") == 1)
+        get_attached_transform()->move(glm::vec3(speed) * get_attached_transform()->get_right());
+    if (get_game_struct()->get_key_state("d") == 1)
+        get_attached_transform()->move(glm::vec3(speed) * -get_attached_transform()->get_right());
+    if (get_game_struct()->get_key_state("space") == 1)
+    {
+        Scene* scene = (*game->get_scenes())[get_scene_name()];
+        unsigned short bottom_collision = scene->get_physic_scene()->check_collision(this, glm::vec3(0, 1, 0), false).size();
+        glm::vec3 force = glm::vec3(jump_force) * get_attached_transform()->get_up();
+        if(scene->use_physic() && bottom_collision > 0) get_attached_physic_object()->apply_force(force, true);
+    }
+    if (get_game_struct()->get_key_state("left shift") == 1)
+        get_attached_transform()->move(glm::vec3(speed) * -get_attached_transform()->get_up());
+}
+
+// Player destructor
+Player::~Player()
+{
+
+}
+
 // Ammo constructor
 Ammo::Ammo(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
@@ -14,14 +90,14 @@ void* Ammo::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
 }
 
 // Late update the ammo
-void Ammo::late_update()
+void Ammo::last_update()
 {
     if (get_collisions_result()->size() > 0)
     {
         Scene* scene = (*game->get_scenes())[get_scene_name()];
         scene->destroy(get_name());
     }
-    Object::late_update();
+    Object::last_update();
 }
 
 // Update the ammo
@@ -171,7 +247,7 @@ void* Target::clone(Advanced_Struct* a_game_struct, std::string a_name, std::str
 }
 
 // Update lately the target
-void Target::late_update()
+void Target::last_update()
 {
     for (int i = 0; i < get_collisions_result()->size(); i++)
     {
@@ -189,7 +265,7 @@ void Target::late_update()
             undeploy();
         }
     }
-    Object::late_update();
+    Object::last_update();
 }
 
 // Add a texture to the target

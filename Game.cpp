@@ -26,7 +26,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mouse_x, global_mouse_y), window_height(a_window_height), window_width(a_window_width)
 {
     load_keys();
-
     // Configurate base_struct
     get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
     get_camera()->set_rotation(glm::vec3(0.0, 0.0, 0.0));

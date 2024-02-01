@@ -25,6 +25,22 @@ Physic_Object::Physic_Object(Base_Struct* a_base_struct, Transform_Object& a_att
 
 }
 
+// Apply a force to the object
+void Physic_Object::apply_force(glm::vec3 force, bool directly_apply)
+{
+	glm::vec3 new_velocity =  force / glm::vec3(get_mass(), get_mass(), get_mass());
+	
+	if (directly_apply)
+	{
+		glm::vec3 move = glm::vec3(new_velocity[0], new_velocity[1], new_velocity[2]);
+		attached_transform.move(move);
+	}
+	else
+	{
+		set_velocity(get_velocity() + new_velocity);
+	}
+}
+
 // Update the physic object
 void Physic_Object::update()
 {

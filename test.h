@@ -3,13 +3,45 @@
 #include "Game.h"
 #include <random>
 
+class Entity : public Object
+{
+    // Class representing an entity
+public:
+    Entity(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Entity constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the entity
+    ~Entity(); // Entity destructor
+
+    // Getters and setters
+    inline float get_speed() { return speed; };
+    inline bool is_moving() { return moving; };
+    void update() {}; // Update the entity
+protected:
+    bool moving = true; // If the entity can move or not
+    float speed = 5.0f; // Speed of the entity
+private:
+    Base_Struct* base_struct = 0; // Base struct of the game
+};
+
+class Player : public Entity
+{
+    // Class representing a player entity
+public:
+    Player(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Player constructor
+    void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the player
+    void late_update(); // Late update the player
+    void update_move(); // Update the moving of the player
+    ~Player(); // Player destructor
+private:
+    Game* game = 0;
+};
+
 class Ammo : public Object
 {
     // Class representing an Ammo
 public:
     Ammo(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Ammo constructor
     void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the ammo
-    void late_update(); // Late update the ammo
+    void last_update(); // Late update the ammo
     void update(); // Update the ammo
     ~Ammo(); // Ammo destructor
 private:
@@ -59,7 +91,7 @@ class Target : public Object
 public:
     Target(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Target constructor
     void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the target
-    void late_update(); // Update lately the target
+    void last_update(); // Update lately the target
     void new_texture(std::string texture); // Add a texture to the target
     void place_randomly(); // Place randomly the target
     void undeploy(); // Undexploy the target

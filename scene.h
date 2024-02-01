@@ -1,7 +1,6 @@
 #pragma once
 
 #include "advanced_struct.h"
-#include "entity.h"
 #include "graphic.h"
 #include <iostream>
 #include <map>
@@ -79,7 +78,10 @@ class Physic_Scene
 	// Class representing a collection of physic object
 public:
 	Physic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::vector<std::vector<std::vector<Object*>>>& a_objects_map); // Physic_Scene constructor
+	void apply_gravity(); // Apply the gravity to the objects
 	void check_collisions(); // Check the collisions in the system
+	Collision_Result check_collision(Object* object, glm::vec3 direction = glm::vec3(1, 1, 1), bool apply_to_target = true); // Check the collision of an object
+	void early_update(); // Update before everything
 	Physic_Object* new_object(std::string name, Transform_Object& transform, bool static_object = true); // Create a new object into the scene and return it
 	void update(); // Update the objects in the scene
 	~Physic_Scene(); // Physic_Scene destructor
@@ -199,15 +201,7 @@ O* Scene::new_object(std::string name, std::string type, Transform_Object* paren
 	if (parent == 0) { parent = this; }
 
 	// Create and add the object
-	Transform_Object* object = 0;
-	if (type == "player")
-	{
-		object = new Player(get_game_struct(), parent, position, rotation, scale);
-	}
-	else
-	{
-		object = new Transform_Object(parent, position, rotation, scale);
-	}
+	Transform_Object* object = new Transform_Object(parent, position, rotation, scale);
 
 	// Create the object in graphic scene
 	Graphic_Object* graphic_object = 0;
