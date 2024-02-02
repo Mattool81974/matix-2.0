@@ -1,10 +1,16 @@
 #pragma once
 
+#include <fstream>
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
+#include <random>
 #include <string>
+#include <sstream>
 #include <vector>
 
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"

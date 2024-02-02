@@ -1,5 +1,4 @@
 #include "advanced_struct.h"
-#include <iostream>
 
 // Part constructor
 Part::Part(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale, std::string a_type, std::string a_texture_path, void* a_base_object) : position(a_position), rotation(a_rotation), scale(a_scale), type(a_type), texture_path(a_texture_path), base_object(a_base_object)
@@ -106,19 +105,40 @@ void Advanced_Struct::load_VAOs()
 	types["circle"] = "circle";
 	types["cube"] = "cube";
 	types["cylinder"] = "cylinder";
-	types["player"] = "cube";
+	types["hud"] = "hud";
 	types["one_faced_cube"] = "one_faced_cube";
+	types["player"] = "cube";
 	types["square"] = "triangle";
 	types["table"] = "table";
 
+	// Define attributes for VAOs
+	// Create base Shader_Program_Variable for the shader program
+	std::vector<Shader_Program_Variable> base_3d_attributes = std::vector<Shader_Program_Variable>();
+	std::vector<Shader_Program_Variable> hud_attributes = std::vector<Shader_Program_Variable>();
+	Shader_Program_Variable v1 = Shader_Program_Variable();
+	Shader_Program_Variable v2 = Shader_Program_Variable();
+	Shader_Program_Variable v3 = Shader_Program_Variable();
+	Shader_Program_Variable v4 = Shader_Program_Variable();
+	v1.vector_size = 3;
+	v2.vector_size = 2;
+	v3.vector_size = 4;
+	v4.vector_size = 3;
+	base_3d_attributes.push_back(v1);
+	base_3d_attributes.push_back(v2);
+	base_3d_attributes.push_back(v3);
+	base_3d_attributes.push_back(v4);
+	hud_attributes.push_back(v1);
+	hud_attributes.push_back(v2);
+
 	// Create VAOs
-	all_vaos["chair"] = new VAO("../shaders/default", "../vbos/chair.vbo");
-	all_vaos["circle"] = new VAO("../shaders/default", "../vbos/polygon50.vbo");
-	all_vaos["cylinder"] = new VAO("../shaders/default", "../vbos/polygon_3d50.vbo");
-	all_vaos["cube"] = new VAO("../shaders/default", "../vbos/cube.vbo");
-	all_vaos["one_faced_cube"] = new VAO("../shaders/default", "../vbos/one_faced_cube.vbo");
-	all_vaos["table"] = new VAO("../shaders/default", "../vbos/table.vbo");
-	all_vaos["triangle"] = new VAO("../shaders/default", "");
+	all_vaos["chair"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/chair.vbo");
+	all_vaos["circle"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon50.vbo");
+	all_vaos["cylinder"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon_3d50.vbo");
+	all_vaos["cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/cube.vbo");
+	all_vaos["hud"] = new VAO("../shaders/hud", hud_attributes, "");
+	all_vaos["one_faced_cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/one_faced_cube.vbo");
+	all_vaos["table"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/table.vbo");
+	all_vaos["triangle"] = new VAO("../shaders/default", base_3d_attributes, "");
 }
 
 // Create a new VAO into the game
@@ -126,8 +146,23 @@ VAO* Advanced_Struct::new_vao(std::string path, std::string type, std::string sh
 {
 	if (contains_vao(path)) { std::cout << "Matrix game : error ! The \"" << type << "\" VAO already exists." << std::endl; return 0; }
 
+	// Create base Shader_Program_Variable for the shader program
+	std::vector<Shader_Program_Variable> base_3d_attributes = std::vector<Shader_Program_Variable>();
+	Shader_Program_Variable v1 = Shader_Program_Variable();
+	Shader_Program_Variable v2 = Shader_Program_Variable();
+	Shader_Program_Variable v3 = Shader_Program_Variable();
+	Shader_Program_Variable v4 = Shader_Program_Variable();
+	v1.vector_size = 3;
+	v2.vector_size = 2;
+	v3.vector_size = 4;
+	v4.vector_size = 3;
+	base_3d_attributes.push_back(v1);
+	base_3d_attributes.push_back(v2);
+	base_3d_attributes.push_back(v3);
+	base_3d_attributes.push_back(v4);
+
 	types[type] = type;
-	all_vaos[type] = new VAO(shader_path, path);
+	all_vaos[type] = new VAO(shader_path, base_3d_attributes, path);
 	return all_vaos[type];
 }
 

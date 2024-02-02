@@ -1,10 +1,4 @@
 #include "base_struct.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
-#include <string>
-#include <vector>
 
 // Cut a string where there are the "cut"
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank)

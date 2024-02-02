@@ -154,7 +154,7 @@ Shader_Program::~Shader_Program()
 }
 
 // VBO constructor
-VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
+VBO::VBO(std::vector<Shader_Program_Variable> a_attributes, bool fill_datas, bool a_use_ebo): attributes(a_attributes), use_ebo(a_use_ebo)
 {
 	if(fill_datas) // Fill datas with a basic square
 	{
@@ -165,14 +165,17 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(1.0f);
 		datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(0.0f);
-		datas.push_back(1.0f);
-		datas.push_back(1.0f);
+		if (a_attributes.size() > 2)
+		{
+			datas.push_back(0.0f);
+			datas.push_back(0.0f);
+			datas.push_back(1.0f);
+			datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(-1.0f);
-		datas.push_back(1.0f);
+			datas.push_back(0.0f);
+			datas.push_back(-1.0f);
+			datas.push_back(1.0f);
+		}
 
 		datas.push_back(0.5f);
 		datas.push_back(-0.5f);
@@ -181,14 +184,17 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(1.0f);
 		datas.push_back(0.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(0.0f);
-		datas.push_back(1.0f);
-		datas.push_back(1.0f);
+		if (a_attributes.size() > 2)
+		{
+			datas.push_back(0.0f);
+			datas.push_back(0.0f);
+			datas.push_back(1.0f);
+			datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(-1.0f);
-		datas.push_back(1.0f);
+			datas.push_back(0.0f);
+			datas.push_back(-1.0f);
+			datas.push_back(1.0f);
+		}
 
 		datas.push_back(-0.5f);
 		datas.push_back(-0.5f);
@@ -197,14 +203,17 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(0.0f);
 		datas.push_back(0.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(0.0f);
-		datas.push_back(1.0f);
-		datas.push_back(1.0f);
+		if (a_attributes.size() > 2)
+		{
+			datas.push_back(0.0f);
+			datas.push_back(0.0f);
+			datas.push_back(1.0f);
+			datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(-1.0f);
-		datas.push_back(1.0f);
+			datas.push_back(0.0f);
+			datas.push_back(-1.0f);
+			datas.push_back(1.0f);
+		}
 
 		datas.push_back(-0.5f);
 		datas.push_back(0.5f);
@@ -213,14 +222,17 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		datas.push_back(0.0f);
 		datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(0.0f);
-		datas.push_back(1.0f);
-		datas.push_back(1.0f);
+		if (a_attributes.size() > 2)
+		{
+			datas.push_back(0.0f);
+			datas.push_back(0.0f);
+			datas.push_back(1.0f);
+			datas.push_back(1.0f);
 
-		datas.push_back(0.0f);
-		datas.push_back(-1.0f);
-		datas.push_back(1.0f);
+			datas.push_back(0.0f);
+			datas.push_back(-1.0f);
+			datas.push_back(1.0f);
+		}
 
 		indices.push_back(0);
 		indices.push_back(1);
@@ -230,20 +242,6 @@ VBO::VBO(bool fill_datas, bool a_use_ebo): use_ebo(a_use_ebo)
 		indices.push_back(2);
 		indices.push_back(3);
 	}
-
-	// Create base Shader_Program_Variable for the shader program
-	Shader_Program_Variable v1 = Shader_Program_Variable();
-	Shader_Program_Variable v2 = Shader_Program_Variable();
-	Shader_Program_Variable v3 = Shader_Program_Variable();
-	Shader_Program_Variable v4 = Shader_Program_Variable();
-	v1.vector_size = 3;
-	v2.vector_size = 2;
-	v3.vector_size = 4;
-	v4.vector_size = 3;
-	attributes.push_back(v1);
-	attributes.push_back(v2);
-	attributes.push_back(v3);
-	attributes.push_back(v4);
 
 	// Generate the VBO into the GPU memory
 	glGenBuffers(1, &vbo);
@@ -342,7 +340,7 @@ VBO::~VBO()
 }
 
 // VAO constructor
-VAO::VAO(std::string shader_path, std::string vbo_path)
+VAO::VAO(std::string shader_path, std::vector<Shader_Program_Variable> a_attributes, std::string vbo_path)
 {
 	shader_program = load_shader_program(shader_path); // Load the shader program
 
@@ -350,12 +348,12 @@ VAO::VAO(std::string shader_path, std::string vbo_path)
 	glGenVertexArrays(1, &vao);
 	if (vbo_path != "") // Create the VBO for this VAO
 	{
-		vbo = new VBO(false, false);
+		vbo = new VBO(a_attributes, false, false);
 		vbo->load_from_file(vbo_path);
 	}
 	else
 	{
-		vbo = new VBO();
+		vbo = new VBO(a_attributes);
 	}
 
 	// Bind the VAO and the VBO

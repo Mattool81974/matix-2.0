@@ -205,7 +205,7 @@ def perfect_texture(path):
     img1.rectangle(((rectangle_width, 500 - offset), (500 + rectangle_width, 500 + rectangle_width)), fill ="grey")"""
     img.save(path)
 
-create_cube("textures/warehouse/door_dir", "textures/warehouse/door.png")
+create_cube("textures/warehouse/package_dir", "textures/warehouse/package.png")
 #create_cube("textures/computer_dir", "textures/computer.png")
 #create_chair("textures/table_dir", "textures/table.png")
 #create_chair("textures/chair_dir", "textures/chair.png")

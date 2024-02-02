@@ -44,7 +44,7 @@ void Player::update_move()
     speed *= delta_time;
 
     // Rotate and move camera
-    float jump_force = 3;
+    float jump_force = 4;
     float rotate_speed = 45;
     float sensitivity = get_game_struct()->get_camera()->get_sensitivity();
     get_attached_transform()->rotate(glm::vec3(0.0, sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));

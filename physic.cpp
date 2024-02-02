@@ -1,4 +1,3 @@
-#include <iostream>
 #include "physic.h"
 
 // Collision constructor

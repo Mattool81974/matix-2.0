@@ -1,8 +1,5 @@
 #include "Game.h"
 #include "model.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
 #include "matix/stb_image.h"
 
 double global_mouse_x = 500; // Global variable representing the X pos of the mouse
@@ -64,11 +61,29 @@ Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mous
     load_VAOs();
 }
 
+// Add an existing HUD to the game
+void Game::add_hud_object(std::string name, HUD_Object* object)
+{
+    if (contains_hud_object(name)) { std::cout << "Matix game : error ! The HUD object \"" << name << "\" you want to add already exists." << std::endl; return; }
+    (*get_hud_objects())[name] = object;
+}
+
 // Add an existing scene to the game
 void Game::add_scene(std::string name, Scene* scene)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to add already exists." << std::endl; return; }
     (*get_scenes())[name] = scene;
+}
+
+// Return if the game contains an HUD Object
+bool Game::contains_hud_object(std::string name)
+{
+    std::map < std::string, HUD_Object*>* objects = get_hud_objects();
+    for (std::map<std::string, HUD_Object*>::iterator it = objects->begin(); it != objects->end(); it++)
+    {
+        if (it->first == name) { return true; } // Verify each hud object name (first element of map)
+    }
+    return false;
 }
 
 // Returns if the game contains a scene
@@ -119,12 +134,28 @@ void Game::load_keys()
     keys["tab"] = GLFW_KEY_TAB;
 }
 
+// Create a new HUD Object into the game
+HUD_Object* Game::new_hud_object(std::string name, std::string texture_path)
+{
+    if (contains_scene(name)) { std::cout << "Matix game : error ! The objects \"" << name << "\" you want to create already exists." << std::endl; return 0; }
+
+    bool texture_resize = false; // Load the texture
+    Texture* texture = get_texture(texture_path, texture_resize);
+
+    // Load the VAO
+    VAO* vao = (*get_all_vaos())[(*get_type())["hud"]];
+
+    HUD_Object* new_object = new HUD_Object(this, name, texture, vao);
+    add_hud_object(name, new_object);
+    return new_object;
+}
+
 // Create a scene into the game and return it
 Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode mode, bool use_graphic, bool use_physic)
 {
     if (contains_scene(name)) { std::cout << "Matix game : error ! The scene \"" << name << "\" you want to create already exists." << std::endl; return 0; }
 
-    Scene* new_scene = new Scene(this, name, map_path, use_graphic, use_physic, mode);
+    Scene* new_scene = new Scene(this, name, hud_objects, map_path, use_graphic, use_physic, mode);
     add_scene(name, new_scene);
     return new_scene;
 }
@@ -239,6 +270,13 @@ Game::~Game()
     for (std::map<std::string, Scene*>::iterator it = scenes->begin(); it != scenes->end(); it++)
     {
         delete it->second; // Destroy each scenes
+        it->second = 0;
+    }
+
+    std::map<std::string, HUD_Object*>* huds = get_hud_objects();
+    for (std::map<std::string, HUD_Object*>::iterator it = huds->begin(); it != huds->end(); it++)
+    {
+        delete it->second; // Destroy each HUD_Object
         it->second = 0;
     }
 }

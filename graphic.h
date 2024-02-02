@@ -22,3 +22,32 @@ private:
 	VAO* vao = 0; // Pointer to the VAO used to render the object
 	Texture *texture = 0; // Pointer to the Texture used to render the object
 };
+
+class HUD_Object
+{
+	// Class representing a HUB object
+public:
+	HUD_Object(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao); // HUD_Object constructor
+	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
+	void render(); // Render the graphic HUD
+	void update(); // Update the graphic HUD
+	~HUD_Object(); // HUD_Object destructor
+
+	// Getters and setters
+	inline Base_Struct* get_base_struct() { return base_struct; };
+	inline glm::vec3 get_position() { return glm::vec3(position[0], position[1], 0); };
+	inline glm::vec3 get_rotation() { return glm::vec3(rotation[0], rotation[1], rotation[2]); };
+	inline glm::vec3 get_scale() { return glm::vec3(scale[0], scale[1], 1); };
+	inline Texture* get_texture() { return texture; };
+	inline void set_texture(Texture* a_texture) { texture = a_texture; };
+private:
+	std::string name; // Name of the object
+
+	glm::vec2 position = glm::vec2(0, 0); // Position of the HUD on the screen
+	glm::vec3 rotation = glm::vec3(0, 0, 0); // Rotation of the HUD on the screen
+	glm::vec2 scale = glm::vec2(1, 1); // Size of the HUD on the screen
+
+	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
+	VAO* vao = 0; // Pointer to the VAO used to render the object
+	Texture* texture = 0; // Pointer to the Texture used to render the object
+};

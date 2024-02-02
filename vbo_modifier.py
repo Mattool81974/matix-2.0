@@ -88,17 +88,19 @@ class Vertice:
         """
         self.point = point
     
-    def to_string(self) -> str:
+    def to_string(self, in_3d: bool = True) -> str:
         """Return the vertices into a string
 
         Returns:
             str: vertices into a string
         """
         to_return = str(round(self.get_point()[0], 5)) + "f " + str(round(self.get_point()[1], 5)) + "f " + str(round(self.get_point()[2], 5)) + "f "
-        to_return += str(round(self.get_texture_pos()[0], 5)) + "f " + str(round(self.get_texture_pos()[1], 5)) + "f "
-        to_return += str(round(self.get_texture_rect()[0], 5)) + "f " + str(round(self.get_texture_rect()[1], 5)) + "f " + str(round(self.get_texture_rect()[2], 5)) + "f " + str(round(self.get_texture_rect()[3], 5)) + "f "
-        to_return += str(round(self.get_rescaling()[0], 5)) + "f " + str(round(self.get_rescaling()[1], 5)) + "f " + str(round(self.get_rescaling()[2], 5)) + "f"
-        return to_return
+        if in_3d:
+            to_return += str(round(self.get_texture_pos()[0], 5)) + "f " + str(round(self.get_texture_pos()[1], 5)) + "f "
+            to_return += str(round(self.get_texture_rect()[0], 5)) + "f " + str(round(self.get_texture_rect()[1], 5)) + "f " + str(round(self.get_texture_rect()[2], 5)) + "f " + str(round(self.get_texture_rect()[3], 5)) + "f "
+            to_return += str(round(self.get_rescaling()[0], 5)) + "f " + str(round(self.get_rescaling()[1], 5)) + "f " + str(round(self.get_rescaling()[2], 5)) + "f "
+        return to_return[:-1]
+        
 
 def form_informations(points: list) -> None:
     """Print some rotation about a form

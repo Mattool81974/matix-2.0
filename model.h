@@ -43,7 +43,7 @@ class VBO
 {
 	// Class representing a VBO interface
 public:
-	VBO(bool fill_datas = true, bool a_use_ebo = true); // VBO constructor
+	VBO(std::vector<Shader_Program_Variable> a_attributes, bool fill_datas = true, bool a_use_ebo = true); // VBO constructor
 	void bind(); // Bind the VBO into the GPU memory
 	void bind_buffer(); // Bind the buffer data of the VBO
 	unsigned int get_vertice_number(); // Returns the number of vertices into the VBO
@@ -72,7 +72,7 @@ class VAO
 {
 	// Class representing a VAO interface
 public:
-	VAO(std::string shader_path, std::string vbo_path = ""); // VAO constructor
+	VAO(std::string shader_path, std::vector<Shader_Program_Variable> a_attributes, std::string vbo_path = ""); // VAO constructor
 	void bind(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Bind the VAO into the GPU memory
 	Shader_Program *load_shader_program(std::string shader_path); // Load and return a shader
 	void render(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Render the VAO

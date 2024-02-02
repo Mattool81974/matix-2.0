@@ -12,6 +12,7 @@ void warehouse()
     Part* floor_exterior = game.new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
     Part* floor_interior = game.new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
     Part* door = game.new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), "../textures/warehouse/door.png");
+    Part* package = game.new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/package.png");
     Part* wall_exterior = game.new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
 
     // Configurate parts
@@ -28,9 +29,11 @@ void warehouse()
     game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(2, 8, 2), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
+    Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
+    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(2, 15, 2), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
-    
+    HUD_Object* watermark = game.new_hud_object("watermark", "../textures/watermark.png");
+
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
     camera->set_position(glm::vec3(0, 0.75, 0));

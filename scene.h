@@ -2,12 +2,8 @@
 
 #include "advanced_struct.h"
 #include "graphic.h"
-#include <iostream>
-#include <map>
 #include "model.h"
 #include "physic.h"
-#include <string>
-#include <vector>
 
 struct Map_Level {
 	// Struct representing a level of a map
@@ -56,7 +52,7 @@ class Graphic_Scene
 {
 	// Class representing a collection of graphic object
 public:
-	Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects); // Graphic_Scene constructor
+	Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::map < std::string, HUD_Object*>& a_hud_objects); // Graphic_Scene constructor
 	Graphic_Object* new_object(std::string name, Transform_Object& transform, std::string type, std::string texture_path = "", bool texture_resize = true); // Create a new object into the scene and return it
 	void render(); // Render the objects in the scene
 	void update(); // Update the objects in the scene
@@ -64,12 +60,14 @@ public:
 
 	// Getters and setters
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
+	inline std::map < std::string, HUD_Object*>* get_hud_objects() { return &hud_objects; };
 	inline std::string get_name() { return name; };
 	inline std::map<std::string, Object*>* get_objects() { return &objects; };
 private:
 	std::string name; // Name of the scene
 
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
+	std::map < std::string, HUD_Object*>& hud_objects; // Reference to the HUD_Objects
 	std::map<std::string, Object*>& objects; // Each objects, with their name at key, in the game
 };
 
@@ -105,7 +103,7 @@ class Scene: public Transform_Object
 public:
 	std::string map_part_delimitation = "<----------------------------------------------->";
 
-	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
+	Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map < std::string, HUD_Object*>& a_hud_objects, std::string a_map_path = "", bool a_graphic = true, bool a_physic = true, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Scene constructor
 	void add_object(std::string name, Object* object); // Add an existing object into the scene
 	inline void assign_map_pos(std::vector<glm::vec3> positions, Object *object) // Put the positions into the map pos
 	{
@@ -168,6 +166,7 @@ public:
 	// Getters and setters
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline Graphic_Scene* get_graphic_scene() { return graphic_scene; };
+	inline std::map < std::string, HUD_Object*>* get_hud_objects() { return &hud_objects; };
 	inline std::string get_name() { return name; };
 	inline Object* get_object(std::string name) { if (!contains_object(name)) { std::cout << "Scene \"" << get_name() << "\": error : The object \"" << name << "\" you want to access does not exist." << std::endl; return 0; } return (*get_objects())[name]; };
 	inline std::map<std::string, Object*> *get_objects() { return &objects; };
@@ -184,6 +183,7 @@ private:
 
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
+	std::map < std::string, HUD_Object*>& hud_objects; // Reference to the HUD_Objects
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
 	std::vector<std::vector<std::vector<Object*>>> objects_map = std::vector<std::vector<std::vector<Object*>>>(); // Each objects, arranged as a map, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
