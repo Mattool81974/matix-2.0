@@ -42,6 +42,8 @@ void warehouse()
     player->get_attached_physic_object()->set_use_collision(true);
     player->set_map_pos(glm::vec3(2, 1, 2));
     player->set_description("player");
+    watermark->set_position(glm::vec3(-0.6, 0.76, 0));
+    watermark->set_scale(glm::vec3(0.4, 0.24, 1));
 
     float last_size = player->get_all_map_pos().size();
     std::vector<glm::vec3> positions = player->get_all_map_pos();

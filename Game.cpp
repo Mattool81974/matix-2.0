@@ -52,7 +52,9 @@ Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mous
     }
 
     // Texture setting
+    glEnable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     stbi_set_flip_vertically_on_load(true);
 
     glfwSetCursorPosCallback(window, mouse_callback);
