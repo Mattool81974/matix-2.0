@@ -28,7 +28,7 @@ void warehouse()
     game.set_current_scene("warehouse");
 
     // Construct objects for testing
-    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(2, 7, 2), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
+    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(2, 8, 2), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
     
     // Configurate some objects in the scene

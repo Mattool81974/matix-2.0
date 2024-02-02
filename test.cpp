@@ -44,7 +44,7 @@ void Player::update_move()
     speed *= delta_time;
 
     // Rotate and move camera
-    float jump_force = 10;
+    float jump_force = 3;
     float rotate_speed = 45;
     float sensitivity = get_game_struct()->get_camera()->get_sensitivity();
     get_attached_transform()->rotate(glm::vec3(0.0, sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));
@@ -61,10 +61,8 @@ void Player::update_move()
         get_attached_transform()->move(glm::vec3(speed) * -get_attached_transform()->get_right());
     if (get_game_struct()->get_key_state("space") == 1)
     {
-        Scene* scene = (*game->get_scenes())[get_scene_name()];
-        unsigned short bottom_collision = scene->get_physic_scene()->check_collision(this, glm::vec3(0, 1, 0), false).size();
         glm::vec3 force = glm::vec3(jump_force) * get_attached_transform()->get_up();
-        if(scene->use_physic() && bottom_collision > 0) get_attached_physic_object()->apply_force(force, true);
+        if (use_physic() && get_attached_physic_object()->is_standing()) get_attached_physic_object()->apply_force(force);
     }
     if (get_game_struct()->get_key_state("left shift") == 1)
         get_attached_transform()->move(glm::vec3(speed) * -get_attached_transform()->get_up());

@@ -108,8 +108,14 @@ void Physic_Scene::apply_gravity()
 		if (it->second->use_physic() && !it->second->get_attached_physic_object()->is_static())
 		{
 			// Calculate the gravity force
-			glm::vec3 gravity = get_game_struct()->get_gravity_force() * it->second->get_attached_physic_object()->get_gravity_value() * glm::vec3(get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time());
-			it->second->get_attached_physic_object()->apply_force(gravity, true); // Update each object one by one
+			glm::vec3 gravity = get_game_struct()->get_gravity_force() * glm::vec3(get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time(), get_game_struct()->get_delta_time());
+			it->second->get_attached_physic_object()->apply_gravity(gravity); // Update each object one by one
+
+			// Check if the object is standing
+			std::vector<glm::vec3> map_positions = it->second->get_all_map_pos(glm::vec3(0, 1, 0), true); // Check each part of the map the object is
+			Collision_Result result = check_collision(it->second, glm::vec3(0, 2, 0), false);
+			if (result.size() > 0 && glm::abs(it->second->get_attached_physic_object()->get_velocity()[1]) < 0.1) it->second->get_attached_physic_object()->set_is_standing(true);
+			else it->second->get_attached_physic_object()->set_is_standing(false);
 		}
 	}
 }
@@ -117,7 +123,7 @@ void Physic_Scene::apply_gravity()
 // Check the collisions in the system
 void Physic_Scene::check_collisions()
 {
-	std::vector<Object*> dynamic_objects = std::vector<Object*>();
+	std::vector<Object*> dynamic_objects = std::vector<Object*>(); // Get the dynamics objects
 	for (std::map<std::string, Object*>::iterator it = get_objects()->begin(); it != get_objects()->end(); it++)
 	{
 		if (it->second->use_physic() && !it->second->get_attached_physic_object()->is_static() && it->second->get_attached_physic_object()->use_collision())
@@ -126,7 +132,7 @@ void Physic_Scene::check_collisions()
 		}
 	}
 
-	for (int i = 0; i < dynamic_objects.size(); i++)
+	for (int i = 0; i < dynamic_objects.size(); i++) // Check collision of each objects
 	{
 		Object* object = dynamic_objects[i];
 		(*object->get_collisions_result()) = check_collision(object, glm::vec3(1, 1, 1), true);

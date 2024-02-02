@@ -31,6 +31,7 @@ class Physic_Object
 public:
 	Physic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, bool a_static_object = true, unsigned short type = 1); // Physic_Object constructor
 	void apply_force(glm::vec3 force, bool directly_apply = false); // Apply a force to the object
+	void apply_gravity(glm::vec3 gravity_force); // Apply the gravity to the object
 	void update(); // Update the physic object
 	void update_velocity(); // Update the velocity of the object
 	~Physic_Object(); // Physic_Object destructor
@@ -41,8 +42,12 @@ public:
 	inline glm::vec3 get_gravity_value() { return gravity_value; };
 	inline float get_mass() { return mass; };
 	inline glm::vec3 get_velocity() { return velocity; };
+	inline bool is_falling() { return fall; };
+	inline bool is_standing() { return stand; };
 	inline bool is_static() { return static_object; };
 	inline void set_gravity_value(glm::vec3 a_gravity_value) { gravity_value = a_gravity_value; };
+	inline void set_is_falling(bool is_falling) { fall = is_falling; };
+	inline void set_is_standing(bool is_standing) { stand = is_standing; };
 	inline void set_mass(float a_mass) { mass = a_mass; };
 	inline void set_use_collision(bool a_use_collision) { is_using_collision = a_use_collision; };
 	inline void set_velocity(glm::vec3 a_velocity) { velocity = a_velocity; };
@@ -50,7 +55,9 @@ public:
 private:
 	float mass = 1; // Mass of the object
 	bool static_object = true; // If the object is static or not
+	bool fall = false; // If the object fall or not
 	bool is_using_collision = true; // If the object use the collisions or not
+	bool stand = false; // If the object is standing here
 
 	Transform_Object& attached_transform; // Reference to the attached transform object
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
