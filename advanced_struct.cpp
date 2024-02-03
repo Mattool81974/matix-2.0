@@ -35,6 +35,17 @@ void Advanced_Struct::assign_part(unsigned int number, Part* part)
 	(*get_parts())[number] = part;
 }
 
+// Returns if the struct contains a font
+bool Advanced_Struct::contains_font(std::string font_name)
+{
+	std::map<std::string, Font_Texture*>* textures = get_fonts_textures();
+	for (std::map<std::string, Font_Texture*>::iterator it = textures->begin(); it != textures->end(); it++)
+	{
+		if (it->first == font_name) { return true; } // Verify each font name (first element of map)
+	}
+	return false;
+}
+
 // Returns if the struct contains a part
 bool Advanced_Struct::contains_part(unsigned int number)
 {
@@ -46,7 +57,7 @@ bool Advanced_Struct::contains_part(unsigned int number)
 	return false;
 }
 
-// Returns if the struct contains a textures
+// Returns if the struct contains a texture
 bool Advanced_Struct::contains_texture(std::string texture_path)
 {
 	std::map<std::string, Texture*>* textures = get_textures();
@@ -66,6 +77,21 @@ bool Advanced_Struct::contains_vao(std::string type)
 		if (it->first == type) { return true; } // Verify each vaos name (first element of map)
 	}
 	return false;
+}
+
+// Returns a texture in the struct
+Font_Texture* Advanced_Struct::get_font_texture(std::string font_name)
+{
+	if (contains_font(font_name))
+	{
+		return (*get_fonts_textures())[font_name];
+	}
+	else
+	{
+		Font_Texture* texture = new Font_Texture(font_name);
+		(*get_textures())[font_name] = texture;
+		return texture;
+	}
 }
 
 // Returns a part
@@ -131,6 +157,7 @@ void Advanced_Struct::load_VAOs()
 	hud_attributes.push_back(v2);
 
 	// Create VAOs
+	all_fonts_vaos["default"] = new Font_VAO();
 	all_vaos["chair"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/chair.vbo");
 	all_vaos["circle"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon50.vbo");
 	all_vaos["cylinder"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon_3d50.vbo");
@@ -139,6 +166,9 @@ void Advanced_Struct::load_VAOs()
 	all_vaos["one_faced_cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/one_faced_cube.vbo");
 	all_vaos["table"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/table.vbo");
 	all_vaos["triangle"] = new VAO("../shaders/default", base_3d_attributes, "");
+
+	// Create base texture
+	fonts_textures["default"] = new Font_Texture("../fonts/default.png");
 }
 
 // Create a new VAO into the game
@@ -166,6 +196,28 @@ VAO* Advanced_Struct::new_vao(std::string path, std::string type, std::string sh
 	return all_vaos[type];
 }
 
+// Unload all the fonts
+void Advanced_Struct::unload_fonts()
+{
+	std::map<std::string, Font_Texture*>* fonts = get_fonts_textures();
+	for (std::map<std::string, Font_Texture*>::iterator it = fonts->begin(); it != fonts->end(); it++)
+	{
+		delete it->second; // Delete fonts
+		it->second = 0;
+	}
+}
+
+// Unload all the textures
+void Advanced_Struct::unload_textures()
+{
+	std::map<std::string, Texture*>* textures = get_textures();
+	for (std::map<std::string, Texture*>::iterator it = textures->begin(); it != textures->end(); it++)
+	{
+		delete it->second; // Delete textures
+		it->second = 0;
+	}
+}
+
 // Advanced_Struct destructor
 Advanced_Struct::~Advanced_Struct()
 {
@@ -176,12 +228,8 @@ Advanced_Struct::~Advanced_Struct()
 		it->second = 0;
 	}
 
-	std::map<std::string, Texture*>* textures = get_textures();
-	for (std::map<std::string, Texture*>::iterator it = textures->begin(); it != textures->end(); it++)
-	{
-		delete it->second; // Delete textures
-		it->second = 0;
-	}
+	unload_fonts();
+	unload_textures();
 
 	std::map<unsigned int, Part*>* parts = get_parts();
 	for (std::map<unsigned int, Part*>::iterator it = parts->begin(); it != parts->end(); it++)

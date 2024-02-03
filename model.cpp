@@ -153,102 +153,20 @@ Shader_Program::~Shader_Program()
 	glDeleteProgram(shader_program);
 }
 
-// VBO constructor
-VBO::VBO(std::vector<Shader_Program_Variable> a_attributes, bool fill_datas, bool a_use_ebo): attributes(a_attributes), use_ebo(a_use_ebo)
+VBO::VBO(std::vector<Shader_Program_Variable> a_attributes, std::vector<float> a_datas, bool a_use_ebo): attributes(a_attributes), datas(a_datas), use_ebo(a_use_ebo) // VBO complete constructor
 {
-	if(fill_datas) // Fill datas with a basic square
-	{
-		datas.push_back(0.5f);
-		datas.push_back(0.5f);
-		datas.push_back(0.0f);
-
-		datas.push_back(1.0f);
-		datas.push_back(1.0f);
-
-		if (a_attributes.size() > 2)
-		{
-			datas.push_back(0.0f);
-			datas.push_back(0.0f);
-			datas.push_back(1.0f);
-			datas.push_back(1.0f);
-
-			datas.push_back(0.0f);
-			datas.push_back(-1.0f);
-			datas.push_back(1.0f);
-		}
-
-		datas.push_back(0.5f);
-		datas.push_back(-0.5f);
-		datas.push_back(0.0f);
-
-		datas.push_back(1.0f);
-		datas.push_back(0.0f);
-
-		if (a_attributes.size() > 2)
-		{
-			datas.push_back(0.0f);
-			datas.push_back(0.0f);
-			datas.push_back(1.0f);
-			datas.push_back(1.0f);
-
-			datas.push_back(0.0f);
-			datas.push_back(-1.0f);
-			datas.push_back(1.0f);
-		}
-
-		datas.push_back(-0.5f);
-		datas.push_back(-0.5f);
-		datas.push_back(0.0f);
-
-		datas.push_back(0.0f);
-		datas.push_back(0.0f);
-
-		if (a_attributes.size() > 2)
-		{
-			datas.push_back(0.0f);
-			datas.push_back(0.0f);
-			datas.push_back(1.0f);
-			datas.push_back(1.0f);
-
-			datas.push_back(0.0f);
-			datas.push_back(-1.0f);
-			datas.push_back(1.0f);
-		}
-
-		datas.push_back(-0.5f);
-		datas.push_back(0.5f);
-		datas.push_back(0.0f);
-
-		datas.push_back(0.0f);
-		datas.push_back(1.0f);
-
-		if (a_attributes.size() > 2)
-		{
-			datas.push_back(0.0f);
-			datas.push_back(0.0f);
-			datas.push_back(1.0f);
-			datas.push_back(1.0f);
-
-			datas.push_back(0.0f);
-			datas.push_back(-1.0f);
-			datas.push_back(1.0f);
-		}
-
-		indices.push_back(0);
-		indices.push_back(1);
-		indices.push_back(3);
-
-		indices.push_back(1);
-		indices.push_back(2);
-		indices.push_back(3);
-	}
-
 	// Generate the VBO into the GPU memory
 	glGenBuffers(1, &vbo);
-	if(use_ebo)
+	if (use_ebo)
 	{
 		glGenBuffers(1, &ebo);
 	}
+}
+
+// VBO constructor
+VBO::VBO(std::vector<Shader_Program_Variable> a_attributes, bool fill_datas, bool a_use_ebo): VBO(a_attributes, get_base_datas(a_attributes), a_use_ebo)
+{
+	
 }
 
 // Bind the VBO into the GPU memory
@@ -447,6 +365,44 @@ VAO::~VAO()
 	glDeleteVertexArrays(1, &vao);
 }
 
+// Font_Vao constructor
+Font_VAO::Font_VAO(): VAO("../shaders/font", get_base_attributes())
+{
+	
+}
+
+// Bind the VAO into the GPU memory
+void Font_VAO::bind(glm::vec4 rect)
+{
+	get_shader_program()->use();
+	get_shader_program()->set_uniform4f_value("texture_rect", rect[0], rect[1], rect[2], rect[3]);
+	glBindVertexArray(get_vao());
+}
+
+// Render the Font_VAO
+void Font_VAO::render(glm::vec4 rect)
+{
+	bind(rect);
+	if (get_vbo()->is_using_vbo()) // Render the VAO with a different function if the VBO use EBOs or not
+	{
+		glDrawElements(GL_TRIANGLES, get_vbo()->get_indices().size(), GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glDrawArrays(GL_TRIANGLES, 0, triangle_number() * 3.0);
+	}
+}
+
+// Font_VAO destructor
+Font_VAO::~Font_VAO()
+{
+	delete shader_program;
+	shader_program = 0;
+	delete vbo;
+	vbo = 0;
+	glDeleteVertexArrays(1, &vao);
+}
+
 // Texture constructor
 Texture::Texture(std::string a_texture_path, bool a_resize): texture_path(a_texture_path), resize(a_resize)
 {
@@ -474,6 +430,73 @@ void Texture::bind()
 
 // Texture destructor
 Texture::~Texture()
+{
+
+}
+
+// Font_Texture constructor
+Font_Texture::Font_Texture(std::string a_font_texture_path): Texture(a_font_texture_path, false)
+{
+
+}
+
+// Return the VBO datas for a character
+std::vector<float> Font_Texture::get_character_data(char character)
+{
+	glm::vec4 rect = get_character_rect(character);
+
+	std::vector<float> a_datas = std::vector<float>();
+	a_datas.push_back(0.5f);
+	a_datas.push_back(0.5f);
+	a_datas.push_back(0.0f);
+
+	a_datas.push_back(rect[0] + rect[2]);
+	a_datas.push_back(rect[1] + rect[3]);
+
+	a_datas.push_back(0.5f);
+	a_datas.push_back(-0.5f);
+	a_datas.push_back(0.0f);
+
+	a_datas.push_back(rect[0] + rect[2]);
+	a_datas.push_back(rect[1]);
+
+	a_datas.push_back(-0.5f);
+	a_datas.push_back(-0.5f);
+	a_datas.push_back(0.0f);
+
+	a_datas.push_back(rect[0]);
+	a_datas.push_back(rect[1]);
+
+	a_datas.push_back(-0.5f);
+	a_datas.push_back(0.5f);
+	a_datas.push_back(0.0f);
+
+	a_datas.push_back(rect[0]);
+	a_datas.push_back(rect[1] + rect[3]);
+
+	return a_datas;
+}
+
+// Return the place of a character into the characters string
+short Font_Texture::get_character_place(char character)
+{
+	std::string characters = get_characters();
+	// Browse each characters
+	for (int i = 0; i < characters.size(); i++) { if (characters[i] == character) return i; }
+	return -1; // If the character isn't here
+}
+
+// Return the rect of the character on the texture
+glm::vec4 Font_Texture::get_character_rect(char character)
+{
+	short place = get_character_place(character);
+	if (place == -1) { std::cout << "Matix game : error ! The character \"" << character << "\" doesn't exists in the font \"" << get_texture_path() << "\"." << std::endl; return glm::vec4(0, 0, 0, 0); }
+
+	return glm::vec4((place % (int)glm::round(get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], glm::floor(place / (get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], get_character_size()[0], get_character_size()[1]);
+}
+
+// Font_Texture destructor
+Font_Texture::~Font_Texture()
 {
 
 }

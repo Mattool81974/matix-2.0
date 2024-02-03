@@ -43,6 +43,7 @@ class VBO
 {
 	// Class representing a VBO interface
 public:
+	VBO(std::vector<Shader_Program_Variable> a_attributes, std::vector<float> a_datas, bool a_use_ebo = true); // VBO complete constructor
 	VBO(std::vector<Shader_Program_Variable> a_attributes, bool fill_datas = true, bool a_use_ebo = true); // VBO constructor
 	void bind(); // Bind the VBO into the GPU memory
 	void bind_buffer(); // Bind the buffer data of the VBO
@@ -51,7 +52,88 @@ public:
 	void unbind(); // Unbind the VBO from the GPU memory
 	~VBO(); // VBO destructor
 
+	// Getters and setters
 	inline std::vector<Shader_Program_Variable> *get_attributes() { return &attributes; };
+	inline std::vector<float> get_base_datas(std::vector<Shader_Program_Variable> a_attributes)
+	{
+		std::vector<float> a_datas = std::vector<float>();
+		a_datas.push_back(0.5f);
+		a_datas.push_back(0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(1.0f);
+		a_datas.push_back(1.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+
+		a_datas.push_back(0.5f);
+		a_datas.push_back(-0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(1.0f);
+		a_datas.push_back(0.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+
+		a_datas.push_back(-0.5f);
+		a_datas.push_back(-0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(0.0f);
+		a_datas.push_back(0.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+
+		a_datas.push_back(-0.5f);
+		a_datas.push_back(0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(0.0f);
+		a_datas.push_back(1.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+		return a_datas;
+	}
 	inline std::vector<float> get_datas() { return datas; };
 	inline std::vector<unsigned int> get_indices() { return indices; };
 	inline unsigned int* get_indices_in_array() { return indices.data(); };
@@ -73,9 +155,9 @@ class VAO
 	// Class representing a VAO interface
 public:
 	VAO(std::string shader_path, std::vector<Shader_Program_Variable> a_attributes, std::string vbo_path = ""); // VAO constructor
-	void bind(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Bind the VAO into the GPU memory
+	virtual void bind(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Bind the VAO into the GPU memory
 	Shader_Program *load_shader_program(std::string shader_path); // Load and return a shader
-	void render(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Render the VAO
+	virtual void render(glm::vec3 scale = glm::vec3(1.0, 1.0, 1.0)); // Render the VAO
 	unsigned int triangle_number(); // Returns the number of triangle to draw
 	~VAO(); // VAO destructor
 
@@ -84,11 +166,36 @@ public:
 	inline Shader_Program* get_shader_program() { return shader_program; };
 	inline unsigned int& get_vao() { return vao; };
 	inline VBO* get_vbo() { return vbo; };
-private:
+protected:
 	unsigned int vao; // Handle to the VAO
 
 	Shader_Program *shader_program = 0; // Pointer to the shader program
 	VBO *vbo = 0; // Pointer to the VBO
+};
+
+class Font_VAO: public VAO
+{
+	// Class representing a VAO of a font
+public:
+	Font_VAO(); // Font_VAO constructor
+	void bind(glm::vec4 rect); // Bind the font VAO into the GPU memory
+	void render(glm::vec4 rect); // Render the Font_VAO
+	~Font_VAO(); // Font_VAO constructor
+
+	// Getters and setters
+	inline std::vector<Shader_Program_Variable> get_base_attributes()
+	{
+		std::vector<Shader_Program_Variable> hud_attributes = std::vector<Shader_Program_Variable>();
+		Shader_Program_Variable v1 = Shader_Program_Variable();
+		Shader_Program_Variable v2 = Shader_Program_Variable();
+		v1.vector_size = 3;
+		v2.vector_size = 2;
+		hud_attributes.push_back(v1);
+		hud_attributes.push_back(v2);
+
+		return hud_attributes;
+	};
+private:
 };
 
 class Texture
@@ -100,6 +207,7 @@ public:
 	~Texture(); // Texture destructor
 
 	// Getters and setters
+	inline glm::vec2 get_texture_size() { return glm::vec2(width, height); };
 	inline std::string get_texture_path() { return texture_path; };
 	inline bool use_resize() { return resize; };
 private:
@@ -108,4 +216,20 @@ private:
 	unsigned int texture_id = 0; // Handle to the texture
 	std::string texture_path = ""; // Path of the texture
 	int width = 0; // Width of the texture
+};
+
+class Font_Texture: public Texture
+{
+	// Class representing a font
+public:
+	Font_Texture(std::string a_font_texture_path); // Font_Texture constructor
+	std::vector<float> get_character_data(char character); // Return the VBO datas for a character
+	short get_character_place(char character); // Return the place of a character into the characters string
+	glm::vec4 get_character_rect(char character); // Return the rect of the character on the texture
+	~Font_Texture(); // Font_Texture destructor
+
+	// Getters and setters
+	static std::string get_characters() { return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"; };
+	static glm::vec2 get_character_size() { return glm::vec2(100, 100); };
+private:
 };

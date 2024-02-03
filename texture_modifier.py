@@ -4,8 +4,13 @@
 # Import librairies
 import math
 import os
+import pygame as pg
 import PIL.ImageDraw as id
 import PIL.Image as im
+
+font_container = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"
+font_size = 100
+font_square_size = (100, 100)
 
 def create_chair(path: str, final_path: str) -> None:
     """Create a chair texture
@@ -92,6 +97,26 @@ def create_cube(path: str, final_path: str) -> None:
     cube.paste(file6, (500, 1500))
 
     cube.save(final_path)
+
+def create_font(path: str, font_name: str) -> None:
+    """Create a font texture
+    """
+    print(len(font_container))
+    final_size = (1000, 1000) # Create main texture
+    final_surface = pg.Surface(final_size, pg.SRCALPHA).convert_alpha()
+
+    if font_name == "default":
+        font = pg.font.Font(pg.font.get_default_font(), font_size) # Create font
+
+    for i in range(len(font_container)):
+        char = pg.Surface(font_square_size, pg.SRCALPHA)
+        char.blit(font.render(font_container[i], True, (0, 0, 0, 255)), (0, 0, char.get_width(), char.get_height())) # Draw the text
+
+        x = (i % (final_size[0] / font_square_size[0])) * font_square_size[0]
+        y = (i // (final_size[0] / font_square_size[0])) * font_square_size[0]
+        final_surface.blit(char, (x, y, char.get_width(), char.get_height()))
+    
+    pg.image.save(final_surface, path)
 
 def create_famas(path: str, final_path: str) -> None:
     """Create a famas texture
@@ -205,7 +230,10 @@ def perfect_texture(path):
     img1.rectangle(((rectangle_width, 500 - offset), (500 + rectangle_width, 500 + rectangle_width)), fill ="grey")"""
     img.save(path)
 
-create_cube("textures/warehouse/package_dir", "textures/warehouse/package.png")
+pg.init()
+pg.display.set_mode((1, 1))
+
+#create_cube("textures/warehouse/package_dir", "textures/warehouse/package.png")
 #create_cube("textures/computer_dir", "textures/computer.png")
 #create_chair("textures/table_dir", "textures/table.png")
 #create_chair("textures/chair_dir", "textures/chair.png")
@@ -213,3 +241,4 @@ create_cube("textures/warehouse/package_dir", "textures/warehouse/package.png")
 #create_famas("textures/famas_dir", "textures/famas.png")
 #create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
 #create_shell("textures/shell_dir", "textures/shell.png")
+create_font("fonts/default.png", "default")

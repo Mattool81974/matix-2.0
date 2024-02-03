@@ -25,11 +25,11 @@ private:
 
 class HUD_Object
 {
-	// Class representing a HUB object
+	// Class representing a HUD object
 public:
 	HUD_Object(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao); // HUD_Object constructor
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
-	void render(); // Render the graphic HUD
+	virtual void render(); // Render the graphic HUD
 	void update(); // Update the graphic HUD
 	~HUD_Object(); // HUD_Object destructor
 
@@ -53,4 +53,15 @@ private:
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
 	VAO* vao = 0; // Pointer to the VAO used to render the object
 	Texture* texture = 0; // Pointer to the Texture used to render the object
+};
+
+class HUD_Font
+{
+	// Class representing an HUD font object
+public:
+	HUD_Font(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, Font_VAO* a_vao); // HUD_Font constructor
+	void render(); // Render the font for HUD
+	~HUD_Font(); // HUD_Object destructor
+private:
+
 };

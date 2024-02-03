@@ -82,3 +82,21 @@ HUD_Object::~HUD_Object()
 {
 
 }
+
+// HUD_Font constructor
+HUD_Font::HUD_Font(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao) : HUD_Object(a_base_struct, a_name, a_texture, a_vao)
+{
+
+}
+
+// Render the font for HUD
+void HUD_Font::render()
+{
+
+}
+
+// HUD_Object destructor
+HUD_Font::~HUD_Font()
+{
+
+}
