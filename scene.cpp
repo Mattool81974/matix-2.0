@@ -441,25 +441,25 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, 
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			float x = middle[0] + level->position[0] + part->get_position()[0];
-			float y = middle[1] + level->position[1] + part->get_position()[1];
-			float z = middle[2] + level->position[2] + part->get_position()[2];
+			float x = middle[0] + level->position[level_count][0] + part->get_position()[0];
+			float y = middle[1] + level->position[level_count][1] + part->get_position()[1];
+			float z = middle[2] + level->position[level_count][2] + part->get_position()[2];
 
 			glm::vec3 scale = glm::vec3(part->get_scale()[0] * (difference[0] + 1), part->get_scale()[1] * (difference[1] + 1), part->get_scale()[2] * (difference[2] + 1));
 			if (part->get_scale_level_multiplier()[0] != 0)
 			{
-				scale[0] *= level->scale[0] * part->get_scale_level_multiplier()[0];
-				x += (level->scale[0] * part->get_scale_level_multiplier()[0]) / 2;
+				scale[0] *= level->scale[level_count][0] * part->get_scale_level_multiplier()[0];
+				x += (level->scale[level_count][0] * part->get_scale_level_multiplier()[0]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[1] != 0)
 			{
-				scale[1] *= level->scale[1] * part->get_scale_level_multiplier()[1];
-				y += (level->scale[1] * part->get_scale_level_multiplier()[1]) / 2;
+				scale[1] *= level->scale[level_count][1] * part->get_scale_level_multiplier()[1];
+				y += (level->scale[level_count][1] * part->get_scale_level_multiplier()[1]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[2] != 0)
 			{
-				scale[2] *= level->scale[2] * part->get_scale_level_multiplier()[2];
-				z += (level->scale[2] * part->get_scale_level_multiplier()[2]) / 2;
+				scale[2] *= level->scale[level_count][2] * part->get_scale_level_multiplier()[2];
+				z += (level->scale[level_count][2] * part->get_scale_level_multiplier()[2]) / 2;
 			}
 
 			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
@@ -476,7 +476,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 {
 	// Reset the scene map
 
-	if (mode == Map_Opening_Mode::Simple)
+	if (mode == Map_Opening_Mode::Simple) // SImple opening mode
 	{
 		std::vector<std::string> lines = cut_string(map, "\n");
 
@@ -521,7 +521,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			}
 		}
 	}
-	else if (mode == Map_Opening_Mode::Collections)
+	else if (mode == Map_Opening_Mode::Collections) // Complex opening mode
 	{
 		std::vector<std::string> parts = cut_string(map, map_part_delimitation); // Cut the map by parts
 
@@ -534,29 +534,42 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		std::map<unsigned short, Object*> level_object = std::map<unsigned short, Object*>();
 		for (int i = 1; i < lines.size(); i++) // Check each levels of the map
 		{
-			std::vector<std::string> level_str = cut_string(lines[i], " ");
-			unsigned short level_id = std::stoi(level_str[0]);
-
-			unsigned short length = std::stoi(level_str[9]); // Get the size of the level
-			unsigned short height = std::stoi(level_str[8]);
-			unsigned short width = std::stoi(level_str[7]);
-
-			Map_Level level; // Configurate the level
+			Map_Level level; // Create the level
+			std::vector<std::string> level_count = cut_string(lines[i], ",");
+			unsigned short level_id = std::stoi(level_count[0]); // Get and set ID
 			level.id = level_id;
-			level.scale = glm::vec3(length, height, width);
-			levels[level_id] = level;
 
-			float x = level.position[0];
-			float y = level.position[1];
-			float z = level.position[2];
+			for (int j = 1; j < level_count.size(); j++) // Browse each level part
+			{
+				std::vector<std::string> level_str = cut_string(level_count[j], " ");
+				unsigned short level_id = std::stoi(level_str[0]);
 
-			std::string object_name = "level" + level_str[0]; // Configurate the level Object
-			Transform_Object* level_transform = new Transform_Object(this, glm::vec3(x, y, z), level.rotation, level.scale);
-			// Object* level_object = new Object(get_game_struct(), object_name, get_name(), level_transform);
-			// add_object(object_name, level_object);
+				float x = std::stof(level_str[1]); // Get the position of the level
+				float y = std::stof(level_str[2]);
+				float z = std::stof(level_str[3]);
+
+				float yaw = std::stof(level_str[5]); // Get the position of the level
+				float pitch = std::stof(level_str[4]);
+				float roll = std::stof(level_str[6]);
+
+				unsigned short length = std::stoi(level_str[9]); // Get the size of the level
+				unsigned short height = std::stoi(level_str[8]);
+				unsigned short width = std::stoi(level_str[7]);
+
+				level.position.push_back(glm::vec3(x, y, z));
+				level.rotation.push_back(glm::vec3(yaw, pitch, roll));
+				level.scale.push_back(glm::vec3(length, height, width));
+
+				// std::string object_name = "level" + level_str[0]; // Configurate the level Object
+				// Transform_Object* level_transform = new Transform_Object(this, glm::vec3(x, y, z), level.rotation, level.scale);
+				// Object* level_object = new Object(get_game_struct(), object_name, get_name(), level_transform);
+				// add_object(object_name, level_object);
+			}
+
+			levels[level_id] = level; // Add the level
 		}
 
-		total_size = glm::vec3(60, 5, 60);
+		total_size = glm::vec3(60, 10, 60);
 
 		clear_objects_map();
 

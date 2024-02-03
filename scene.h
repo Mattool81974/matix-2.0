@@ -8,9 +8,11 @@
 struct Map_Level {
 	// Struct representing a level of a map
 	unsigned short id = 0;
-	glm::vec3 position = glm::vec3(0, 0, 0);
-	glm::vec3 rotation = glm::vec3(0, 0, 0);
-	glm::vec3 scale = glm::vec3(1, 1, 1);
+	unsigned short level_number = 0;
+	std::vector<Object*> parent = std::vector<Object*>();
+	std::vector<glm::vec3> position = std::vector<glm::vec3>();
+	std::vector<glm::vec3> rotation = std::vector<glm::vec3>();
+	std::vector<glm::vec3> scale = std::vector<glm::vec3>();
 };
 enum Map_Level_Orientation {Vertical, Horizontal}; // Differents orientations for a map lev collection
 class Map_Level_Collection {

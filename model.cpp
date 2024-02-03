@@ -452,7 +452,6 @@ Texture::Texture(std::string a_texture_path, bool a_resize): texture_path(a_text
 {
 	int nrChannels = 0;
 	unsigned char* texture = stbi_load(texture_path.c_str(), &width, &height, &nrChannels, 0);
-	std::cout << "E " << nrChannels << std::endl;
 
 	// Load the texture
 	glGenTextures(1, &texture_id);
