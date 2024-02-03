@@ -9,8 +9,8 @@ import PIL.ImageDraw as id
 import PIL.Image as im
 
 font_container = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"
-font_size = 100
-font_square_size = (100, 100)
+font_size = 200
+font_square_size = (110, 200)
 
 def create_chair(path: str, final_path: str) -> None:
     """Create a chair texture
@@ -98,22 +98,26 @@ def create_cube(path: str, final_path: str) -> None:
 
     cube.save(final_path)
 
-def create_font(path: str, font_name: str) -> None:
+def create_font(path: str, font_name: str, final_size = (1000, 1000)) -> None:
     """Create a font texture
     """
     print(len(font_container))
-    final_size = (1000, 1000) # Create main texture
+    # Create main texture
     final_surface = pg.Surface(final_size, pg.SRCALPHA).convert_alpha()
 
     if font_name == "default":
         font = pg.font.Font(pg.font.get_default_font(), font_size) # Create font
+    else:
+        font = pg.font.SysFont(font_name, font_size) # Create font
 
     for i in range(len(font_container)):
         char = pg.Surface(font_square_size, pg.SRCALPHA)
-        char.blit(font.render(font_container[i], True, (0, 0, 0, 255)), (0, 0, char.get_width(), char.get_height())) # Draw the text
+        drawn_character = font.render(font_container[i], True, (0, 0, 0, 255))
+        print(font_container[i], drawn_character.get_width())
+        char.blit(drawn_character, (0, 0, char.get_width(), char.get_height())) # Draw the text
 
         x = (i % (final_size[0] / font_square_size[0])) * font_square_size[0]
-        y = (i // (final_size[0] / font_square_size[0])) * font_square_size[0]
+        y = (i // (final_size[1] / font_square_size[1])) * font_square_size[1]
         final_surface.blit(char, (x, y, char.get_width(), char.get_height()))
     
     pg.image.save(final_surface, path)
@@ -241,4 +245,4 @@ pg.display.set_mode((1, 1))
 #create_famas("textures/famas_dir", "textures/famas.png")
 #create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
 #create_shell("textures/shell_dir", "textures/shell.png")
-create_font("fonts/default.png", "default")
+create_font("fonts/consolas.png", "Consolas", final_size = (1100, 2000))

@@ -43,25 +43,31 @@ public:
 	inline void set_rotation(glm::vec3 a_rotation) { rotation = a_rotation; };
 	inline void set_scale(glm::vec3 a_scale) { scale = a_scale; };
 	inline void set_texture(Texture* a_texture) { texture = a_texture; };
+protected:
+	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
+	VAO* vao = 0; // Pointer to the VAO used to render the object
+	Texture* texture = 0; // Pointer to the Texture used to render the object
 private:
 	std::string name; // Name of the object
 
 	glm::vec2 position = glm::vec2(0, 0); // Position of the HUD on the screen
 	glm::vec3 rotation = glm::vec3(0, 0, 0); // Rotation of the HUD on the screen
 	glm::vec2 scale = glm::vec2(1, 1); // Size of the HUD on the screen
-
-	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
-	VAO* vao = 0; // Pointer to the VAO used to render the object
-	Texture* texture = 0; // Pointer to the Texture used to render the object
 };
 
-class HUD_Font
+class HUD_Text: public HUD_Object
 {
-	// Class representing an HUD font object
+	// Class representing an HUD text object
 public:
-	HUD_Font(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, Font_VAO* a_vao); // HUD_Font constructor
+	HUD_Text(Base_Struct* a_base_struct, std::string a_name, Font_Texture* a_texture, Font_VAO* a_vao); // HUD_Font constructor
 	void render(); // Render the font for HUD
-	~HUD_Font(); // HUD_Object destructor
-private:
+	~HUD_Text(); // HUD_Object destructor
 
+	// Getters and setters
+	inline std::string get_text() { return text; };
+	inline Font_Texture* get_texture() { return (Font_Texture*)texture; };
+	inline Font_VAO* get_vao() { return (Font_VAO*)vao; };
+	inline void set_text(std::string a_text) { text = a_text; };
+private:
+	std::string text = "Homophobie";
 };

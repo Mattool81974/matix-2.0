@@ -83,20 +83,45 @@ HUD_Object::~HUD_Object()
 
 }
 
-// HUD_Font constructor
-HUD_Font::HUD_Font(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao) : HUD_Object(a_base_struct, a_name, a_texture, a_vao)
+
+// HUD_Text constructor
+HUD_Text::HUD_Text(Base_Struct* a_base_struct, std::string a_name, Font_Texture* a_texture, Font_VAO* a_vao) : HUD_Object(a_base_struct, a_name, a_texture, a_vao)
 {
 
 }
 
-// Render the font for HUD
-void HUD_Font::render()
+// Render the text for HUD
+void HUD_Text::render()
 {
+	texture->bind(); // Bind the texture
+	glm::mat4 model = get_model_matrix();
 
+	std::string final_text = get_text();
+	unsigned short text_length = final_text.size();
+	glm::vec2 text_size = get_texture()->size("a");
+	float ratio = text_size[0] / text_size[1];
+	glm::vec3 scale = glm::vec3(ratio, 1.0, 1); // Calculate the necessary scale
+	scale /= glm::vec3(text_length, text_length, text_length);
+	scale = glm::normalize(scale);
+	glm::mat4 model_scaled = glm::scale(model, scale); // Calculate the scale of the character
+	std::cout << "R " << scale[0] << " " << scale[1] << " " << text_size[0] << " " << ratio << " " << text_length << std::endl;
+
+	for (int i = 0; i < text_length; i++) // Generate each char one by one
+	{
+		char chr = get_text()[i];
+		if (chr != ' ')
+		{
+			vao->get_shader_program()->set_uniform4fv_value("model", model_scaled); // Write some uniform variables into the shader
+			vao->get_shader_program()->set_uniform4f_value("texture_rect", ((Font_Texture*)texture)->get_character_rect(chr)); // Write some uniform variables into the shader
+
+			((Font_VAO*)vao)->render(((Font_Texture*)texture)->get_character_rect(chr)); // Render the object
+		}
+		model_scaled = glm::translate(model_scaled, glm::vec3(1, 0, 0));
+	}
 }
 
-// HUD_Object destructor
-HUD_Font::~HUD_Font()
+// HUD_Text destructor
+HUD_Text::~HUD_Text()
 {
 
 }

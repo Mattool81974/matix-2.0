@@ -133,6 +133,12 @@ void Shader_Program::set_uniform4f_value(std::string name, float v1, float v2, f
 	glUniform4f(uniform_location, v1, v2, v3, v4);
 }
 
+// Change the value of a uniform vec4 float value
+void Shader_Program::set_uniform4f_value(std::string name, glm::vec4 v)
+{
+	set_uniform4f_value(name, v[0], v[1], v[2], v[3]);
+}
+
 // Change the value of a matrix mat4 float value
 void Shader_Program::set_uniform4fv_value(std::string name, glm::mat4 fv)
 {
@@ -264,7 +270,11 @@ VAO::VAO(std::string shader_path, std::vector<Shader_Program_Variable> a_attribu
 
 	// Create the VAO into the GPU memory
 	glGenVertexArrays(1, &vao);
-	if (vbo_path != "") // Create the VBO for this VAO
+	if (vbo_path == "0")
+	{
+		vbo = new VBO(a_attributes, true, false);
+	}
+	else if (vbo_path != "") // Create the VBO for this VAO
 	{
 		vbo = new VBO(a_attributes, false, false);
 		vbo->load_from_file(vbo_path);
@@ -366,7 +376,7 @@ VAO::~VAO()
 }
 
 // Font_Vao constructor
-Font_VAO::Font_VAO(): VAO("../shaders/font", get_base_attributes())
+Font_VAO::Font_VAO(): VAO("../shaders/font", get_base_attributes(), "0")
 {
 	
 }
@@ -492,7 +502,16 @@ glm::vec4 Font_Texture::get_character_rect(char character)
 	short place = get_character_place(character);
 	if (place == -1) { std::cout << "Matix game : error ! The character \"" << character << "\" doesn't exists in the font \"" << get_texture_path() << "\"." << std::endl; return glm::vec4(0, 0, 0, 0); }
 
-	return glm::vec4((place % (int)glm::round(get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], glm::floor(place / (get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], get_character_size()[0], get_character_size()[1]);
+	glm::vec4 result = glm::vec4((place % (int)glm::round(get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], glm::floor(place / (get_texture_size()[1] / get_character_size()[1])) * get_character_size()[1], get_character_size()[0], get_character_size()[1]);
+	result /= glm::vec4(get_texture_size()[0], get_texture_size()[1], get_texture_size()[0], get_texture_size()[1]);
+	result = glm::vec4(result[0], 1.0 - (result[1] + 0.1), result[2], result[3]);
+	return result;
+}
+
+// Return the size of the text
+glm::vec2 Font_Texture::size(std::string text)
+{
+	return glm::vec2(get_character_size()[0] * text.size(), get_character_size()[1]);
 }
 
 // Font_Texture destructor

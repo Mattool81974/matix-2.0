@@ -25,6 +25,7 @@ public:
 	void set_uniform2f_value(std::string name, float v1, float v2); // Change the value of a uniform vec2 float value
 	void set_uniform3f_value(std::string name, float v1, float v2, float v3); // Change the value of a uniform vec3 float value
 	void set_uniform4f_value(std::string name, float v1, float v2, float v3, float v4); // Change the value of a uniform vec4 float value
+	void set_uniform4f_value(std::string name, glm::vec4 v); // Change the value of a uniform vec4 float value
 	void set_uniform4fv_value(std::string name, glm::mat4 fv); // Change the value of a uniform mat4 float value
 	void use(); // Start using the shader
 	~Shader_Program(); // Shader_Program destructor
@@ -96,6 +97,44 @@ public:
 		}
 
 		a_datas.push_back(-0.5f);
+		a_datas.push_back(0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(0.0f);
+		a_datas.push_back(1.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+
+		a_datas.push_back(0.5f);
+		a_datas.push_back(-0.5f);
+		a_datas.push_back(0.0f);
+
+		a_datas.push_back(1.0f);
+		a_datas.push_back(0.0f);
+
+		if (a_attributes.size() > 2)
+		{
+			a_datas.push_back(0.0f);
+			a_datas.push_back(0.0f);
+			a_datas.push_back(1.0f);
+			a_datas.push_back(1.0f);
+
+			a_datas.push_back(0.0f);
+			a_datas.push_back(-1.0f);
+			a_datas.push_back(1.0f);
+		}
+
+		a_datas.push_back(-0.5f);
 		a_datas.push_back(-0.5f);
 		a_datas.push_back(0.0f);
 
@@ -132,6 +171,7 @@ public:
 			a_datas.push_back(-1.0f);
 			a_datas.push_back(1.0f);
 		}
+
 		return a_datas;
 	}
 	inline std::vector<float> get_datas() { return datas; };
@@ -226,10 +266,11 @@ public:
 	std::vector<float> get_character_data(char character); // Return the VBO datas for a character
 	short get_character_place(char character); // Return the place of a character into the characters string
 	glm::vec4 get_character_rect(char character); // Return the rect of the character on the texture
+	glm::vec2 size(std::string text); // Return the size of the text
 	~Font_Texture(); // Font_Texture destructor
 
 	// Getters and setters
 	static std::string get_characters() { return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"; };
-	static glm::vec2 get_character_size() { return glm::vec2(100, 100); };
+	static glm::vec2 get_character_size() { return glm::vec2(110, 200); };
 private:
 };
