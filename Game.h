@@ -15,9 +15,11 @@ public:
 	HUD(Advanced_Struct* a_advanced_struct, std::string a_name); // HUD constructor
 	void add_hud_object(std::string name, HUD_Object* object); // Add an existing HUD to the game
 	bool contains_hud_object(std::string name); // Return if the game contains an HUD Object
-	HUD_Object* new_hud_object(std::string name, std::string texture_path = ""); // Create a new HUD Object into the game
+	template <class O = HUD_Object> // Template for adding a type of HUD object
+	O* new_hud_object(std::string name, std::string texture_path = "", std::string vao_name = "hud"); // Create a new HUD Object into the game
 	void render(); // Render the HUD
 	void sort_objects(); // Sort the HUD for a good render
+	void update(); // Update the HUD
 	~HUD(); // HUD destructor
 
 	// Getters and setters
@@ -51,6 +53,7 @@ public:
 	~Game(); // Game destructor
 
 	// Getters and setters
+	inline glm::vec4 get_background_color() { return background_color; };
 	inline HUD* get_current_hud() { if (get_current_hud_name() == "") return 0; return (*get_huds())[get_current_hud_name()]; };
 	inline Scene* get_current_scene() { if (get_current_scene_name() == "") return 0; return (*get_scenes())[get_current_scene_name()]; };
 	inline std::string get_current_hud_name() { return current_hud; };
@@ -60,6 +63,7 @@ public:
 	inline std::map<std::string, Scene*> *get_scenes() { return &scenes; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
+	inline void set_background_color(glm::vec4 a_background_color) { background_color = a_background_color; };
 	void set_current_hud(std::string a_name);
 	void set_current_scene(std::string a_name);
 private:
@@ -69,8 +73,25 @@ private:
 	int window_height = 0; // Height of the graphic window
 	int window_width = 0; // Widt of the graphic window
 
+	glm::vec4 background_color = glm::vec4(0.2f, 0.3f, 0.1f, 1.0f); // Background color of the game
 	std::map < std::string, HUD*> huds = std::map < std::string, HUD*>(); // Each HUD, with their name as key, in the game
 	std::map<std::string, Scene *> scenes = std::map<std::string, Scene *>(); // Each scenes, with their name as key, in the game
 	GLFWwindow* window = 0; // Pointer to the GLFW window
 };
 
+// Create a new HUD Object into the HUD
+template <class O> // Template for adding a type of HUD object
+O* HUD::new_hud_object(std::string name, std::string texture_path, std::string vao_name)
+{
+	if (contains_hud_object(name)) { std::cout << "HUD \"" << get_name() << "\" error ! The objects \"" << name << "\" you want to create already exists." << std::endl; return 0; }
+
+	bool texture_resize = false; // Load the texture
+	Texture* texture = get_advanced_struct()->get_texture(texture_path, texture_resize);
+
+	// Load the VAO
+	VAO* vao = (*get_advanced_struct()->get_all_vaos())[vao_name];
+
+	O* new_object = new O(get_advanced_struct(), name, texture, vao);
+	add_hud_object(name, new_object);
+	return new_object;
+}

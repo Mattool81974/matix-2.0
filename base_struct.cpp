@@ -130,6 +130,31 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 // Return the size of a number
 float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
 
+// Transform a string to an uppercase string
+std::string to_uppercase(std::string str)
+{
+	std::string result = "";
+	for (int i = 0; i < str.length(); i++)
+	{
+		char chr = str[i];
+		int chr_ascii = chr;
+
+		if(chr_ascii >= 97 && chr_ascii <= 122)
+		{
+			result += chr_ascii - 32;
+		}
+		else if (chr == ';')
+		{
+			result = ".";
+		}
+		else
+		{
+			result += chr;
+		}
+	}
+	return result;
+}
+
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
@@ -364,13 +389,7 @@ Camera::~Camera()
 // Base_Struct constructor
 Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y): mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
 {
-	(*get_keys_state())["a"] = 0;
-	(*get_keys_state())["z"] = 0;
-	(*get_keys_state())["s"] = 0;
-	(*get_keys_state())["q"] = 0;
-	(*get_keys_state())["d"] = 0;
-	(*get_keys_state())["space"] = 0;
-	(*get_keys_state())["left shift"] = 0;
+	
 }
 
 // Return the projection matrix

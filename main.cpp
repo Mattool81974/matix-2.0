@@ -1,19 +1,50 @@
-#include "Game.h"
+#include "game.h"
 #include <iostream>
 #include "test.h"
+
+Game* game = 0;
+
+void cli()
+{
+    // Construct game
+    game->set_background_color(glm::vec4(0, 0, 0, 1));
+
+    // Construct the HUD
+    HUD* hud = game->new_hud("base");
+    game->set_current_hud("base");
+    HUD_Text* cli = hud->new_hud_object<HUD_Text>("fps", "../fonts/default.png", "default_font");
+
+    // Configurate the HUD
+    std::string user = "User : ";
+    cli->set_background_color(glm::vec4(0, 0, 0, 1));
+    cli->set_focused(true);
+    cli->set_font_color(glm::vec4(1, 1, 1, 1));
+    cli->set_font_size(0.04);
+    cli->set_input(true);
+    cli->set_input_text("all");
+    cli->set_position(glm::vec3(-0.95, 0.95, 0));
+    cli->set_scale(glm::vec3(1, 1, 1));
+    cli->set_text(user);
+
+    while (game->run())
+    {
+        game->update_event();
+
+        game->update();
+    }
+}
 
 void warehouse()
 {
     // Construct game
-    Game game(1600, 900);
-    Camera* camera = game.get_camera();
-    game.new_vao("../vbos/famas.vbo", "famas");
-    game.new_vao("../vbos/shell.vbo", "ammo");
-    Part* floor_exterior = game.new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
-    Part* floor_interior = game.new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
-    Part* door = game.new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), "../textures/warehouse/door.png");
-    Part* package = game.new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/package.png");
-    Part* wall_exterior = game.new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
+    Camera* camera = game->get_camera();
+    game->new_vao("../vbos/famas.vbo", "famas");
+    game->new_vao("../vbos/shell.vbo", "ammo");
+    Part* floor_exterior = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
+    Part* floor_interior = game->new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
+    Part* door = game->new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), "../textures/warehouse/door.png");
+    Part* package = game->new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/package.png");
+    Part* wall_exterior = game->new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
 
     // Configurate parts
     door->set_description("2");
@@ -25,8 +56,8 @@ void warehouse()
     wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
-    Scene* scene = game.new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
-    game.set_current_scene("warehouse");
+    Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
+    game->set_current_scene("warehouse");
 
     // Construct objects for testing
     Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
@@ -34,11 +65,10 @@ void warehouse()
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
 
     // Construct the HUD
-    HUD* hud = game.new_hud("base");
-    game.set_current_hud("base");
-    HUD_Text* fps = new HUD_Text(&game, "fps", game.get_font_texture("default"), (Font_VAO*)(*game.get_fonts_vaos())["default"]);
+    HUD* hud = game->new_hud("base");
+    game->set_current_hud("base");
+    HUD_Text* fps = hud->new_hud_object<HUD_Text>("fps", "../fonts/default.png", "default_font");
     HUD_Object* watermark = hud->new_hud_object("watermark", "../textures/watermark.png");
-    hud->add_hud_object("fps", fps);
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
@@ -51,6 +81,8 @@ void warehouse()
 
     // Configurate the HUD
     std::string texte_fps = "FPS : 0.";
+    fps->set_background_color(glm::vec4(0, 0, 0, 1));
+    fps->set_font_color(glm::vec4(1, 1, 1, 1));
     fps->set_position(glm::vec3(0.65, 0.9, 0));
     fps->set_scale(glm::vec3(0.1, 0.1, 1));
     fps->set_text(texte_fps);
@@ -60,30 +92,29 @@ void warehouse()
     float last_size = player->get_all_map_pos().size();
     std::vector<glm::vec3> positions = player->get_all_map_pos();
 
-    while (game.run())
+    while (game->run())
     {
-        game.update_event();
+        game->update_event();
 
-        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game.get_delta_time())) + ".";
+        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game->get_delta_time())) + ".";
         fps->set_text(texte_fps);
 
-        game.update();
+        game->update();
     }
 }
 
 void level0()
 {
     // Construct game
-    Game game(1600, 900);
-    Camera* camera = game.get_camera();
-    game.new_vao("../vbos/famas.vbo", "famas");
-    game.new_vao("../vbos/shell.vbo", "ammo");
-    game.new_part(1, "one_faced_cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/wall.png");
-    game.new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
+    Camera* camera = game->get_camera();
+    game->new_vao("../vbos/famas.vbo", "famas");
+    game->new_vao("../vbos/shell.vbo", "ammo");
+    game->new_part(1, "one_faced_cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/wall.png");
+    game->new_part(2, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/pillar.png");
 
     // Construct scene
-    Scene* scene = game.new_scene("level0", "../maps/level0.wad");
-    game.set_current_scene("level0");
+    Scene* scene = game->new_scene("level0", "../maps/level0.wad");
+    game->set_current_scene("level0");
 
     // Construct objects for testing
     Object* chair = scene->new_object("chair", "chair", 0, glm::vec3(9, 0.5, 14), glm::vec3(0, 90, 0), glm::vec3(1, 1, 1), true, "../textures/chair.png", false, true, false);
@@ -104,27 +135,26 @@ void level0()
     player->get_attached_physic_object()->get_collision()->set_width(0.65);
     player->get_attached_physic_object()->set_use_collision(true);
 
-    while (game.run())
+    while (game->run())
     {
-        game.update_event();
+        game->update_event();
 
-        game.update();
+        game->update();
     }
 }
 
 void shooting_range()
 {
     // Construct game
-    Game game(1600, 900);
-    Camera* camera = game.get_camera();
-    game.new_vao("../vbos/famas.vbo", "famas");
-    game.new_vao("../vbos/shell.vbo", "ammo");
-    game.new_part(1, "one_faced_cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/dark_wall.png");
-    game.new_part(2, "table", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/table.png");
+    Camera* camera = game->get_camera();
+    game->new_vao("../vbos/famas.vbo", "famas");
+    game->new_vao("../vbos/shell.vbo", "ammo");
+    game->new_part(1, "one_faced_cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 3, 1), "../textures/dark_wall.png");
+    game->new_part(2, "table", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/table.png");
 
     // Construct scene
-    Scene* scene = game.new_scene("shooting_range", "../maps/shooting_range.wad");
-    game.set_current_scene("shooting_range");
+    Scene* scene = game->new_scene("shooting_range", "../maps/shooting_range.wad");
+    game->set_current_scene("shooting_range");
 
     // Construct objects for testing
     Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
@@ -151,11 +181,11 @@ void shooting_range()
     target1->set_bottom_y(0.5);
     target1->set_top_y(2.5);
 
-    while (game.run())
+    while (game->run())
     {
-        game.update_event();
+        game->update_event();
 
-        game.update();
+        game->update();
     }
 }
 
@@ -163,7 +193,12 @@ int main()
 {
     srand(time(0));
 
+    game = new Game(1600, 900);
+
+    // cli();
     warehouse();
+
+    delete game;
 
     return 0;
 }

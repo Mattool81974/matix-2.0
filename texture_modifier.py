@@ -8,7 +8,7 @@ import pygame as pg
 import PIL.ImageDraw as id
 import PIL.Image as im
 
-font_container = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"
+font_container = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^<*%¨> =\'\"_@"
 font_size = 200
 font_square_size = (105, 200)
 

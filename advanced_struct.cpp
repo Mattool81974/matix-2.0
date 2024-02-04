@@ -157,18 +157,18 @@ void Advanced_Struct::load_VAOs()
 	hud_attributes.push_back(v2);
 
 	// Create VAOs
-	all_fonts_vaos["default"] = new Font_VAO();
 	all_vaos["chair"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/chair.vbo");
 	all_vaos["circle"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon50.vbo");
 	all_vaos["cylinder"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon_3d50.vbo");
 	all_vaos["cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/cube.vbo");
+	all_vaos["default_font"] = new Font_VAO();
 	all_vaos["hud"] = new VAO("../shaders/hud", hud_attributes, "0");
 	all_vaos["one_faced_cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/one_faced_cube.vbo");
 	all_vaos["table"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/table.vbo");
 	all_vaos["triangle"] = new VAO("../shaders/default", base_3d_attributes, "0");
 
 	// Create base texture
-	fonts_textures["default"] = new Font_Texture("../fonts/consolas.png");
+	textures["../fonts/default.png"] = new Font_Texture("../fonts/consolas.png");
 }
 
 // Create a new VAO into the game

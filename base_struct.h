@@ -18,6 +18,7 @@ std::vector<std::string> cut_string(std::string string, std::string cut, bool er
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
 float sign(float number); // Return the sign of a number
+std::string to_uppercase(std::string str); // Transform a string to an uppercase string
 
 struct Transform_Animation {
 	// Struct representing a transform object animation
@@ -183,6 +184,8 @@ private:
 	float sensitivity = 30; // Sensitivity of the camera
 };
 
+enum Key_State { Nothing, Pressed, Already_Pressed }; // Differents orientations for a map lev collection
+
 class Base_Struct
 {
 public:
@@ -196,8 +199,8 @@ public:
 	inline glm::vec3 get_gravity_force() { return gravity_force; };
 	inline unsigned short get_key_state(std::string name) { return (*get_keys_state())[name]; };
 	inline unsigned short get_key_state_frame(std::string name) { return (*get_keys_state_frame())[name]; };
-	inline std::map<std::string, unsigned short>* get_keys_state() { return &keys_state; };
-	inline std::map<std::string, unsigned short>* get_keys_state_frame() { return &keys_state_frame; };
+	inline std::map<std::string, Key_State>* get_keys_state() { return &keys_state; };
+	inline std::map<std::string, Key_State>* get_keys_state_frame() { return &keys_state_frame; };
 	inline double get_last_mouse_x() { return last_mouse_x; };
 	inline double get_last_mouse_y() { return last_mouse_y; };
 	inline unsigned short get_left_mouse_button_state() { return left_mouse_button_state; };
@@ -205,6 +208,8 @@ public:
 	inline double get_mouse_move_y() { return mouse_move_y; };
 	inline double get_mouse_x() { return mouse_x; };
 	inline double get_mouse_y() { return mouse_y; };
+	inline std::vector<std::string>* get_pressed_keys() { return &pressed_keys; };
+	inline std::vector <std::string>* get_pressed_keys_frame() { return &pressed_keys_frame; };
 	inline unsigned short get_right_mouse_button_state() { return right_mouse_button_state; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
@@ -233,6 +238,8 @@ private:
 
 	Camera camera; // Camera of the game
 	glm::vec3 gravity_force = glm::vec3(0, -9.80665, 0); // Value of the gravity
-	std::map<std::string, unsigned short> keys_state = std::map<std::string, unsigned short>(); // Current state of the key
-	std::map<std::string, unsigned short> keys_state_frame = std::map<std::string, unsigned short>(); // State of the key if changed during this frame
+	std::map<std::string, Key_State> keys_state = std::map<std::string, Key_State>(); // Current state of the key
+	std::map<std::string, Key_State> keys_state_frame = std::map<std::string, Key_State>(); // State of the key if changed during this frame
+	std::vector <std::string> pressed_keys = std::vector <std::string>(); // All the pressed keys
+	std::vector <std::string> pressed_keys_frame = std::vector <std::string>(); // All the pressed keys during this frame
 };

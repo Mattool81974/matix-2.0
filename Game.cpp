@@ -51,22 +51,6 @@ bool HUD::contains_hud_object(std::string name)
     return false;
 }
 
-// Create a new HUD Object into the HUD
-HUD_Object* HUD::new_hud_object(std::string name, std::string texture_path)
-{
-    if (contains_hud_object(name)) { std::cout << "HUD \"" << get_name() << "\" error ! The objects \"" << name << "\" you want to create already exists." << std::endl; return 0; }
-
-    bool texture_resize = false; // Load the texture
-    Texture* texture = get_advanced_struct()->get_texture(texture_path, texture_resize);
-
-    // Load the VAO
-    VAO* vao = (*get_advanced_struct()->get_all_vaos())[(*get_advanced_struct()->get_type())["hud"]];
-
-    HUD_Object* new_object = new HUD_Object(get_advanced_struct(), name, texture, vao);
-    add_hud_object(name, new_object);
-    return new_object;
-}
-
 // Render the HUD
 void HUD::render()
 {
@@ -80,6 +64,16 @@ void HUD::render()
 void HUD::sort_objects()
 {
     std::sort(sorted_hud_objects.begin(), sorted_hud_objects.end(), compare_depht_hud_object); //*/
+}
+
+// Update the HUD
+void HUD::update()
+{
+    for (int i = 0; i < get_sorted_hud_objects()->size(); i++)
+    {
+        (*get_sorted_hud_objects())[i]->update();
+    }
+    render();
 }
 
 // HUD destructor
@@ -206,8 +200,14 @@ void Game::load_keys()
     keys["y"] = GLFW_KEY_Y;
     keys["z"] = GLFW_KEY_W;
 
+    // Poncutation
+    keys[";"] = GLFW_KEY_COMMA;
+
     // Other
+    keys["backspace"] = GLFW_KEY_BACKSPACE;
+    keys["enter"] = GLFW_KEY_ENTER;
     keys["left shift"] = GLFW_KEY_LEFT_SHIFT;
+    keys["right shift"] = GLFW_KEY_RIGHT_SHIFT;
     keys["space"] = GLFW_KEY_SPACE;
     keys["tab"] = GLFW_KEY_TAB;
 }
@@ -276,13 +276,12 @@ void Game::update()
     {
         Scene* scene = get_current_scene();
         if(scene != 0) scene->update();
-        
-        HUD* hud = get_current_hud();
-        if (hud != 0) hud->render();
     }
-    else
+
+    if (contains_hud(get_current_hud_name()))
     {
-        std::cout << "Matrix game : error ! The current scene \"" << get_current_scene_name() << "\" does not exist." << std::endl;
+        HUD* hud = get_current_hud();
+        if (hud != 0) hud->update();
     }
 
     // Update OpenGL
@@ -294,7 +293,7 @@ void Game::update()
 void Game::update_event()
 {
     // Clear OpenGL window
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(get_background_color()[0], get_background_color()[1], get_background_color()[2], get_background_color()[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate delta time
@@ -314,36 +313,41 @@ void Game::update_event()
         set_right_mouse_button_state(1);
 
     // Update the keys
-    for (std::map<std::string, unsigned short>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
+    get_pressed_keys()->clear();
+    get_pressed_keys_frame()->clear();
+    for (std::map<std::string, Key_State>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
     {
-        it->second = 0; // Reset keys
+        it->second = Key_State::Nothing; // Reset keys
     }
 
     for (std::map<std::string, unsigned int>::iterator it = keys.begin(); it != keys.end(); it++)
     {
         if (glfwGetKey(window, it->second) == GLFW_PRESS)
-            (*get_keys_state())[it->first] = 1;
+        {
+            (*get_keys_state())[it->first] = Key_State::Pressed;
+            get_pressed_keys()->push_back(it->first);
+        }
     }
 
     // Update key frame
-    unsigned short limit = 65000;
-    for (std::map<std::string, unsigned short>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
+    for (std::map<std::string, Key_State>::iterator it = get_keys_state()->begin(); it != get_keys_state()->end(); it++)
     {
-        unsigned short state = it->second;
-        if (state != 0)
+        Key_State state = it->second;
+        if (state != Key_State::Nothing)
         {
-            if ((*get_keys_state_frame())[it->first] != state && (*get_keys_state_frame())[it->first] != limit)
+            if ((*get_keys_state_frame())[it->first] != state && (*get_keys_state_frame())[it->first] != Key_State::Already_Pressed)
             {
-                (*get_keys_state_frame())[it->first] = state;
+                (*get_keys_state_frame())[it->first] = Key_State::Pressed;
+                get_pressed_keys_frame()->push_back(it->first);
             }
             else
             {
-                (*get_keys_state_frame())[it->first] = limit;
+                (*get_keys_state_frame())[it->first] = Key_State::Already_Pressed;
             }
         }
         else
         {
-            (*get_keys_state_frame())[it->first] = 0; // Reset keys
+            (*get_keys_state_frame())[it->first] = Key_State::Nothing; // Reset keys
         }
     }
 
