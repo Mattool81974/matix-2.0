@@ -271,6 +271,6 @@ public:
 
 	// Getters and setters
 	static std::string get_characters() { return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"; };
-	static glm::vec2 get_character_size() { return glm::vec2(110, 200); };
+	static glm::vec2 get_character_size() { return glm::vec2(105, 200); };
 private:
 };

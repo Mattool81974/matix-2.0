@@ -100,11 +100,10 @@ void HUD_Text::render()
 	unsigned short text_length = final_text.size();
 	glm::vec2 text_size = get_texture()->size("a");
 	float ratio = text_size[0] / text_size[1];
-	glm::vec3 scale = glm::vec3(ratio, 1.0, 1); // Calculate the necessary scale
+	glm::vec3 scale = glm::vec3(ratio / 2.0, 1.0, 1); // Calculate the necessary scale
 	scale /= glm::vec3(text_length, text_length, text_length);
 	scale = glm::normalize(scale);
 	glm::mat4 model_scaled = glm::scale(model, scale); // Calculate the scale of the character
-	std::cout << "R " << scale[0] << " " << scale[1] << " " << text_size[0] << " " << ratio << " " << text_length << std::endl;
 
 	for (int i = 0; i < text_length; i++) // Generate each char one by one
 	{

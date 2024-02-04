@@ -32,14 +32,13 @@ void warehouse()
     Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
     Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(3, 32, 3), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
-    HUD_Object* watermark = game.new_hud_object("watermark", "../textures/watermark.png");
 
-    HUD_Text* text_test = new HUD_Text(&game, "test", game.get_font_texture("default"), (Font_VAO*)(*game.get_fonts_vaos())["default"]);
-    game.add_hud_object("test", text_test);
-    text_test->set_position(glm::vec3(0, 0, 10));
-    text_test->set_scale(glm::vec3(0.05, 0.05, 1));
-    std::string texte = "L'amx 30 est un char de combat de l'armée française";
-    text_test->set_text(texte);
+    // Construct the HUD
+    HUD* hud = game.new_hud("base");
+    game.set_current_hud("base");
+    HUD_Text* fps = new HUD_Text(&game, "fps", game.get_font_texture("default"), (Font_VAO*)(*game.get_fonts_vaos())["default"]);
+    HUD_Object* watermark = hud->new_hud_object("watermark", "../textures/watermark.png");
+    hud->add_hud_object("fps", fps);
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
@@ -49,7 +48,13 @@ void warehouse()
     player->get_attached_physic_object()->set_use_collision(true);
     player->set_map_pos(glm::vec3(2, 1, 2));
     player->set_description("player");
-    watermark->set_position(glm::vec3(-0.6, 0.76, 0));
+
+    // Configurate the HUD
+    std::string texte_fps = "FPS : 0.";
+    fps->set_position(glm::vec3(0.65, 0.9, 0));
+    fps->set_scale(glm::vec3(0.1, 0.1, 1));
+    fps->set_text(texte_fps);
+    watermark->set_position(glm::vec3(-0.6, 0.76, 0.9));
     watermark->set_scale(glm::vec3(0.4, 0.24, 1));
 
     float last_size = player->get_all_map_pos().size();
@@ -58,6 +63,9 @@ void warehouse()
     while (game.run())
     {
         game.update_event();
+
+        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game.get_delta_time())) + ".";
+        fps->set_text(texte_fps);
 
         game.update();
     }

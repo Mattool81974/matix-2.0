@@ -10,7 +10,7 @@ import PIL.Image as im
 
 font_container = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\éèàçù^¨#{]()}^$*%¨£µ=\'\"_@"
 font_size = 200
-font_square_size = (110, 200)
+font_square_size = (105, 200)
 
 def create_chair(path: str, final_path: str) -> None:
     """Create a chair texture
@@ -245,4 +245,4 @@ pg.display.set_mode((1, 1))
 #create_famas("textures/famas_dir", "textures/famas.png")
 #create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
 #create_shell("textures/shell_dir", "textures/shell.png")
-create_font("fonts/consolas.png", "Consolas", final_size = (1100, 2000))
+create_font("fonts/consolas.png", "Consolas", final_size = (1050, 2000))

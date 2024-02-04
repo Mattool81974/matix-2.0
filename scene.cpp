@@ -24,7 +24,7 @@ Map_Level_Collection::~Map_Level_Collection()
 }
 
 // Graphic_Scene constructor
-Graphic_Scene::Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects, std::map < std::string, HUD_Object*>& a_hud_objects): game_struct(a_game_struct), hud_objects(a_hud_objects), name(a_name), objects(a_objects)
+Graphic_Scene::Graphic_Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map<std::string, Object*>& a_objects): game_struct(a_game_struct), name(a_name), objects(a_objects)
 {
 
 }
@@ -59,18 +59,13 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 void Graphic_Scene::render()
 {
 	std::map<std::string, Object*>* objects = get_objects();
+
 	for (std::map<std::string, Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
 		if (it->second->use_graphic())
 		{
 			it->second->get_attached_graphic_object()->render(); // Render each object
 		}
-	}
-
-	std::map<std::string, HUD_Object*>* huds = get_hud_objects();
-	for (std::map<std::string, HUD_Object*>::iterator it = huds->begin(); it != huds->end(); it++)
-	{
-		it->second->render(); // Render each HUD
 	}
 }
 
@@ -213,11 +208,11 @@ Physic_Scene::~Physic_Scene()
 }
 
 // Scene constructor
-Scene::Scene(Advanced_Struct* a_game_struct, std::string a_name, std::map < std::string, HUD_Object*>& a_hud_objects, std::string a_map_path, bool a_graphic, bool a_physic, Map_Opening_Mode mode): Transform_Object(), game_struct(a_game_struct), hud_objects(a_hud_objects), name(a_name), graphic(a_graphic), physic(a_physic)
+Scene::Scene(Advanced_Struct* a_game_struct, std::string a_name, std::string a_map_path, bool a_graphic, bool a_physic, Map_Opening_Mode mode): Transform_Object(), game_struct(a_game_struct), name(a_name), graphic(a_graphic), physic(a_physic)
 {
 	if (use_graphic())
 	{
-		graphic_scene = new Graphic_Scene(get_game_struct(), get_name(), objects, *get_hud_objects()); // If use graphic, construct a graphic scene
+		graphic_scene = new Graphic_Scene(get_game_struct(), get_name(), objects); // If use graphic, construct a graphic scene
 	}
 
 	if (use_physic())
