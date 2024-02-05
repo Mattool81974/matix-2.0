@@ -213,6 +213,18 @@ void Game::load_keys()
     keys["y"] = GLFW_KEY_Y;
     keys["z"] = GLFW_KEY_W;
 
+    // Numbers
+    keys["0"] = GLFW_KEY_KP_0;
+    keys["1"] = GLFW_KEY_KP_1;
+    keys["2"] = GLFW_KEY_KP_2;
+    keys["3"] = GLFW_KEY_KP_3;
+    keys["4"] = GLFW_KEY_KP_4;
+    keys["5"] = GLFW_KEY_KP_5;
+    keys["6"] = GLFW_KEY_KP_6;
+    keys["7"] = GLFW_KEY_KP_7;
+    keys["8"] = GLFW_KEY_KP_8;
+    keys["9"] = GLFW_KEY_KP_9;
+
     // Poncutation
     keys[";"] = GLFW_KEY_COMMA;
 

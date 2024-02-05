@@ -536,13 +536,17 @@ bool HUD_CLI::contains_command(std::string command_name)
 // Execute a command in the CLI
 void HUD_CLI::execute_command(std::string command_name)
 {
-    if (!contains_command(command_name))
+    if (command_name == "") return;
+
+    std::vector<std::string> cutted_command = cut_string(command_name, " "); // Get all the part of the command
+
+    if (!contains_command(cutted_command[0]))
     {
         new_line("Matix CLI", get_unknow_command_message(command_name));
         return;
     }
 
-    CLI_Command command = commands_name[command_name];
+    CLI_Command command = commands_name[cutted_command[0]];
     if (command ==  CLI_Command::Quit) // If the quit command is entered
     {
         game->set_is_running(false);
@@ -563,6 +567,15 @@ void HUD_CLI::execute_command(std::string command_name)
 
         new_line("Matix CLI", data.substr(0, data.size() - 1));
     }
+    else if (command == CLI_Command::Partie) // Change the part
+    {
+        std::string p = "part" + cutted_command[1];
+        std::vector<std::string> r = cut_string(response[p], "&");
+        std::string final = "";
+        for (int i = 0; i < r.size(); i++) final += r[i] + "\n";
+
+        new_line("Freud", final.substr(0, final.size() - 1));
+    }
 }
 
 // Load the CLI from the data
@@ -580,6 +593,11 @@ void HUD_CLI::load(std::string data)
         else if(cutted[0] == "d")
         {
             datas[cutted[1]] = cutted[2];
+            if (cutted[1] == "font_size")
+            {
+                std::string::size_type sz;
+                font_size = std::stod(cutted[2], &sz);
+            }
         }
     }
 
@@ -612,7 +630,7 @@ void HUD_CLI::new_line(std::string actual_user, std::string line_text)
     user->set_text(actual_user + " : ");
 
     // Configurate the text HUD
-    std::string input_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    std::string input_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789";
     text->set_background_color(glm::vec4(0, 0, 0, 1));
     text->set_cursor_character("|");
     text->set_focused(true);
@@ -647,7 +665,7 @@ float HUD_CLI::next_y_position()
 {
     float line_multiplicator = 1.1f;
     float multiplicator = 1.25;
-    float total = 0.95f;
+    float total = 1.0f - get_font_size() * line_multiplicator;
     for (int i = 0; i < user_text.size(); i++) // Calculate the y pos
     {
         unsigned int line_size = cut_string(text_hud[i]->get_text(), "\n").size();
@@ -683,6 +701,11 @@ void HUD_CLI::start()
     commands_name["datas"] = CLI_Command::Datas;
     commands_name["donnee"] = CLI_Command::Datas;
     commands_name["donnees"] = CLI_Command::Datas;
+    // Part
+    commands_name["part"] = CLI_Command::Partie;
+    commands_name["parts"] = CLI_Command::Partie;
+    commands_name["partie"] = CLI_Command::Partie;
+    commands_name["parties"] = CLI_Command::Partie;
 }
 
 // Update the CLI

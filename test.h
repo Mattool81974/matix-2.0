@@ -181,7 +181,7 @@ private:
     Door* other_door = 0; // Door linked with this door
 };
 
-enum CLI_Command {Quit, Clear_CLI, Datas}; // Every CLI command
+enum CLI_Command {Quit, Clear_CLI, Datas, Partie}; // Every CLI command
 class HUD_CLI : public HUD
 {
     // Class representing a CLI for the HUD
