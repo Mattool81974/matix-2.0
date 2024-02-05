@@ -1,0 +1,7 @@
+d^author^Matt code
+d^base^Matix by Matt code
+d^version^normal
+d^subversion^normal
+r^get_datas^Here the CLI datas
+r^unknow_command^Unknow command "*", tap "help" to get helped.
+r^welcome^Welcome to the Matix CLI !

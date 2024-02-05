@@ -12,6 +12,7 @@ void cli()
     // Construct the HUD
     HUD_CLI* hud = game->new_hud<HUD_CLI>("base");
     game->set_current_hud("base");
+    hud->load_from_file("../cli/normal_fr.cli");
 
     while (game->run())
     {
@@ -178,6 +179,8 @@ void shooting_range()
 
 int main()
 {
+    setlocale(LC_ALL, "fr_FR.UTF8");
+
     srand(time(0));
 
     game = new Game(1600, 900);

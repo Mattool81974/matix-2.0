@@ -41,6 +41,47 @@ std::vector<std::string> cut_string(std::string string, std::string cut, bool er
 	return result;
 }
 
+// Cut a wstring where there are the "cut"
+std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank)
+{
+	std::wstring last_string; // String since the last cut
+	std::wstring last_string_cut; // String of the "cut" size which allows to know where to cut
+	std::vector<std::wstring> result = std::vector<std::wstring>();
+	for (int i = 0; i < string.size(); i++) // Browse the string char by char
+	{
+		last_string_cut += string[i];
+		if (last_string_cut.size() > cut.size()) // If the string which allows to know where to cut is too long, cut him
+		{
+			last_string_cut = last_string_cut.substr(1, cut.size());
+		}
+
+		if (last_string_cut == cut) // If the string which allows to know where to cut is equal to the part to cut, do a cut
+		{
+			std::wstring final_string = last_string.substr(0, last_string.size() - (cut.size() - 1));
+			if (erase_blank)
+			{
+				if (!final_string.empty())
+				{
+					result.push_back(final_string);
+				}
+			}
+			else
+			{
+				result.push_back(final_string);
+			}
+			last_string.clear();
+			last_string_cut.clear();
+		}
+		else
+		{
+			last_string += string[i];
+		}
+	}
+
+	if (last_string.size() > 0) { result.push_back(last_string); } // Add the last non-cutted element
+	return result;
+}
+
 // Normalize a rotation and return it
 glm::vec3 normalize_rotation(glm::vec3 rotation)
 {
@@ -72,6 +113,42 @@ glm::vec3 normalize_rotation(glm::vec3 rotation)
 	}
 
 	return rotation;
+}
+
+// Return the file
+std::string read_file(std::string path, File_Type type)
+{
+	std::string file_content;
+	if (type == File_Type::Text)
+	{
+		std::ifstream file;
+
+		// ensure ifstream objects can throw exceptions:
+		file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			file.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<char>));
+
+			// open files
+			file.open(path);
+			std::stringstream stream;
+
+			// read file's buffer contents into streams
+			stream << file.rdbuf();
+
+			// close file handlers
+			file.close();
+
+			// convert stream into string
+			file_content = stream.str();
+		}
+		catch (std::ifstream::failure e)
+		{
+			std::cout << "Matrix game : map file \"" << path << "\" unreadable." << std::endl;
+		}
+	}
+
+	return file_content;
 }
 
 // Rotate a vector around a rotating point

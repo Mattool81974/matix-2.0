@@ -83,7 +83,6 @@ HUD_Object::~HUD_Object()
 
 }
 
-
 // HUD_Text constructor
 HUD_Text::HUD_Text(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao) : HUD_Object(a_base_struct, a_name, a_texture, a_vao)
 {
@@ -96,7 +95,7 @@ void HUD_Text::render()
 	texture->bind(); // Bind the texture
 	glm::mat4 model = get_model_matrix();
 
-	std::string final_text = get_text();
+	std::string final_text = get_text(true);
 	unsigned short text_length = final_text.size();
 	glm::vec2 text_size = get_texture()->size("a");
 	float ratio = text_size[0] / text_size[1];
@@ -109,7 +108,7 @@ void HUD_Text::render()
 
 	for (int i = 0; i < text_length; i++) // Generate each char one by one
 	{
-		char chr = get_text()[i];
+		char chr = final_text[i];
 
 		if (chr == '\n') // Jump a line
 		{
@@ -132,7 +131,28 @@ void HUD_Text::render()
 // Update the text HUD
 void HUD_Text::update()
 {
+	update_cursor();
 	update_text_input();
+}
+
+// Update the cursor of the text
+void HUD_Text::update_cursor()
+{
+	if (is_using_cursor())
+	{
+		time_since_last_cursor_display += get_base_struct()->get_delta_time();
+	}
+	else
+	{
+		display_cursor = true;
+		time_since_last_cursor_display = 0;
+	}
+
+	if (time_since_last_cursor_display > get_cursor_display_time())
+	{
+		display_cursor = !display_cursor;
+		time_since_last_cursor_display = 0;
+	}
 }
 
 // Apply the text input to the text
@@ -159,6 +179,8 @@ void HUD_Text::update_text_input()
 			if (authorized_text == "all" || authorized_text.find(key) != std::string::npos) // If the key is authorized
 			{
 				set_text(get_text() + key);
+				display_cursor = true;
+				time_since_last_cursor_display = 0;
 			}
 		}
 
@@ -167,6 +189,8 @@ void HUD_Text::update_text_input()
 			if (get_text().size() > 0)
 			{
 				set_text(get_text().substr(0, get_text().size() - 1));
+				display_cursor = true;
+				time_since_last_cursor_display = 0;
 			}
 		}
 	}

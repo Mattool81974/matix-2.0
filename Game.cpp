@@ -69,11 +69,17 @@ void HUD::sort_objects()
 // Update the HUD
 void HUD::update()
 {
+    update_object();
+    render();
+}
+
+// Update all the objects in the HUD
+void HUD::update_object()
+{
     for (int i = 0; i < get_sorted_hud_objects()->size(); i++)
     {
         (*get_sorted_hud_objects())[i]->update();
     }
-    render();
 }
 
 // Unload the objects in the HUD
@@ -86,6 +92,7 @@ void HUD::unload()
         delete it->second; // Delete each HUD_Object
         it->second = 0;
     }
+    objects->clear();
 }
 
 // HUD destructor
@@ -232,6 +239,7 @@ Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode 
 bool Game::run()
 {
     bool to_return = glfwWindowShouldClose(window);
+    if (!continue_running()) { to_return = true; }
 
     if(to_return)
         glfwTerminate();

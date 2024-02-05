@@ -270,7 +270,7 @@ public:
 	~Font_Texture(); // Font_Texture destructor
 
 	// Getters and setters
-	static std::string get_characters() { return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\יטאחש^¨#{]()}^<*%¨> =\'\"_@"; };
+	static std::string get_characters() { return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-*/,;:!?./§\\יטאחש^¨#{]()}|<*%¨> =\'\"_@"; };
 	static glm::vec2 get_character_size() { return glm::vec2(105, 200); };
 private:
 };

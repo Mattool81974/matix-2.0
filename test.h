@@ -181,11 +181,41 @@ private:
     Door* other_door = 0; // Door linked with this door
 };
 
+enum CLI_Command {Quit, Clear_CLI, Datas}; // Every CLI command
 class HUD_CLI : public HUD
 {
+    // Class representing a CLI for the HUD
 public:
     HUD_CLI(Game* a_advanced_struct, std::string a_name); // HUD_CLI constructor
+    bool contains_command(std::string command_name); // If the CLI contains a command
+    void execute_command(std::string command_name); // Execute a command in the CLI
+    void load(std::string data); // Load the CLI from the data
+    void load_from_file(std::string path); // Load the CLi from a file
+    void new_line(std::string actual_user, std::string line_text); // Add a line to the CLI with a defined text and user
+    void new_line(); // Add a line to the CLI
+    float next_y_position(); // Return the y position of the next line
+    void start(); // Start the CLI
+    void update(); // Update the CLI
     ~HUD_CLI(); // HUD_CLI destructor
+
+    // Getters and setters
+    inline std::map<std::string, CLI_Command>* get_commands_name() { return &commands_name; };
+    inline std::string get_current_user() { return current_user; };
+    inline float get_font_size() { return font_size; };
+    inline std::string get_unknow_command_message(std::string command)
+    {
+        std::string cut = "*";
+        std::vector<std::string> cutted = cut_string(response["unknow_command"], cut);
+        return cutted[0] + command + cutted[1];
+    };
 private:
-    HUD_Text* cli_input = 0; // Pointer to the text input of the CLI
+    std::string current_user = "User"; // Name of the current user
+    float font_size = 0.04; // Size of the font of the CLI
+
+    std::map<std::string, CLI_Command> commands_name = std::map<std::string, CLI_Command>(); // Name of each commands
+    std::map<std::string, std::string> datas = std::map<std::string, std::string>(); // Datas about the CLI
+    Game* game = 0; // Pointer to the game
+    std::map<std::string, std::string> response = std::map<std::string, std::string>(); // Response that the CLI can give
+    std::vector<HUD_Text*> text_hud = std::vector<HUD_Text*>(); // Every text
+    std::vector<HUD_Text*> user_text = std::vector< HUD_Text*>(); // Every user text
 };

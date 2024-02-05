@@ -520,19 +520,186 @@ Door::~Door()
 // HUD_CLI constructor
 HUD_CLI::HUD_CLI(Game* a_advanced_struct, std::string a_name) : HUD(a_advanced_struct, a_name)
 {
-    cli_input = new_hud_object<HUD_Text>("cli", "../fonts/default.png", "default_font");
+    game = (Game*)a_advanced_struct;
+}
 
-    // Configurate the HUD
-    std::string user = "User : ";
-    cli_input->set_background_color(glm::vec4(0, 0, 0, 1));
-    cli_input->set_focused(true);
-    cli_input->set_font_color(glm::vec4(1, 1, 1, 1));
-    cli_input->set_font_size(0.04);
-    cli_input->set_input(true);
-    cli_input->set_input_text("all");
-    cli_input->set_position(glm::vec3(-0.95, 0.95, 0));
-    cli_input->set_scale(glm::vec3(1, 1, 1));
-    cli_input->set_text(user);
+// If the CLI contains a command
+bool HUD_CLI::contains_command(std::string command_name)
+{
+    for (std::map<std::string, CLI_Command>::iterator it = get_commands_name()->begin(); it != get_commands_name()->end(); it++)
+    {
+        if (it->first == command_name) return true;
+    }
+    return false;
+}
+
+// Execute a command in the CLI
+void HUD_CLI::execute_command(std::string command_name)
+{
+    if (!contains_command(command_name))
+    {
+        new_line("Matix CLI", get_unknow_command_message(command_name));
+        return;
+    }
+
+    CLI_Command command = commands_name[command_name];
+    if (command ==  CLI_Command::Quit) // If the quit command is entered
+    {
+        game->set_is_running(false);
+    }
+    else if (command == CLI_Command::Clear_CLI) // If the clear command is entered
+    {
+        text_hud.clear();
+        user_text.clear();
+        unload();
+    }
+    else if (command == CLI_Command::Datas) // If the info command is entered
+    {
+        std::string data = response["get_datas"] + " :\n";
+        for (std::map<std::string, std::string>::iterator it = datas.begin(); it != datas.end(); it++) // Get each data
+        {
+            data += "- " + it->first + " : " + it->second + "\n";
+        }
+
+        new_line("Matix CLI", data.substr(0, data.size() - 1));
+    }
+}
+
+// Load the CLI from the data
+void HUD_CLI::load(std::string data)
+{
+    std::vector<std::string> cutted_datas = cut_string(data, "\n"); // Get every field
+
+    for (int i = 0; i < cutted_datas.size(); i++)
+    {
+        std::vector<std::string> cutted = cut_string(cutted_datas[i], "^");
+        if (cutted[0] == "r")
+        {
+            response[cutted[1]] = cutted[2];
+        }
+        else if(cutted[0] == "d")
+        {
+            datas[cutted[1]] = cutted[2];
+        }
+    }
+
+    start();
+}
+
+// Load the CLi from a file
+void HUD_CLI::load_from_file(std::string path)
+{
+    std::string content = read_file(path);
+    if (!content.empty())
+    {
+        load(content);
+    }
+}
+
+// Add a line to the CLI with a defined text and user
+void HUD_CLI::new_line(std::string actual_user, std::string line_text)
+{
+    // Create each part
+    HUD_Text* user = new_hud_object<HUD_Text>("user" + std::to_string(user_text.size()), "../fonts/default.png", "default_font");
+    HUD_Text* text = new_hud_object<HUD_Text>("text" + std::to_string(text_hud.size()), "../fonts/default.png", "default_font");
+
+    // Configurate the user HUD
+    user->set_background_color(glm::vec4(0, 0, 0, 1));
+    user->set_font_color(glm::vec4(1, 1, 1, 1));
+    user->set_font_size(get_font_size());
+    user->set_position(glm::vec3(-0.975, next_y_position(), 0));
+    user->set_scale(glm::vec3(1, 1, 1));
+    user->set_text(actual_user + " : ");
+
+    // Configurate the text HUD
+    std::string input_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    text->set_background_color(glm::vec4(0, 0, 0, 1));
+    text->set_cursor_character("|");
+    text->set_focused(true);
+    text->set_font_color(glm::vec4(1, 1, 1, 1));
+    text->set_font_size(get_font_size());
+    text->set_input(true);
+    text->set_input_text(input_text);
+    text->set_position(glm::vec3(-0.775, next_y_position(), 0));
+    text->set_scale(glm::vec3(1, 1, 1));
+    text->set_text(line_text);
+    text->set_use_cursor(true);
+
+    // Update the input text
+    if (text_hud.size() > 0)
+    {
+        text_hud[text_hud.size() - 1]->set_use_cursor(false);
+        text_hud[text_hud.size() - 1]->set_focused(false);
+    }
+
+    user_text.push_back(user);
+    text_hud.push_back(text);
+}
+
+// Add a line to the CLI
+void HUD_CLI::new_line()
+{
+    new_line(get_current_user(), "");
+}
+
+// Return the y position of the next line
+float HUD_CLI::next_y_position()
+{
+    float line_multiplicator = 1.1f;
+    float multiplicator = 1.25;
+    float total = 0.95f;
+    for (int i = 0; i < user_text.size(); i++) // Calculate the y pos
+    {
+        unsigned int line_size = cut_string(text_hud[i]->get_text(), "\n").size();
+        float n = 0;
+        for(int j = 0;j<line_size;j++) n += text_hud[i]->get_font_size() * multiplicator;
+        if (line_size > 0) n *= line_multiplicator;
+        total -= n;
+    }
+
+    return total;
+}
+
+// Start the CLI
+void HUD_CLI::start()
+{
+    new_line("Matix CLI", response["welcome"]);
+    new_line();
+
+    // Load base commands
+    // Quit
+    commands_name["arrete"] = CLI_Command::Quit;
+    commands_name["quit"] = CLI_Command::Quit;
+    commands_name["quitter"] = CLI_Command::Quit;
+    commands_name["quitte"] = CLI_Command::Quit;
+    commands_name["stop"] = CLI_Command::Quit;
+    // Clear
+    commands_name["clear"] = CLI_Command::Clear_CLI;
+    commands_name["empty"] = CLI_Command::Clear_CLI;
+    commands_name["vide"] = CLI_Command::Clear_CLI;
+    commands_name["nettoie"] = CLI_Command::Clear_CLI;
+    // Datas
+    commands_name["data"] = CLI_Command::Datas;
+    commands_name["datas"] = CLI_Command::Datas;
+    commands_name["donnee"] = CLI_Command::Datas;
+    commands_name["donnees"] = CLI_Command::Datas;
+}
+
+// Update the CLI
+void HUD_CLI::update()
+{
+    update_object();
+
+    if (get_advanced_struct()->get_key_state_frame("enter") == Key_State::Pressed)
+    {
+        if (text_hud.size() > 0)
+        {
+            execute_command(text_hud[text_hud.size() - 1]->get_text());
+        }
+        new_line();
+    }
+
+    render();
 }
 
 // HUD_CLI destructor

@@ -20,7 +20,8 @@ public:
 	void render(); // Render the HUD
 	void sort_objects(); // Sort the HUD for a good render
 	void unload(); // Unload the objects in the HUD
-	void update(); // Update the HUD
+	virtual void update(); // Update the HUD
+	void update_object(); // Update all the objects in the HUD
 	~HUD(); // HUD destructor
 
 	// Getters and setters
@@ -55,6 +56,7 @@ public:
 	~Game(); // Game destructor
 
 	// Getters and setters
+	inline bool continue_running() { return is_running; };
 	inline glm::vec4 get_background_color() { return background_color; };
 	inline HUD* get_current_hud() { if (get_current_hud_name() == "") return 0; return (*get_huds())[get_current_hud_name()]; };
 	inline Scene* get_current_scene() { if (get_current_scene_name() == "") return 0; return (*get_scenes())[get_current_scene_name()]; };
@@ -68,9 +70,11 @@ public:
 	inline void set_background_color(glm::vec4 a_background_color) { background_color = a_background_color; };
 	void set_current_hud(std::string a_name);
 	void set_current_scene(std::string a_name);
+	inline void set_is_running(bool a_run) { is_running = a_run; };
 private:
 	std::string current_hud = ""; // Name of the current hud loaded
 	std::string current_scene = ""; // Name of the current scene loaded
+	bool is_running = true; // If the game should continue running or not
 	float last_frame_time = 0; // Time when the last frame occurs, for calculating delta_time and FPS
 	int window_height = 0; // Height of the graphic window
 	int window_width = 0; // Widt of the graphic window

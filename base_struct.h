@@ -1,21 +1,27 @@
 #pragma once
 
 #include <algorithm>
+#include <codecvt>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <locale>
 #include <map>
 #include <random>
 #include <string>
 #include <sstream>
 #include <vector>
 
+enum File_Type {Text}; // Every file type
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
+std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank = false); // Cut a wstring where there are the "cut"
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
+std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
 float sign(float number); // Return the sign of a number
 std::string to_uppercase(std::string str); // Transform a string to an uppercase string
