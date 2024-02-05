@@ -62,6 +62,7 @@ public:
 	HUD_Text(Base_Struct* a_base_struct, std::string a_name, Texture* a_texture, VAO* a_vao); // HUD_Font constructor
 	void render(); // Render the text for HUD
 	void update(); // Update the text HUD
+	void update_text_input(); // Apply the text input to the text
 	~HUD_Text(); // HUD_Object destructor
 
 	// Getters and setters

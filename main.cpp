@@ -10,21 +10,8 @@ void cli()
     game->set_background_color(glm::vec4(0, 0, 0, 1));
 
     // Construct the HUD
-    HUD* hud = game->new_hud("base");
+    HUD_CLI* hud = game->new_hud<HUD_CLI>("base");
     game->set_current_hud("base");
-    HUD_Text* cli = hud->new_hud_object<HUD_Text>("fps", "../fonts/default.png", "default_font");
-
-    // Configurate the HUD
-    std::string user = "User : ";
-    cli->set_background_color(glm::vec4(0, 0, 0, 1));
-    cli->set_focused(true);
-    cli->set_font_color(glm::vec4(1, 1, 1, 1));
-    cli->set_font_size(0.04);
-    cli->set_input(true);
-    cli->set_input_text("all");
-    cli->set_position(glm::vec3(-0.95, 0.95, 0));
-    cli->set_scale(glm::vec3(1, 1, 1));
-    cli->set_text(user);
 
     while (game->run())
     {
@@ -195,8 +182,8 @@ int main()
 
     game = new Game(1600, 900);
 
-    // cli();
-    warehouse();
+    cli();
+    // warehouse();
 
     delete game;
 

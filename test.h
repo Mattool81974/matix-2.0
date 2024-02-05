@@ -180,3 +180,12 @@ private:
     Game* game = 0; // Pointer to the game
     Door* other_door = 0; // Door linked with this door
 };
+
+class HUD_CLI : public HUD
+{
+public:
+    HUD_CLI(Game* a_advanced_struct, std::string a_name); // HUD_CLI constructor
+    ~HUD_CLI(); // HUD_CLI destructor
+private:
+    HUD_Text* cli_input = 0; // Pointer to the text input of the CLI
+};

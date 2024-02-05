@@ -19,6 +19,7 @@ public:
 	O* new_hud_object(std::string name, std::string texture_path = "", std::string vao_name = "hud"); // Create a new HUD Object into the game
 	void render(); // Render the HUD
 	void sort_objects(); // Sort the HUD for a good render
+	void unload(); // Unload the objects in the HUD
 	void update(); // Update the HUD
 	~HUD(); // HUD destructor
 
@@ -45,7 +46,8 @@ public:
 	bool contains_hud(std::string name); // Return if the game contains an HUD Object
 	bool contains_scene(std::string name); // Returns if the game contains a scene
 	void load_keys(); // Load the keys in the game
-	HUD* new_hud(std::string name); // Create a new HUD Object into the game
+	template <class O = HUD> // Template for adding a type of HUD
+	O* new_hud(std::string name); // Create a new HUD into the game
 	Scene* new_scene(std::string name, std::string map_path = "", Map_Opening_Mode mode = Map_Opening_Mode::Simple, bool use_graphic = true, bool use_physic = true); // Create a scene into the game and return it
 	bool run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game
@@ -93,5 +95,16 @@ O* HUD::new_hud_object(std::string name, std::string texture_path, std::string v
 
 	O* new_object = new O(get_advanced_struct(), name, texture, vao);
 	add_hud_object(name, new_object);
+	return new_object;
+}
+
+// Create a new HUD Object into the game
+template <class O> // Template for adding a type of HUD
+O* Game::new_hud(std::string name)
+{
+	if (contains_scene(name)) { std::cout << "Matix game : error ! The objects \"" << name << "\" you want to create already exists." << std::endl; return 0; }
+
+	O* new_object = new O(this, name);
+	add_hud(name, new_object);
 	return new_object;
 }

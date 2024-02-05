@@ -516,3 +516,27 @@ Door::~Door()
 {
     Object::~Object();
 }
+
+// HUD_CLI constructor
+HUD_CLI::HUD_CLI(Game* a_advanced_struct, std::string a_name) : HUD(a_advanced_struct, a_name)
+{
+    cli_input = new_hud_object<HUD_Text>("cli", "../fonts/default.png", "default_font");
+
+    // Configurate the HUD
+    std::string user = "User : ";
+    cli_input->set_background_color(glm::vec4(0, 0, 0, 1));
+    cli_input->set_focused(true);
+    cli_input->set_font_color(glm::vec4(1, 1, 1, 1));
+    cli_input->set_font_size(0.04);
+    cli_input->set_input(true);
+    cli_input->set_input_text("all");
+    cli_input->set_position(glm::vec3(-0.95, 0.95, 0));
+    cli_input->set_scale(glm::vec3(1, 1, 1));
+    cli_input->set_text(user);
+}
+
+// HUD_CLI destructor
+HUD_CLI::~HUD_CLI()
+{
+    unload();
+}

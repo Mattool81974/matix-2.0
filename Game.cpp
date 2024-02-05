@@ -76,8 +76,8 @@ void HUD::update()
     render();
 }
 
-// HUD destructor
-HUD::~HUD()
+// Unload the objects in the HUD
+void HUD::unload()
 {
     get_sorted_hud_objects()->clear();
     std::map < std::string, HUD_Object*>* objects = get_hud_objects();
@@ -86,6 +86,12 @@ HUD::~HUD()
         delete it->second; // Delete each HUD_Object
         it->second = 0;
     }
+}
+
+// HUD destructor
+HUD::~HUD()
+{
+    unload();
 }
 
 // Game constructor
@@ -210,16 +216,6 @@ void Game::load_keys()
     keys["right shift"] = GLFW_KEY_RIGHT_SHIFT;
     keys["space"] = GLFW_KEY_SPACE;
     keys["tab"] = GLFW_KEY_TAB;
-}
-
-// Create a new HUD Object into the game
-HUD* Game::new_hud(std::string name)
-{
-    if (contains_scene(name)) { std::cout << "Matix game : error ! The objects \"" << name << "\" you want to create already exists." << std::endl; return 0; }
-
-    HUD* new_object = new HUD(this, name);
-    add_hud(name, new_object);
-    return new_object;
 }
 
 // Create a scene into the game and return it

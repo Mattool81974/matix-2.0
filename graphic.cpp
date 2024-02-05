@@ -132,15 +132,21 @@ void HUD_Text::render()
 // Update the text HUD
 void HUD_Text::update()
 {
+	update_text_input();
+}
+
+// Apply the text input to the text
+void HUD_Text::update_text_input()
+{
 	if (is_focused() && can_take_input())
 	{
 		std::string authorized_text = get_input_text();
-		std::vector<std::string> *pressed_keys = get_base_struct()->get_pressed_keys_frame();
+		std::vector<std::string>* pressed_keys = get_base_struct()->get_pressed_keys_frame();
 		for (int i = 0; i < pressed_keys->size(); i++) // Check each pressed keys
 		{
 			std::string key = (*pressed_keys)[i];
 
-			if (key == "left shift" || key == "right shift" ||key == "backspace") continue; // Ignored keys
+			if (key == "left shift" || key == "right shift" || key == "backspace") continue; // Ignored keys
 
 			if (key == "space") { key = " "; }
 			else if (key == "enter") { key = "\n"; }
