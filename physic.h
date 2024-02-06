@@ -39,12 +39,14 @@ public:
 	// Getters and setters
 	inline Base_Struct* get_base_struct() { return base_struct; };
 	inline Collision* get_collision() { return &collision; };
+	inline float get_elasticity() { return elasticity; };
 	inline glm::vec3 get_gravity_value() { return gravity_value; };
 	inline float get_mass() { return mass; };
 	inline glm::vec3 get_velocity() { return velocity; };
 	inline bool is_falling() { return fall; };
 	inline bool is_standing() { return stand; };
 	inline bool is_static() { return static_object; };
+	inline void set_elasticity(float new_elasticity) { elasticity = new_elasticity; };
 	inline void set_gravity_value(glm::vec3 a_gravity_value) { gravity_value = a_gravity_value; };
 	inline void set_is_falling(bool is_falling) { fall = is_falling; };
 	inline void set_is_standing(bool is_standing) { stand = is_standing; };
@@ -53,6 +55,7 @@ public:
 	inline void set_velocity(glm::vec3 a_velocity) { velocity = a_velocity; };
 	inline bool use_collision() { return is_using_collision; };
 private:
+	float elasticity = 1.0f; // Elasticity of the object
 	float mass = 1; // Mass of the object
 	bool static_object = true; // If the object is static or not
 	bool fall = false; // If the object fall or not

@@ -44,8 +44,9 @@ public:
     void update(); // Update the ammo
     ~Ammo(); // Ammo destructor
 private:
+    bool bounce = false; // If the ball can bounce or not
     float creation_time = 0;
-    float deadline = 3;
+    float deadline = 30;
 
     Game* game = 0;
 };
@@ -63,6 +64,7 @@ public:
 
     // Getters and setters
     inline unsigned short get_ammo_by_second() { return ammo_by_second; };
+    inline glm::vec3 get_ammo_scale() { return glm::vec3(0.1, 0.1, 0.3); };
     inline float get_ammo_speed() { return ammo_speed; };
     inline float get_step_back_duration() { return step_back_duration; };
     inline glm::vec3 get_step_back_force() { return step_back_force; };

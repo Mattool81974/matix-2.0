@@ -409,19 +409,19 @@ void Object::last_update()
 		glm::vec3 new_velocity = get_attached_physic_object()->get_velocity();
 		if (collision->axis_multiplier[0] != 0 && glm::abs(difference_x_movement) < glm::abs(difference_collision_width) && sign(difference_x_movement) != sign(new_movement[0]))
 		{
-			if (sign(new_movement[0]) == sign(new_velocity[0])) new_velocity[0] = 0;
+			if (sign(new_movement[0]) == sign(new_velocity[0])) new_velocity[0] *= -1 * get_attached_physic_object()->get_elasticity();
 			new_movement[0] = 0;		
 		}
 
 		if (collision->axis_multiplier[1] != 0 && new_movement[1] != 0 && glm::abs(difference_y_movement) < glm::abs(difference_collision_height) && sign(difference_y_movement) != sign(new_movement[1]))
 		{
-			if (sign(new_movement[1]) == sign(new_velocity[1])) new_velocity[1] = 0;
+			if (sign(new_movement[1]) == sign(new_velocity[1])) new_velocity[1] *= -1 * get_attached_physic_object()->get_elasticity();
 			new_movement[1] = 0;
 		}
 
 		if (collision->axis_multiplier[2] != 0 && glm::abs(difference_z_movement) < glm::abs(difference_collision_length) && sign(difference_z_movement) != sign(new_movement[2]))
 		{
-			if (sign(new_movement[2]) == sign(new_velocity[2])) new_velocity[2] = 0;
+			if (sign(new_movement[2]) == sign(new_velocity[2])) new_velocity[2] *= -1 * get_attached_physic_object()->get_elasticity();
 			new_movement[2] = 0;
 		}
 

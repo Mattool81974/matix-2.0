@@ -90,7 +90,7 @@ void* Ammo::clone(Advanced_Struct* a_game_struct, std::string a_name, std::strin
 // Late update the ammo
 void Ammo::last_update()
 {
-    if (get_collisions_result()->size() > 0)
+    if (get_collisions_result()->size() > 0 && !bounce)
     {
         Scene* scene = (*game->get_scenes())[get_scene_name()];
         scene->destroy(get_name());
@@ -142,7 +142,7 @@ void Famas::shoot()
     float z_offset = 0.75;
     glm::vec3 position = get_attached_transform()->get_absolute_position() + glm::vec3(0, 0.0, 0.0) + glm::vec3(x_offset, y_offset, z_offset) * forward;
     glm::vec3 rotation = get_attached_transform()->get_rotation() * glm::vec3(-1.0, 1.0, 1.0) + glm::vec3(0, 180, 0);
-    glm::vec3 scale = glm::vec3(0.1, 0.1, 0.3);
+    glm::vec3 scale = get_ammo_scale();
 
     // Create the ammo
     float ammo_speed = get_ammo_speed();
@@ -175,7 +175,6 @@ void Famas::shoot()
 // Update the famas
 void Famas::update()
 {
-    // std::cout << "Absolute position " << get_attached_transform()->get_absolute_position()[0] << " " << get_attached_transform()->get_absolute_position()[1] << " " << get_attached_transform()->get_absolute_position()[2] << std::endl;
     if (get_game_struct()->get_left_mouse_button_state()) // If the left button is pressed
     {
         if (glfwGetTime() - last_ammo_shooted > 1.0f / (float)ammo_by_second)

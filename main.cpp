@@ -4,25 +4,14 @@
 
 Game* game = 0;
 
-void cli()
+void load_cli()
 {
-    // Construct game
-    game->set_background_color(glm::vec4(0, 0, 0, 1));
-
     // Construct the HUD
-    HUD_CLI* hud = game->new_hud<HUD_CLI>("base");
-    game->set_current_hud("base");
+    HUD_CLI* hud = game->new_hud<HUD_CLI>("cli");
     hud->load_from_file("../cli/normal_fr.cli");
-
-    while (game->run())
-    {
-        game->update_event();
-
-        game->update();
-    }
 }
 
-void warehouse()
+void load_warehouse()
 {
     // Construct game
     Camera* camera = game->get_camera();
@@ -45,16 +34,14 @@ void warehouse()
 
     // Construct scene
     Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
-    game->set_current_scene("warehouse");
 
     // Construct objects for testing
     Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
-    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(3, 32, 3), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
+    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(3, 40, 3), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
 
     // Construct the HUD
     HUD* hud = game->new_hud("base");
-    game->set_current_hud("base");
     HUD_Text* fps = hud->new_hud_object<HUD_Text>("fps", "../fonts/default.png", "default_font");
     HUD_Object* watermark = hud->new_hud_object("watermark", "../textures/watermark.png");
 
@@ -64,31 +51,18 @@ void warehouse()
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
     player->get_attached_physic_object()->set_use_collision(true);
+    player->get_attached_physic_object()->set_elasticity(0.0f);
     player->set_map_pos(glm::vec3(2, 1, 2));
     player->set_description("player");
 
     // Configurate the HUD
     std::string texte_fps = "FPS : 0.";
-    fps->set_background_color(glm::vec4(0, 0, 0, 1));
     fps->set_font_color(glm::vec4(1, 1, 1, 1));
     fps->set_position(glm::vec3(0.65, 0.9, 0));
     fps->set_scale(glm::vec3(0.1, 0.1, 1));
     fps->set_text(texte_fps);
     watermark->set_position(glm::vec3(-0.6, 0.76, 0.9));
     watermark->set_scale(glm::vec3(0.4, 0.24, 1));
-
-    float last_size = player->get_all_map_pos().size();
-    std::vector<glm::vec3> positions = player->get_all_map_pos();
-
-    while (game->run())
-    {
-        game->update_event();
-
-        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game->get_delta_time())) + ".";
-        fps->set_text(texte_fps);
-
-        game->update();
-    }
 }
 
 void level0()
@@ -179,14 +153,48 @@ void shooting_range()
 
 int main()
 {
-    setlocale(LC_ALL, "fr_FR.UTF8");
-
     srand(time(0));
 
     game = new Game(1600, 900);
 
-    cli();
-    // warehouse();
+    load_cli();
+    load_warehouse();
+
+    game->set_current_hud("base");
+    game->set_current_scene("warehouse");
+
+    HUD_Text* fps = (HUD_Text*)game->get_hud("base")->get_hud_object("fps");
+    std::string texte_fps = "FPS : 0.";
+
+    bool current_is_cli = false;
+
+    while (game->run())
+    {
+        if (game->get_key_state_frame("tab") == Key_State::Pressed)
+        {
+            if (current_is_cli)
+            {
+                game->set_background_color(glm::vec4(0.0f, (1.0f / 255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f));
+                game->set_current_hud("base");
+                game->set_current_scene("warehouse");
+                current_is_cli = false;
+            }
+            else
+            {
+                game->set_background_color(glm::vec4(0, 0, 0, 1));
+                game->set_current_hud("cli");
+                game->set_current_scene("");
+                current_is_cli = true;
+            }
+        }
+
+        game->update_event();
+
+        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game->get_delta_time())) + ".";
+        fps->set_text(texte_fps);
+
+        game->update();
+    }
 
     delete game;
 

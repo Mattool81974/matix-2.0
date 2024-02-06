@@ -26,6 +26,7 @@ public:
 
 	// Getters and setters
 	inline Advanced_Struct* get_advanced_struct() { return advanced_struct; };
+	inline HUD_Object* get_hud_object(std::string a_name) { return hud_objects[a_name]; };
 	inline std::map < std::string, HUD_Object*>* get_hud_objects() { return &hud_objects; };
 	inline std::string get_name() { return name; };
 	inline std::vector<HUD_Object*>* get_sorted_hud_objects() { return &sorted_hud_objects; };
@@ -62,8 +63,9 @@ public:
 	inline Scene* get_current_scene() { if (get_current_scene_name() == "") return 0; return (*get_scenes())[get_current_scene_name()]; };
 	inline std::string get_current_hud_name() { return current_hud; };
 	inline std::string get_current_scene_name() { return current_scene; };
+	inline HUD* get_hud(std::string a_name) { return huds[a_name]; };
 	inline std::map < std::string, HUD*>* get_huds() { return &huds; };
-	inline Scene* get_scene(std::string name) { if (contains_scene(name)) { return scenes[name]; } std::cout << "Matrix game : error ! The scene \"" << name << "\" does not exist." << std::endl; return 0; }
+	inline Scene* get_scene(std::string name) { if (contains_scene(name) && name != "") { return scenes[name]; } std::cout << "Matrix game : error ! The scene \"" << name << "\" does not exist." << std::endl; return 0; }
 	inline std::map<std::string, Scene*> *get_scenes() { return &scenes; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
@@ -79,7 +81,7 @@ private:
 	int window_height = 0; // Height of the graphic window
 	int window_width = 0; // Widt of the graphic window
 
-	glm::vec4 background_color = glm::vec4(0.2f, 0.3f, 0.1f, 1.0f); // Background color of the game
+	glm::vec4 background_color = glm::vec4(0.0f, (1.0f/255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f); // Background color of the game
 	std::map < std::string, HUD*> huds = std::map < std::string, HUD*>(); // Each HUD, with their name as key, in the game
 	std::map<std::string, Scene *> scenes = std::map<std::string, Scene *>(); // Each scenes, with their name as key, in the game
 	GLFWwindow* window = 0; // Pointer to the GLFW window

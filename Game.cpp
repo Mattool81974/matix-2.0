@@ -279,6 +279,10 @@ void Game::set_current_scene(std::string a_name)
         current_scene = a_name;
         get_current_scene()->load();
     }
+    else if (a_name == "")
+    {
+        current_scene = "";
+    }
     else
     {
         std::cout << "Matrix game : error ! The current scene \"" << a_name << "\" does not exist." << std::endl;
@@ -288,13 +292,13 @@ void Game::set_current_scene(std::string a_name)
 // Update one frame of the game
 void Game::update()
 {
-    if (contains_scene(get_current_scene_name()))
+    if (get_current_scene_name() != "" && contains_scene(get_current_scene_name()))
     {
         Scene* scene = get_current_scene();
         if(scene != 0) scene->update();
     }
 
-    if (contains_hud(get_current_hud_name()))
+    if (get_current_hud_name() != "" && contains_hud(get_current_hud_name()))
     {
         HUD* hud = get_current_hud();
         if (hud != 0) hud->update();
