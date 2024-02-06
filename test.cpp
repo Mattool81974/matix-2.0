@@ -616,8 +616,7 @@ void HUD_CLI::load(std::string data)
             datas[cutted[1]] = final_variable;
             if (cutted[1] == "font_size")
             {
-                std::string::size_type sz;
-                font_size = std::stod(final_variable, &sz);
+                font_size = string_to_float(final_variable);
             }
         }
         else if (cutted[0] == "v")

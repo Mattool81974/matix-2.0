@@ -1,5 +1,8 @@
 #include "base_struct.h"
 
+std::string float_character = "";
+std::string non_float_character = "";
+
 // Cut a string where there are the "cut"
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank)
 {
@@ -155,6 +158,17 @@ std::string read_file(std::string path, File_Type type)
 	return file_content;
 }
 
+// Replace a string in an another string
+std::string replace(std::string str, std::string to_replace, std::string new_str)
+{
+	std::vector<std::string> part = cut_string(str, to_replace);
+	std::string final = "";
+
+	for (int i = 0; i < part.size(); i++) { final += part[i] + new_str; }
+
+	return final.substr(0, final.size() - new_str.size());
+}
+
 // Rotate a vector around a rotating point
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier)
 {
@@ -210,6 +224,23 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 
 // Return the size of a number
 float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
+
+// Convert a string to a float
+float string_to_float(std::string str)
+{
+	if (float_character == "")
+	{
+		float_character = ".";
+		non_float_character = ",";
+		if (std::stod("0.25") != 0.25)
+		{
+			float_character = ",";
+			non_float_character = ".";
+		}
+	}
+
+	return std::stod(replace(str, non_float_character, float_character));
+}
 
 // Transform a string to an uppercase string
 std::string to_uppercase(std::string str)

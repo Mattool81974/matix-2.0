@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>Matix - Scene</title>
+    </head>
+    <body>
+        <h1>Matix - Scene</h1>
+        <h2>Presentation</h2>
+        <div>
+            A Matix scene represents a set of objects.</br>
+            Each scene is cutted in levels, and each levels are cutted in sub-levels.</br>
+            To optimize a scene, a system with something called "Collection" can be used.</br>
+            A scene can be load from a map with the ".wad" extension.</br>
+            <h3>Collection system</h3>
+            <div>
+                With a very big scene, making, for exemple, a 500 * 500 cube building is very unoptimized.</br>
+                To be more optimized, we can use a collection. A collection is a big cube assembled of a lot of little cube, without rendering them.</br>
+                It reduces the GPU works and can be very usefull to do a big building.</br>
+                A collection can belong to a level, or to the entire scene. We can define which part can be turned as a collection or not.</br>
+            </div>
+            <h3>Levels and sub-levels</h3>
+            <div>
+                A level represents a Transform_Object parent of a few objects in the scene.</br>
+                For exemple, it can represents a stage of a building.</br>
+                For a better construction and ordering, each level are made of sub-levels, which doesn't represent a Transform_Object.</br>
+                Each level and sub-levels are defined by a number between 0 and 65535.</br>
+            </div>
+            <h3>.wad maps</h3>
+            <div>
+                A .wad map is an UTF-8 file. it's cutted between a lot of parts, by the string :</br>
+                &lt;-----------------------------------------------&gt;</br>
+                The first character of each part is a letter corresponding of the part type.</br>
+                If the letter is "l", the part describes each level.</br>
+                If the letter is "w", the part contains each level parts curdly, one by one.</br></br>
+                The part starting with "l" should describe every level. It should be the first part of the file.</br>
+                Each level is separated line by line, each sub-level is separated by a comma and each datas by a space.</br>
+                The first part of each level is the number of the level and their transformation, in same format as sub-level. The other part separated by a comma are the sub-level datas.</br>
+                The datas (separated by a space) in the sub-level are ordered like that :</br>
+                Sub_level_numero x_position y_position z_position x_rotation y_rotation z_rotation x_scale y_scale z_scale</br>
+                Warning, sub-level are not transform object, the transformation are only applied to the parts.</br></br>
+                The part starting with "w" should tell what contains every sub-level level parts. It can be everywhere in the file.</br>
+                The first line of the part is in the format "w x;y" where x is the number of the level and y the number of the sub-level.</br>
+                The other lines represent a mapping with the same width and height as the sub-level, with every parts in the sub-level.</br>
+                This system is very unoptimized and not recommanded for big level, but can be pretty good for a little and precise level.</br></br>
+            </div>
+        </div>
+    </body>
+</html>

@@ -55,7 +55,7 @@ def construct_warehouse(path: str):
     truck_part_entrance_rect = ((length / 6) * 4, width / 2, length / 6, 1, 0)
 
     # Write the parts of the map
-    content += "l\n0,0 0 0 0 0 0 0 " + str(width_floor) + " " + str(height_floor) + " " + str(length_floor) + ","
+    content += "l\n0 0 0 0 0 0 0 1 1 1,0 0 0 0 0 0 0 " + str(width_floor) + " " + str(height_floor) + " " + str(length_floor) + ","
     content += "1 0 0 0 0 0 0 " + str(width) + " " + str(height) + " " + str(length) + ","
     content += "2 0 " + str(y_2) + " 0 0 0 0 " + str(width_2) + " " + str(height_2) + " " + str(length_2) + ","
     content += "3 0 " + str(y_3) + " 0 0 0 0 " + str(width_3) + " " + str(height_3) + " " + str(length_3) + ","

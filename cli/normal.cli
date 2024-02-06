@@ -1,5 +1,6 @@
 d^author^Matt code
 d^base^Matix by Matt code
+d^font_size^0,04
 d^version^normal
 d^subversion^normal
 r^clear_command_help^The "clear" command clear the CLI.

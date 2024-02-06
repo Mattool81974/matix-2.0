@@ -22,8 +22,10 @@ std::vector<std::string> cut_string(std::string string, std::string cut, bool er
 std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank = false); // Cut a wstring where there are the "cut"
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file
+std::string replace(std::string str, std::string to_replace, std::string new_str); // Replace a string in an another string
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
 float sign(float number); // Return the sign of a number
+float string_to_float(std::string str); // Convert a string to a float
 std::string to_uppercase(std::string str); // Transform a string to an uppercase string
 
 struct Transform_Animation {
