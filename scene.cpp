@@ -439,30 +439,30 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			float x = middle[0] + collection.get_level()->position[collection.get_level_count()][0] + part->get_position()[0];
-			float y = middle[1] + collection.get_level()->position[collection.get_level_count()][1] + part->get_position()[1];
-			float z = middle[2] + collection.get_level()->position[collection.get_level_count()][2] + part->get_position()[2];
+			float x = middle[0] + collection.get_level()->sub_level_position[collection.get_level_count()][0] + part->get_position()[0];
+			float y = middle[1] + collection.get_level()->sub_level_position[collection.get_level_count()][1] + part->get_position()[1];
+			float z = middle[2] + collection.get_level()->sub_level_position[collection.get_level_count()][2] + part->get_position()[2];
 
 			glm::vec3 scale = glm::vec3(part->get_scale()[0] * (difference[0] + 1), part->get_scale()[1] * (difference[1] + 1), part->get_scale()[2] * (difference[2] + 1));
 			if (part->get_scale_level_multiplier()[0] != 0)
 			{
-				scale[0] *= collection.get_level()->scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0];
-				x += (collection.get_level()->scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0]) / 2;
+				scale[0] *= collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0];
+				x += (collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[1] != 0)
 			{
-				scale[1] *= collection.get_level()->scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1];
-				y += (collection.get_level()->scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1]) / 2;
+				scale[1] *= collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1];
+				y += (collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[2] != 0)
 			{
-				scale[2] *= collection.get_level()->scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2];
-				z += (collection.get_level()->scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2]) / 2;
+				scale[2] *= collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2];
+				z += (collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2]) / 2;
 			}
 
 			std::string name = "level" + std::to_string(collection.get_level()->id) + ";w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
-			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
+			Object* object = new_object(name, part->get_type(), collection.get_level()->map_level_object->get_attached_transform(), glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
 			assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
 			object->set_description(part->get_description());
 		}
@@ -528,13 +528,14 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		std::vector<std::string> lines = cut_string(parts[0], "\n", true); // Check the first part
 		if(lines[0] != "l") { std::cout << "Scene \"" << get_name() << "\" : erreur ! The map you want to load is probably corrompted." << std::endl; return; }
 
-		std::map<unsigned short, Map_Level> levels = std::map<unsigned short, Map_Level>();
+		levels = std::map<unsigned short, Map_Level>();
 		std::map<unsigned short, Object*> level_object = std::map<unsigned short, Object*>();
 		for (int i = 1; i < lines.size(); i++) // Check each levels of the map
 		{
 			Map_Level level; // Create the level
 			std::vector<std::string> level_count = cut_string(lines[i], ",");
-			unsigned short level_id = std::stoi(level_count[0]); // Get and set ID
+			std::vector<std::string> level_specifications = cut_string(level_count[0], " ");
+			unsigned short level_id = std::stoi(level_specifications[0]); // Get and set ID
 			level.id = level_id;
 
 			for (int j = 1; j < level_count.size(); j++) // Browse each level part
@@ -542,27 +543,47 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 				std::vector<std::string> level_str = cut_string(level_count[j], " ");
 				unsigned short level_id = std::stoi(level_str[0]);
 
-				float x = std::stof(level_str[1]); // Get the position of the level
-				float y = std::stof(level_str[2]);
-				float z = std::stof(level_str[3]);
+				float x = string_to_float(level_str[1]); // Get the position of the level
+				float y = string_to_float(level_str[2]);
+				float z = string_to_float(level_str[3]);
 
-				float yaw = std::stof(level_str[5]); // Get the position of the level
-				float pitch = std::stof(level_str[4]);
-				float roll = std::stof(level_str[6]);
+				float yaw = string_to_float(level_str[5]); // Get the position of the level
+				float pitch = string_to_float(level_str[4]);
+				float roll = string_to_float(level_str[6]);
 
 				unsigned short length = std::stoi(level_str[9]); // Get the size of the level
 				unsigned short height = std::stoi(level_str[8]);
 				unsigned short width = std::stoi(level_str[7]);
 
-				level.position.push_back(glm::vec3(x, y, z));
-				level.rotation.push_back(glm::vec3(yaw, pitch, roll));
-				level.scale.push_back(glm::vec3(length, height, width));
-
-				// std::string object_name = "level" + level_str[0]; // Configurate the level Object
-				// Transform_Object* level_transform = new Transform_Object(this, glm::vec3(x, y, z), level.rotation, level.scale);
-				// Object* level_object = new Object(get_game_struct(), object_name, get_name(), level_transform);
-				// add_object(object_name, level_object);
+				level.sub_level_position.push_back(glm::vec3(x, y, z));
+				level.sub_level_rotation.push_back(glm::vec3(yaw, pitch, roll));
+				level.sub_level_scale.push_back(glm::vec3(length, height, width));
 			}
+
+			// Get the level specifications
+			float x = string_to_float(level_specifications[1]);
+			float y = string_to_float(level_specifications[2]);
+			float z = string_to_float(level_specifications[3]);
+
+			float yaw = string_to_float(level_specifications[5]);
+			float pitch = string_to_float(level_specifications[4]);
+			float roll = string_to_float(level_specifications[6]);
+
+			unsigned short length = std::stoi(level_specifications[9]);
+			unsigned short height = std::stoi(level_specifications[8]);
+			unsigned short width = std::stoi(level_specifications[7]);
+
+			// Set the level specifications
+			level.position = glm::vec3(x, y, z);
+			level.rotation = glm::vec3(pitch, yaw, roll);
+			level.scale = glm::vec3(width, height, length);
+
+			std::string object_name = "level" + level_specifications[0]; // Configurate the level Object
+			Transform_Object* level_transform = new Transform_Object(this, level.position, level.rotation, level.scale);
+			Object* level_object = new Object(get_game_struct(), object_name, get_name(), level_transform);
+			add_object(object_name, level_object);
+
+			level.map_level_object = level_object;
 
 			levels[level_id] = level; // Add the level
 		}
@@ -585,6 +606,10 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			if (lines[0][0] == 'w') // Load each level count
 			{
 				std::vector<Map_Level_Collection> all = construct_collections(lines, level, level_count);
+				for (int i = 0; i < all.size(); i++)
+				{
+					collections.push_back(all[i]);
+				}
 				load_from_collection(all);
 			}
 		}

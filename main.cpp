@@ -167,6 +167,12 @@ int main()
     Scene* warehouse = game->get_scene("warehouse");
     std::string texte_fps = "FPS : 0.";
 
+    std::vector<Map_Level_Collection>* collections = warehouse->get_collections();
+    for (int i = 0; i < collections->size(); i++)
+    {
+        std::cout << (*collections)[i].to_string() << std::endl;
+    }
+
     bool current_is_cli = false;
 
     while (game->run())

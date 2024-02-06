@@ -9,10 +9,14 @@ struct Map_Level {
 	// Struct representing a level of a map
 	unsigned short id = 0;
 	unsigned short level_number = 0;
+	Object* map_level_object = 0;
 	std::vector<Object*> parent = std::vector<Object*>();
-	std::vector<glm::vec3> position = std::vector<glm::vec3>();
-	std::vector<glm::vec3> rotation = std::vector<glm::vec3>();
-	std::vector<glm::vec3> scale = std::vector<glm::vec3>();
+	glm::vec3 position = glm::vec3(0, 0, 0);
+	glm::vec3 rotation = glm::vec3(0, 0, 0);
+	glm::vec3 scale = glm::vec3(1, 1, 1);
+	std::vector<glm::vec3> sub_level_position = std::vector<glm::vec3>();
+	std::vector<glm::vec3> sub_level_rotation = std::vector<glm::vec3>();
+	std::vector<glm::vec3> sub_level_scale = std::vector<glm::vec3>();
 };
 class Map_Level_Collection {
 	// Class representing a collection of cutted part in level of a map
@@ -39,7 +43,12 @@ public:
 	inline void set_final_position(glm::vec3 a_final_rotation) { final_position = a_final_rotation; };
 	inline void set_rotation(glm::vec3 a_rotation) { rotation = a_rotation; };
 	inline void set_scale(glm::vec3 a_scale) { scale = a_scale; };
-	inline std::string to_string() { return std::to_string(part) + ";" + std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[2]) + ";" + std::to_string(get_final_position()[2]); };
+	inline std::string to_string()
+	{
+		return std::to_string(part) + ";" + std::to_string(get_level()->level_number) + ";" + std::to_string(get_level_count()) + ";" +
+			std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_base_position()[2]) + ";" +
+			std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[2]) + ";" + std::to_string(get_final_position()[2]);
+	};
 private:
 	unsigned short level_count = 0; // Level count of the collection
 	unsigned short part = 0;
@@ -166,6 +175,7 @@ public:
 	~Scene(); // Scene destructor
 
 	// Getters and setters
+	inline std::vector<Map_Level_Collection>* get_collections() { return &collections; };
 	inline Advanced_Struct* get_game_struct() { return game_struct; };
 	inline Graphic_Scene* get_graphic_scene() { return graphic_scene; };
 	inline std::string get_name() { return name; };
@@ -185,6 +195,7 @@ private:
 	std::vector<Map_Level_Collection> collections = std::vector<Map_Level_Collection>(); // Collections in the map
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
+	std::map<unsigned short, Map_Level> levels = std::map<unsigned short, Map_Level>(); // Each levels, with their numer as key, in the scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene
 	std::vector<std::vector<std::vector<Object*>>> objects_map = std::vector<std::vector<std::vector<Object*>>>(); // Each objects, arranged as a map, in the scene
 	Physic_Scene* physic_scene = 0; // Pointer to the physic scene
