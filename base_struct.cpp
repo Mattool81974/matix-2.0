@@ -119,7 +119,6 @@ glm::vec3 normalize_rotation(glm::vec3 rotation)
 std::string read_file(std::string path, File_Type type)
 {
 	std::locale current_locale = std::locale("");
-	// setlocale(LC_ALL, "fr_FR.UTF8");
 
 	std::string file_content;
 	if (type == File_Type::Text)

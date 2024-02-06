@@ -14,7 +14,6 @@ struct Map_Level {
 	std::vector<glm::vec3> rotation = std::vector<glm::vec3>();
 	std::vector<glm::vec3> scale = std::vector<glm::vec3>();
 };
-enum Map_Level_Orientation {Vertical, Horizontal}; // Differents orientations for a map lev collection
 class Map_Level_Collection {
 	// Class representing a collection of cutted part in level of a map
 public:
@@ -27,28 +26,31 @@ public:
 	inline glm::vec3 get_base_position() { return base_position; };
 	inline glm::vec3 get_difference() { return get_final_position() - get_base_position(); };
 	inline glm::vec3 get_final_position() { return final_position; };
+	inline unsigned short get_level_count() { return level_count; };
+	inline Map_Level* get_level() { return level; };
 	inline glm::vec3 get_middle() { return get_base_position() + get_difference() / glm::vec3(2, 2, 2); };
 	inline std::string get_name() { return std::to_string(get_difference()[0]) + " " + std::to_string(get_difference()[1]) + " " + std::to_string(get_difference()[2]); };
-	inline Map_Level_Orientation get_orientation() { return orientation; };
-	static std::map<Map_Level_Orientation, std::string> get_orientation_name() { std::map<Map_Level_Orientation, std::string> orientation_name = std::map<Map_Level_Orientation, std::string>(); orientation_name[Map_Level_Orientation::Horizontal] = "horizontal"; orientation_name[Map_Level_Orientation::Vertical] = "vertical"; return orientation_name; };
 	inline glm::vec3 get_rotation() { return rotation; };
 	inline glm::vec3 get_scale() { return scale; };
 	inline void set_part(unsigned short a_part) { part = a_part; };
 	inline void set_base_position(glm::vec3 a_base_position) { base_position = a_base_position; };
+	inline void set_level(Map_Level* new_level) { level = new_level; };
+	inline void set_level_count(unsigned short count) { level_count = count; };
 	inline void set_final_position(glm::vec3 a_final_rotation) { final_position = a_final_rotation; };
-	inline void set_orientation(Map_Level_Orientation a_orientation) { orientation = a_orientation; };
 	inline void set_rotation(glm::vec3 a_rotation) { rotation = a_rotation; };
 	inline void set_scale(glm::vec3 a_scale) { scale = a_scale; };
 	inline std::string to_string() { return std::to_string(part) + ";" + std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[2]) + ";" + std::to_string(get_final_position()[2]); };
 private:
+	unsigned short level_count = 0; // Level count of the collection
 	unsigned short part = 0;
 	glm::vec3 base_position = glm::vec3(0, 0, 0);
 	glm::vec3 final_position = glm::vec3(0, 0, 0);
-	Map_Level_Orientation orientation = Map_Level_Orientation::Vertical;
 	glm::vec3 rotation = glm::vec3(0, 0, 0);
 	glm::vec3 scale = glm::vec3(1, 1, 1);
+
+	Map_Level* level = 0; // Level of the collection
 };
-enum Map_Opening_Mode { Simple, Collections }; // Opening mode for the map
+enum Map_Opening_Mode { Simple, Collections, Complex }; // Opening mode for the map
 
 class Graphic_Scene
 {
@@ -154,7 +156,7 @@ public:
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene
 	void load(); // Load the scene
-	void load_from_collection(std::vector<Map_Level_Collection> collections, Map_Level* level, unsigned short level_count); // Load the scene from a vector of collections
+	void load_from_collection(std::vector<Map_Level_Collection> collections); // Load the scene from a vector of collections
 	void load_from_map(std::string, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map
 	void load_from_file(std::string map_path, Map_Opening_Mode mode = Map_Opening_Mode::Simple); // Load the scene from a map file
 	template <class O = Object> // Template for adding a type of object
@@ -180,6 +182,7 @@ private:
 	std::string name; // Name of the scene
 	bool physic; // If the scene use physic
 
+	std::vector<Map_Level_Collection> collections = std::vector<Map_Level_Collection>(); // Collections in the map
 	Advanced_Struct* game_struct = 0; // Pointer to the Advanced_Struct in the game
 	Graphic_Scene* graphic_scene = 0; // Pointer to the graphic scene
 	std::map<std::string, Object *> objects = std::map<std::string, Object*>(); // Each objects, with their name at key, in the scene

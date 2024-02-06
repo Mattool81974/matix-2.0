@@ -33,7 +33,7 @@ void load_warehouse()
     wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
-    Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Collections);
+    Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Complex);
 
     // Construct objects for testing
     Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
@@ -164,6 +164,7 @@ int main()
     game->set_current_scene("warehouse");
 
     HUD_Text* fps = (HUD_Text*)game->get_hud("base")->get_hud_object("fps");
+    Scene* warehouse = game->get_scene("warehouse");
     std::string texte_fps = "FPS : 0.";
 
     bool current_is_cli = false;

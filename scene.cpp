@@ -9,10 +9,11 @@ Map_Level_Collection::Map_Level_Collection()
 // Map_Level_Collection copy constructor
 Map_Level_Collection::Map_Level_Collection(const Map_Level_Collection& copy) : Map_Level_Collection()
 {
+	level = copy.level;
+	level_count = copy.level_count;
 	part = copy.part;
 	base_position = copy.base_position;
 	final_position = copy.final_position;
-	orientation = copy.orientation;
 	rotation = copy.rotation;
 	scale = copy.scale;
 }
@@ -358,7 +359,8 @@ std::vector<Map_Level_Collection> Scene::construct_collections(std::vector<std::
 							Map_Level_Collection collection = Map_Level_Collection(); // Create the collection
 							collection.set_base_position(glm::vec3(start_pos[0], 0, start_pos[1]));
 							collection.set_final_position(glm::vec3(end_pos[0], 0, end_pos[1]));
-							collection.set_orientation(Map_Level_Orientation::Horizontal);
+							collection.set_level(level);
+							collection.set_level_count(level_count);
 							collection.set_part(part_number);
 							collections.push_back(collection);
 						}
@@ -371,7 +373,8 @@ std::vector<Map_Level_Collection> Scene::construct_collections(std::vector<std::
 						Map_Level_Collection collection = Map_Level_Collection(); // Create the collection
 						collection.set_base_position(glm::vec3(j, 0, k));
 						collection.set_final_position(glm::vec3(j, 0, k));
-						collection.set_orientation(Map_Level_Orientation::Horizontal);
+						collection.set_level(level);
+						collection.set_level_count(level_count);
 						collection.set_part(part_number);
 						collections.push_back(collection);
 					}
@@ -424,7 +427,7 @@ void Scene::load()
 }
 
 // Load the scene from a vector of collections
-void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, Map_Level* level, unsigned short level_count)
+void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 {
 	for (int i = 0; i < collections.size(); i++) // Construct each collections
 	{
@@ -436,28 +439,28 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections, 
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			float x = middle[0] + level->position[level_count][0] + part->get_position()[0];
-			float y = middle[1] + level->position[level_count][1] + part->get_position()[1];
-			float z = middle[2] + level->position[level_count][2] + part->get_position()[2];
+			float x = middle[0] + collection.get_level()->position[collection.get_level_count()][0] + part->get_position()[0];
+			float y = middle[1] + collection.get_level()->position[collection.get_level_count()][1] + part->get_position()[1];
+			float z = middle[2] + collection.get_level()->position[collection.get_level_count()][2] + part->get_position()[2];
 
 			glm::vec3 scale = glm::vec3(part->get_scale()[0] * (difference[0] + 1), part->get_scale()[1] * (difference[1] + 1), part->get_scale()[2] * (difference[2] + 1));
 			if (part->get_scale_level_multiplier()[0] != 0)
 			{
-				scale[0] *= level->scale[level_count][0] * part->get_scale_level_multiplier()[0];
-				x += (level->scale[level_count][0] * part->get_scale_level_multiplier()[0]) / 2;
+				scale[0] *= collection.get_level()->scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0];
+				x += (collection.get_level()->scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[1] != 0)
 			{
-				scale[1] *= level->scale[level_count][1] * part->get_scale_level_multiplier()[1];
-				y += (level->scale[level_count][1] * part->get_scale_level_multiplier()[1]) / 2;
+				scale[1] *= collection.get_level()->scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1];
+				y += (collection.get_level()->scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1]) / 2;
 			}
 			if (part->get_scale_level_multiplier()[2] != 0)
 			{
-				scale[2] *= level->scale[level_count][2] * part->get_scale_level_multiplier()[2];
-				z += (level->scale[level_count][2] * part->get_scale_level_multiplier()[2]) / 2;
+				scale[2] *= collection.get_level()->scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2];
+				z += (collection.get_level()->scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2]) / 2;
 			}
 
-			std::string name = "level" + std::to_string(level->id) + ";w;" + collection.get_name() + ";" + std::to_string(level_count) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+			std::string name = "level" + std::to_string(collection.get_level()->id) + ";w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
 			Object* object = new_object(name, part->get_type(), 0, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
 			assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
@@ -516,7 +519,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			}
 		}
 	}
-	else if (mode == Map_Opening_Mode::Collections) // Complex opening mode
+	else if (mode == Map_Opening_Mode::Complex) // Complex opening mode
 	{
 		std::vector<std::string> parts = cut_string(map, map_part_delimitation); // Cut the map by parts
 
@@ -567,6 +570,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		total_size = glm::vec3(60, 10, 60);
 
 		clear_objects_map();
+		collections.clear();
 
 		for (int i = 1; i < parts.size(); i++)
 		{
@@ -578,9 +582,10 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			unsigned short level_id = std::stoi(level_id_str[1]);
 			Map_Level* level = &levels[level_id];
 
-			if (lines[0][0] == 'w')
+			if (lines[0][0] == 'w') // Load each level count
 			{
-				load_from_collection(construct_collections(lines, level, level_count), level, level_count);
+				std::vector<Map_Level_Collection> all = construct_collections(lines, level, level_count);
+				load_from_collection(all);
 			}
 		}
 	}
@@ -589,32 +594,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 // Load the scene from a map file
 void Scene::load_from_file(std::string map_path, Map_Opening_Mode mode)
 {
-	std::string map_content;
-	std::ifstream map_file;
-
-	// ensure ifstream objects can throw exceptions:
-	map_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	try
-	{
-		// open files
-		map_file.open(map_path);
-		std::stringstream map_stream;
-
-		// read file's buffer contents into streams
-		map_stream << map_file.rdbuf();
-
-		// close file handlers
-		map_file.close();
-
-		// convert stream into string
-		map_content = map_stream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "Scene \"" << get_name() << "\" : map file \"" << map_path << "\" unreadable." << std::endl;
-	}
-
-	load_from_map(map_content, mode); // Load the map
+	load_from_map(read_file(map_path), mode); // Load the map
 }
 
 // Return the objects map to string to debug
