@@ -12,7 +12,7 @@ void cli()
     // Construct the HUD
     HUD_CLI* hud = game->new_hud<HUD_CLI>("base");
     game->set_current_hud("base");
-    hud->load_from_file("../cli/philosophy.cli");
+    hud->load_from_file("../cli/normal_fr.cli");
 
     while (game->run())
     {

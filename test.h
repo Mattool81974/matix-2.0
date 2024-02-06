@@ -181,7 +181,7 @@ private:
     Door* other_door = 0; // Door linked with this door
 };
 
-enum CLI_Command {Quit, Clear_CLI, Datas, Partie}; // Every CLI command
+enum CLI_Command {Quit, Clear_CLI, Datas, Get, Help}; // Every CLI command
 class HUD_CLI : public HUD
 {
     // Class representing a CLI for the HUD
@@ -218,4 +218,5 @@ private:
     std::map<std::string, std::string> response = std::map<std::string, std::string>(); // Response that the CLI can give
     std::vector<HUD_Text*> text_hud = std::vector<HUD_Text*>(); // Every text
     std::vector<HUD_Text*> user_text = std::vector< HUD_Text*>(); // Every user text
+    std::map<std::string, std::string> variables = std::map<std::string, std::string>(); // Variable in the CLI
 };

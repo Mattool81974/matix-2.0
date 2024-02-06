@@ -2,6 +2,11 @@ d^author^Matt code
 d^base^Matix by Matt code
 d^version^normal
 d^subversion^normal
+r^clear_command_help^The "clear" command clear the CLI.
+r^get_command_help^The "get" command allow to get a variable's value.
 r^get_datas^Here the CLI datas
+r^help^Here the usable commands :&clear&get&help
+r^help_command_help^The "help" command give informations about each commands.
 r^unknow_command^Unknow command "*", tap "help" to get helped.
 r^welcome^Welcome to the Matix CLI !
+v^leclerc^Leclerc SXXI is a french MBT constructed by Nexter (previously GIAT).&It's equipped with a 120mm cannon CN-120F1 which can shot an APFSDS and a HEATFS.&It's very fast, with 72km/h on a road.

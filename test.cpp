@@ -567,14 +567,31 @@ void HUD_CLI::execute_command(std::string command_name)
 
         new_line("Matix CLI", data.substr(0, data.size() - 1));
     }
-    else if (command == CLI_Command::Partie) // Change the part
+    else if (command == CLI_Command::Get) // Change the part
     {
-        std::string p = "part" + cutted_command[1];
-        std::vector<std::string> r = cut_string(response[p], "&");
-        std::string final = "";
-        for (int i = 0; i < r.size(); i++) final += r[i] + "\n";
+        if (cutted_command.size() > 1 && cutted_command[1] != "")
+        {
+            std::string p = cutted_command[1];
 
-        new_line("Freud", final.substr(0, final.size() - 1));
+            new_line("Matix CLI", variables[p]);
+        }
+        else
+        {
+            new_line("Matix CLI", response["get_command_help"]);
+        }
+    }
+    else if (command == CLI_Command::Help)
+    {
+        std::string final_help = "";
+        std::vector<std::string> help = cut_string(response["help"], "\n");
+
+        final_help += help[0]; // Construct the help text
+        for (int i = 1; i < help.size(); i++)
+        {
+            final_help += "\n" + help[i] + " : " + response[help[i] + "_command_help"];
+        }
+
+        new_line("Matix CLI", final_help);
     }
 }
 
@@ -586,18 +603,27 @@ void HUD_CLI::load(std::string data)
     for (int i = 0; i < cutted_datas.size(); i++)
     {
         std::vector<std::string> cutted = cut_string(cutted_datas[i], "^");
+        std::vector<std::string> r = cut_string(cutted[2], "&");
+        std::string final_variable = "";
+        for (int i = 0; i < r.size(); i++) final_variable += r[i] + "\n";
+        final_variable = final_variable.substr(0, final_variable.size() - 1);
+
         if (cutted[0] == "r")
         {
-            response[cutted[1]] = cutted[2];
+            response[cutted[1]] = final_variable;
         }
         else if(cutted[0] == "d")
         {
-            datas[cutted[1]] = cutted[2];
+            datas[cutted[1]] = final_variable;
             if (cutted[1] == "font_size")
             {
                 std::string::size_type sz;
-                font_size = std::stod(cutted[2], &sz);
+                font_size = std::stod(final_variable, &sz);
             }
+        }
+        else if (cutted[0] == "v")
+        {
+            variables[cutted[1]] = final_variable;
         }
     }
 
@@ -702,10 +728,13 @@ void HUD_CLI::start()
     commands_name["donnee"] = CLI_Command::Datas;
     commands_name["donnees"] = CLI_Command::Datas;
     // Part
-    commands_name["part"] = CLI_Command::Partie;
-    commands_name["parts"] = CLI_Command::Partie;
-    commands_name["partie"] = CLI_Command::Partie;
-    commands_name["parties"] = CLI_Command::Partie;
+    commands_name["get"] = CLI_Command::Get;
+    commands_name["avoir"] = CLI_Command::Get;
+    commands_name["voir"] = CLI_Command::Get;
+    // Help
+    commands_name["help"] = CLI_Command::Help;
+    commands_name["aide"] = CLI_Command::Help;
+    commands_name["sos"] = CLI_Command::Help;
 }
 
 // Update the CLI
