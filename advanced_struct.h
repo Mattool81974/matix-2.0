@@ -47,7 +47,7 @@ class Advanced_Struct : public Base_Struct
 {
 	// Class representing the advanced struct in the game
 public:
-	Advanced_Struct(double& a_mouse_x, double& a_mouse_y); // Advanced_Struct constructor
+	Advanced_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path); // Advanced_Struct constructor
 	void assign_part(unsigned int number, Part* part); // Assign to a number a part
 	bool contains_font(std::string font_name); // Returns if the struct contains a textures
 	bool contains_part(unsigned int number); // Returns if the struct contains a part

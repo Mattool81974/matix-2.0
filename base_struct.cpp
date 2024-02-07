@@ -85,6 +85,16 @@ std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool
 	return result;
 }
 
+// Returns if a file exists
+bool file_exists(std::string path)
+{
+	struct stat sb;
+
+	bool result = (stat(path.c_str(), &sb) == 0);
+
+	return result;
+}
+
 // Normalize a rotation and return it
 glm::vec3 normalize_rotation(glm::vec3 rotation)
 {
@@ -265,6 +275,28 @@ std::string to_uppercase(std::string str)
 		}
 	}
 	return result;
+}
+
+// Write something in a file
+void write_in_file(std::string path, std::string to_write, std::ios::openmode opening_mode, File_Type type)
+{
+	std::ofstream file;
+	file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+	try
+	{
+		if (type == File_Type::Text)
+		{
+			file.open(path, std::ios::out | opening_mode);
+
+			file << to_write; // Write a text into the file
+
+			file.close();
+		}
+	}
+	catch (std::ofstream::failure e)
+	{
+		std::cout << "Matrix game : map file \"" << path << "\" unwritable." << std::endl;
+	}
 }
 
 // Transform_Object contructor
@@ -499,7 +531,7 @@ Camera::~Camera()
 }
 
 // Base_Struct constructor
-Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y): mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
+Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path): exec_path(a_exec_path), mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
 {
 	
 }

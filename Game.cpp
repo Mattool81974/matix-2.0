@@ -102,7 +102,7 @@ HUD::~HUD()
 }
 
 // Game constructor
-Game::Game(int a_window_width, int a_window_height): Advanced_Struct(global_mouse_x, global_mouse_y), window_height(a_window_height), window_width(a_window_width)
+Game::Game(int a_window_width, int a_window_height, std::string a_exec_path): Advanced_Struct(global_mouse_x, global_mouse_y, a_exec_path), window_height(a_window_height), window_width(a_window_width)
 {
     load_keys();
     // Configurate base_struct

@@ -151,11 +151,13 @@ void shooting_range()
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     srand(time(0));
 
-    game = new Game(1600, 900);
+    game = new Game(1600, 900, argv[0]);
+
+    std::cout << game->get_exec_directory() << " " << file_exists("J://cpplib") << " " << file_exists("J://cpplib/glad.c") << " " << file_exists("J://cpplib/lol.c") << std::endl;
 
     load_cli();
     load_warehouse();
@@ -166,12 +168,6 @@ int main()
     HUD_Text* fps = (HUD_Text*)game->get_hud("base")->get_hud_object("fps");
     Scene* warehouse = game->get_scene("warehouse");
     std::string texte_fps = "FPS : 0.";
-
-    std::vector<Map_Level_Collection>* collections = warehouse->get_collections();
-    for (int i = 0; i < collections->size(); i++)
-    {
-        std::cout << (*collections)[i].to_string() << std::endl;
-    }
 
     bool current_is_cli = false;
 

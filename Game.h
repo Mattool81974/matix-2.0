@@ -42,7 +42,7 @@ class Game: public Advanced_Struct
 {
 	// Class representing the game
 public:
-	Game(int a_window_width, int a_window_height); // Game constructor
+	Game(int a_window_width, int a_window_height, std::string a_exec_path); // Game constructor
 	void add_hud(std::string name, HUD* object); // Add an existing HUD to the game
 	void add_scene(std::string name, Scene* scene); // Add an existing scene to the game
 	bool contains_hud(std::string name); // Return if the game contains an HUD Object
@@ -63,6 +63,13 @@ public:
 	inline Scene* get_current_scene() { if (get_current_scene_name() == "") return 0; return (*get_scenes())[get_current_scene_name()]; };
 	inline std::string get_current_hud_name() { return current_hud; };
 	inline std::string get_current_scene_name() { return current_scene; };
+	inline std::string get_exec_directory()
+	{
+		std::vector<std::string> parts = cut_string(get_exec_path(), "\\");
+		std::string result = "";
+		for (int i = 0; i < parts.size() - 1; i++) { result += parts[i] + "/"; }
+		return result;
+	} // Return the directory of the game exe
 	inline HUD* get_hud(std::string a_name) { return huds[a_name]; };
 	inline std::map < std::string, HUD*>* get_huds() { return &huds; };
 	inline Scene* get_scene(std::string name) { if (contains_scene(name) && name != "") { return scenes[name]; } std::cout << "Matrix game : error ! The scene \"" << name << "\" does not exist." << std::endl; return 0; }

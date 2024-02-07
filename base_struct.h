@@ -15,18 +15,21 @@
 #include <random>
 #include <string>
 #include <sstream>
+#include <sys/stat.h>
 #include <vector>
 
 enum File_Type {Text}; // Every file type
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
 std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank = false); // Cut a wstring where there are the "cut"
+bool file_exists(std::string path); // Returns if a file exists
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
-std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file
+std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file content
 std::string replace(std::string str, std::string to_replace, std::string new_str); // Replace a string in an another string
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate a vector around a rotating point
 float sign(float number); // Return the sign of a number
 float string_to_float(std::string str); // Convert a string to a float
 std::string to_uppercase(std::string str); // Transform a string to an uppercase string
+void write_in_file(std::string path, std::string to_write, std::ios::openmode opening_mode = std::ios::trunc, File_Type type = File_Type::Text); // Write something in a file
 
 struct Transform_Animation {
 	// Struct representing a transform object animation
@@ -197,13 +200,14 @@ enum Key_State { Nothing, Pressed, Already_Pressed }; // Differents orientations
 class Base_Struct
 {
 public:
-	Base_Struct(double& a_mouse_x, double& a_mouse_y); // Base_Struct constructor
+	Base_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path); // Base_Struct constructor
 	glm::mat4 get_projection(); // Return the projection matrix
 	~Base_Struct(); // Base_Struct destructor
 
 	// Getters and setters
 	inline Camera* get_camera() { return &camera; };
 	inline float get_delta_time() { return delta_time; };
+	inline std::string get_exec_path() { return exec_path; };
 	inline glm::vec3 get_gravity_force() { return gravity_force; };
 	inline unsigned short get_key_state(std::string name) { return (*get_keys_state())[name]; };
 	inline unsigned short get_key_state_frame(std::string name) { return (*get_keys_state_frame())[name]; };
@@ -233,6 +237,7 @@ public:
 	inline void set_window_width(int width) { window_width = width; };
 private:
 	float delta_time = 0; // Time since the last frame of the game
+	const std::string exec_path = ""; // Path of the game exe
 	double last_mouse_x = 0; // Last X position of the mouse
 	double last_mouse_y = 0; // Last Y position of the mouse
 	unsigned short left_mouse_button_state = 0; // State of the left button mouse

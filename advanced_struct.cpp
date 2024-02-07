@@ -23,7 +23,7 @@ Part::~Part()
 }
 
 // Advanced_Struct constructor
-Advanced_Struct::Advanced_Struct(double& a_mouse_x, double& a_mouse_y): Base_Struct(a_mouse_x, a_mouse_y)
+Advanced_Struct::Advanced_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path): Base_Struct(a_mouse_x, a_mouse_y, a_exec_path)
 {
 	
 }

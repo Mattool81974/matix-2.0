@@ -62,7 +62,7 @@ def construct_warehouse(path: str):
     content += "4 0 " + str(y_4) + " 0 0 0 0 " + str(width_4) + " " + str(height_4) + " " + str(length_4) + "\n" + big_delimitation + "\n"
 
     # Write the floor of the first stage
-    content += "w 0;0\n"
+    content += "p 0;0\n"
     for i in range(length):
         for j in range(width):
             if i > length / 2 and j > width / 2:
@@ -175,4 +175,4 @@ def construct_shooting_range(path: str):
     file.write(content)
     file.close()
 
-construct_warehouse("maps/warehouse_pattern.wad")
+construct_warehouse("maps/warehouse_pattern_base.wad")

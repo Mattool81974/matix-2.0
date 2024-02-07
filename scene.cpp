@@ -597,15 +597,42 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		{
 			std::vector<std::string> lines = cut_string(parts[i], "\n", true);
 
+			char part_type = lines[0][0];
+			if (part_type == 'p') { continue; }
+
 			std::vector<std::string> level_str = cut_string(lines[0], ";"); // Get the level id of the part
 			std::vector<std::string> level_id_str = cut_string(level_str[0], " ");
-			unsigned short level_count = std::stoi(level_str[1]);
 			unsigned short level_id = std::stoi(level_id_str[1]);
 			Map_Level* level = &levels[level_id];
 
-			if (lines[0][0] == 'w') // Load each level count
+			if (part_type == 'w') // Load each level count
 			{
+				unsigned short level_count = std::stoi(level_str[1]);
+
 				std::vector<Map_Level_Collection> all = construct_collections(lines, level, level_count);
+				for (int i = 0; i < all.size(); i++) // Construct each collections
+				{
+					collections.push_back(all[i]);
+				}
+				load_from_collection(all);
+			}
+			else if (part_type == 'c') // Load the collections in a level
+			{
+				std::vector<Map_Level_Collection> all = std::vector<Map_Level_Collection>();
+
+				for (int j = 1; j < lines.size(); j++) // Construct each collections
+				{
+					std::vector<std::string> cutted = cut_string(lines[j], ";");
+
+					Map_Level_Collection collection = Map_Level_Collection();
+					collection.set_base_position(glm::vec3(string_to_float(cutted[2]), 0, string_to_float(cutted[4])));
+					collection.set_final_position(glm::vec3(string_to_float(cutted[5]), 0, string_to_float(cutted[7])));
+					collection.set_level(level);
+					collection.set_level_count(std::stoi(cutted[1]));
+					collection.set_part(std::stoi(cutted[0]));
+					all.push_back(collection);
+				}
+
 				for (int i = 0; i < all.size(); i++)
 				{
 					collections.push_back(all[i]);

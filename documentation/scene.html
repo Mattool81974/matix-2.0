@@ -32,17 +32,25 @@
                 A .wad map is an UTF-8 file. it's cutted between a lot of parts, by the string :</br>
                 &lt;-----------------------------------------------&gt;</br>
                 The first character of each part is a letter corresponding of the part type.</br>
+                If the letter is "c", the part contains each levels (or not) collections.</br>
                 If the letter is "l", the part describes each level.</br>
+                If the letter is "p", the part contains each level parts curdly, one by one, but only used as a pattern to do collection part.</br>
                 If the letter is "w", the part contains each level parts curdly, one by one.</br></br>
+                The part starting with "c" should tell what contains every levels, in collections of parts.</br>
+                Each collections are separated line by line and each level datas are separated by a ";" in the line.</br>
+                The first line of the part is in the format "c x" where x is the number of the level, or only "c" if the parts doesn't belong to a leve.</br>
+                The datas (separated by a ";") in each lines are ordered like that :</br>
+                Part_number;sub_level_number;x_base_position;y_base_position;z_base_position;x_final_position;y_final_position;z_final_position</br></br>
                 The part starting with "l" should describe every level. It should be the first part of the file.</br>
                 Each level is separated line by line, each sub-level is separated by a comma and each datas by a space.</br>
                 The first part of each level is the number of the level and their transformation, in same format as sub-level. The other part separated by a comma are the sub-level datas.</br>
                 The datas (separated by a space) in the sub-level are ordered like that :</br>
                 Sub_level_numero x_position y_position z_position x_rotation y_rotation z_rotation x_scale y_scale z_scale</br>
                 Warning, sub-level are not transform object, the transformation are only applied to the parts.</br></br>
-                The part starting with "w" should tell what contains every sub-level level parts. It can be everywhere in the file.</br>
-                The first line of the part is in the format "w x;y" where x is the number of the level and y the number of the sub-level.</br>
+                The part starting with "p" and "w" should tell what contains every sub-level level parts. It can be everywhere in the file.</br>
+                The first line of the part is in the format "p x;y" or "w x;y" where x is the number of the level and y the number of the sub-level.</br>
                 The other lines represent a mapping with the same width and height as the sub-level, with every parts in the sub-level.</br>
+                The "w" part is used in the game, but not the "p" part.</br>
                 This system is very unoptimized and not recommanded for big level, but can be pretty good for a little and precise level.</br></br>
             </div>
         </div>
