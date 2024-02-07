@@ -183,7 +183,7 @@ private:
     Door* other_door = 0; // Door linked with this door
 };
 
-enum CLI_Command {Quit, Clear_CLI, Datas, Get, Help}; // Every CLI command
+enum CLI_Command {Quit, Clear_CLI, CWD, Datas, Get, Help}; // Every CLI command
 class HUD_CLI : public HUD
 {
     // Class representing a CLI for the HUD
@@ -191,8 +191,10 @@ public:
     HUD_CLI(Game* a_advanced_struct, std::string a_name); // HUD_CLI constructor
     bool contains_command(std::string command_name); // If the CLI contains a command
     void execute_command(std::string command_name); // Execute a command in the CLI
+    void load(); // Load the CLI after being selected as the new current HUD
     void load(std::string data); // Load the CLI from the data
     void load_from_file(std::string path); // Load the CLi from a file
+    void new_error(std::string error); // Declares a error in the CLI
     void new_line(std::string actual_user, std::string line_text); // Add a line to the CLI with a defined text and user
     void new_line(); // Add a line to the CLI
     float next_y_position(); // Return the y position of the next line
@@ -203,6 +205,7 @@ public:
     // Getters and setters
     inline std::map<std::string, CLI_Command>* get_commands_name() { return &commands_name; };
     inline std::string get_current_user() { return current_user; };
+    inline std::string get_current_working_directory() { return current_working_directory; };
     inline float get_font_size() { return font_size; };
     inline std::string get_unknow_command_message(std::string command)
     {
@@ -210,8 +213,35 @@ public:
         std::vector<std::string> cutted = cut_string(response["unknow_command"], cut);
         return cutted[0] + command + cutted[1];
     };
+    inline void set_current_working_directory(std::string new_cwd)
+    {
+        if (file_exists(new_cwd))
+        {
+            if ((file_datas(new_cwd).st_mode & S_IFDIR) == S_IFDIR)
+            {
+                current_working_directory = new_cwd;
+                new_line("Matix CLI", response["cwd"] + " : " + get_current_working_directory());
+            }
+            else
+            {
+                std::vector<std::string> parts = cut_string(response["bad_path_cwd"], "*");
+
+                std::string error = parts[0] + new_cwd + parts[1];
+                new_error(error);
+            }
+        }
+        else
+        {
+            std::vector<std::string> parts = cut_string(response["unknow_path_cwd"], "*");
+
+            std::string error = parts[0] + new_cwd + parts[1];
+            new_error(error);
+        }
+        new_line();
+    };
 private:
     std::string current_user = "User"; // Name of the current user
+    std::string current_working_directory = ""; // Current working directory of the CLI
     float font_size = 0.04; // Size of the font of the CLI
 
     std::map<std::string, CLI_Command> commands_name = std::map<std::string, CLI_Command>(); // Name of each commands

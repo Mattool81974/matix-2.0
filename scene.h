@@ -46,8 +46,8 @@ public:
 	inline std::string to_string()
 	{
 		return std::to_string(part) + ";" + std::to_string(get_level()->level_number) + ";" + std::to_string(get_level_count()) + ";" +
-			std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[2]) + ";" + std::to_string(get_base_position()[2]) + ";" +
-			std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[2]) + ";" + std::to_string(get_final_position()[2]);
+			std::to_string(get_base_position()[0]) + ";" + std::to_string(get_base_position()[1]) + ";" + std::to_string(get_base_position()[2]) + ";" +
+			std::to_string(get_final_position()[0]) + ";" + std::to_string(get_final_position()[1]) + ";" + std::to_string(get_final_position()[2]);
 	};
 private:
 	unsigned short level_count = 0; // Level count of the collection
@@ -161,6 +161,7 @@ public:
 	{
 		clear_objects_map(get_total_size());
 	};
+	std::string collections_to_string(); // Return the collections in the scene to string to debug
 	std::vector<Map_Level_Collection> construct_collections(std::vector<std::string> lines, Map_Level *level, unsigned short level_count); // Construct a vector of collection from a vector of line
 	bool contains_object(std::string name); // Returns if the scene contains an object
 	void destroy(std::string name); // Destroy an object in the scene

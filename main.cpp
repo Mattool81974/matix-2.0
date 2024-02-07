@@ -6,6 +6,8 @@ Game* game = 0;
 
 void load_cli()
 {
+    game->set_background_color(glm::vec4(0, 0, 0, 1));
+
     // Construct the HUD
     HUD_CLI* hud = game->new_hud<HUD_CLI>("cli");
     hud->load_from_file("../cli/normal_fr.cli");
@@ -14,6 +16,7 @@ void load_cli()
 void load_warehouse()
 {
     // Construct game
+    game->set_background_color(glm::vec4(0.0f, (1.0f / 255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f));
     Camera* camera = game->get_camera();
     game->new_vao("../vbos/famas.vbo", "famas");
     game->new_vao("../vbos/shell.vbo", "ammo");
@@ -36,8 +39,7 @@ void load_warehouse()
     Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Complex);
 
     // Construct objects for testing
-    Object* package_test = scene->new_object("package", "cube", 0, glm::vec3(15, 1, 5), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/warehouse/package.png", false, true, true);
-    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(3, 40, 3), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
+    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(13, 3, 53), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
     Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
 
     // Construct the HUD
@@ -157,8 +159,6 @@ int main(int argc, char* argv[])
 
     game = new Game(1600, 900, argv[0]);
 
-    std::cout << game->get_exec_directory() << " " << file_exists("J://cpplib") << " " << file_exists("J://cpplib/glad.c") << " " << file_exists("J://cpplib/lol.c") << std::endl;
-
     load_cli();
     load_warehouse();
 
@@ -166,6 +166,7 @@ int main(int argc, char* argv[])
     game->set_current_scene("warehouse");
 
     HUD_Text* fps = (HUD_Text*)game->get_hud("base")->get_hud_object("fps");
+    Player* player = (Player*)game->get_scene("warehouse")->get_object("player");
     Scene* warehouse = game->get_scene("warehouse");
     std::string texte_fps = "FPS : 0.";
 
@@ -175,20 +176,7 @@ int main(int argc, char* argv[])
     {
         if (game->get_key_state_frame("tab") == Key_State::Pressed)
         {
-            if (current_is_cli)
-            {
-                game->set_background_color(glm::vec4(0.0f, (1.0f / 255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f));
-                game->set_current_hud("base");
-                game->set_current_scene("warehouse");
-                current_is_cli = false;
-            }
-            else
-            {
-                game->set_background_color(glm::vec4(0, 0, 0, 1));
-                game->set_current_hud("cli");
-                game->set_current_scene("");
-                current_is_cli = true;
-            }
+            std::cout << player->get_attached_transform()->get_absolute_position()[0] << " " << player->get_attached_transform()->get_absolute_position()[1] << " " << player->get_attached_transform()->get_absolute_position()[2] << std::endl;
         }
 
         game->update_event();

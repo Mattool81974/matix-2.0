@@ -264,6 +264,7 @@ void Game::set_current_hud(std::string a_name)
     if (contains_hud(a_name))
     {
         current_hud = a_name;
+        get_current_hud()->load();
     }
     else
     {
@@ -319,6 +320,8 @@ void Game::update_event()
     // Calculate delta time
     set_delta_time(glfwGetTime() - last_frame_time);
     last_frame_time = glfwGetTime();
+
+    if (get_delta_time() > 0.1) set_delta_time(0);
 
     // Calculate mouse move and button
     double mouse_move_x = get_mouse_x() - get_last_mouse_x();

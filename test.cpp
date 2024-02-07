@@ -550,6 +550,10 @@ void HUD_CLI::execute_command(std::string command_name)
     {
         game->set_is_running(false);
     }
+    else if (command == CLI_Command::CWD) // If the CWD command is entered
+    {
+        new_line("Matix CLI", response["cwd"] + " : " + get_current_working_directory());
+    }
     else if (command == CLI_Command::Clear_CLI) // If the clear command is entered
     {
         text_hud.clear();
@@ -594,6 +598,12 @@ void HUD_CLI::execute_command(std::string command_name)
     }
 }
 
+// Load the CLI after being selected as the new current HUD
+void HUD_CLI::load()
+{
+    set_current_working_directory(game->get_exec_directory());
+}
+
 // Load the CLI from the data
 void HUD_CLI::load(std::string data)
 {
@@ -636,6 +646,12 @@ void HUD_CLI::load_from_file(std::string path)
     {
         load(content);
     }
+}
+
+// Declares a error in the CLI
+void HUD_CLI::new_error(std::string error)
+{
+    new_line("Matix CLI error handler", error);
 }
 
 // Add a line to the CLI with a defined text and user
@@ -706,7 +722,6 @@ float HUD_CLI::next_y_position()
 void HUD_CLI::start()
 {
     new_line("Matix CLI", response["welcome"]);
-    new_line();
 
     // Load base commands
     // Quit
@@ -720,6 +735,8 @@ void HUD_CLI::start()
     commands_name["empty"] = CLI_Command::Clear_CLI;
     commands_name["vide"] = CLI_Command::Clear_CLI;
     commands_name["nettoie"] = CLI_Command::Clear_CLI;
+    // CWD
+    commands_name["cwd"] = CLI_Command::CWD;
     // Datas
     commands_name["data"] = CLI_Command::Datas;
     commands_name["datas"] = CLI_Command::Datas;

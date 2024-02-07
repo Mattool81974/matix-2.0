@@ -234,6 +234,20 @@ void Scene::add_object(std::string name, Object *object)
 	(*get_objects())[name] = object;
 }
 
+// Return the collections in the scene to string to debug
+std::string Scene::collections_to_string()
+{
+	std::vector<Map_Level_Collection>* collections = get_collections();
+	std::string result = "";
+
+	for (int i = 0; i < collections->size(); i++)
+	{
+		result += (*collections)[i].to_string() + "\n";
+	}
+
+	return result.substr(0, result.size() - 1);
+}
+
 // Construct the collections of a level from a vector of line
 std::vector<Map_Level_Collection> Scene::construct_collections(std::vector<std::string> lines, Map_Level* level, unsigned short level_count)
 {
@@ -625,8 +639,8 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 					std::vector<std::string> cutted = cut_string(lines[j], ";");
 
 					Map_Level_Collection collection = Map_Level_Collection();
-					collection.set_base_position(glm::vec3(string_to_float(cutted[2]), 0, string_to_float(cutted[4])));
-					collection.set_final_position(glm::vec3(string_to_float(cutted[5]), 0, string_to_float(cutted[7])));
+					collection.set_base_position(glm::vec3(string_to_float(cutted[2]), string_to_float(cutted[3]), string_to_float(cutted[4])));
+					collection.set_final_position(glm::vec3(string_to_float(cutted[5]), string_to_float(cutted[6]), string_to_float(cutted[7])));
 					collection.set_level(level);
 					collection.set_level_count(std::stoi(cutted[1]));
 					collection.set_part(std::stoi(cutted[0]));

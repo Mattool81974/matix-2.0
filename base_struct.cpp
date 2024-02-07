@@ -1,5 +1,7 @@
 #include "base_struct.h"
 
+// To avoid a bug with std::codecvt_utf8<char>, go in the project setting > C/C++ > General > SDL Check and disable it
+
 std::string float_character = "";
 std::string non_float_character = "";
 
@@ -83,6 +85,33 @@ std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool
 
 	if (last_string.size() > 0) { result.push_back(last_string); } // Add the last non-cutted element
 	return result;
+}
+
+// Return the content of a directory
+std::vector<std::string> directory_content(std::string path)
+{
+	std::vector<std::string> result = std::vector<std::string>();
+
+	for (const auto& entry : std::filesystem::directory_iterator(path))
+	{
+		std::string sub_file = entry.path().string();
+
+		std::cout << sub_file << std::endl;
+
+		result.push_back(sub_file);
+	}
+
+	return result;
+}
+
+// Return the datas about a file
+struct stat file_datas(std::string path)
+{
+	struct stat sb;
+
+	bool result = (stat(path.c_str(), &sb) == 0);
+
+	return sb;
 }
 
 // Returns if a file exists

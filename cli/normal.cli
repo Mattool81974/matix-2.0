@@ -3,11 +3,15 @@ d^base^Matix by Matt code
 d^font_size^0,04
 d^version^normal
 d^subversion^normal
+r^bad_path_cwd^The "*" path you want to make the current workink directory is not a directory.
 r^clear_command_help^The "clear" command clear the CLI.
+r^cwd^Current working directory
+r^cwd_command_help^The "cwd" command shows the current working directory.
 r^get_command_help^The "get" command allow to get a variable's value.
 r^get_datas^Here the CLI datas
-r^help^Here the usable commands :&clear&get&help
+r^help^Here the usable commands :&clear&cwd&get&help
 r^help_command_help^The "help" command give informations about each commands.
 r^unknow_command^Unknow command "*", tap "help" to get helped.
+r^unknow_path_cwd^The "*" directory you want to make the current workink directory does not exist.
 r^welcome^Welcome to the Matix CLI !
 v^leclerc^Leclerc SXXI is a french MBT constructed by Nexter (previously GIAT).&It's equipped with a 120mm cannon CN-120F1 which can shot an APFSDS and a HEATFS.&It's very fast, with 72km/h on a road.

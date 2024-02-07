@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <codecvt>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -21,6 +22,8 @@
 enum File_Type {Text}; // Every file type
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
 std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank = false); // Cut a wstring where there are the "cut"
+std::vector<std::string> directory_content(std::string path); // Return the content of a directory
+struct stat file_datas(std::string path); // Return the datas about a file
 bool file_exists(std::string path); // Returns if a file exists
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file content

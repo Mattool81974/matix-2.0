@@ -15,6 +15,7 @@ public:
 	HUD(Advanced_Struct* a_advanced_struct, std::string a_name); // HUD constructor
 	void add_hud_object(std::string name, HUD_Object* object); // Add an existing HUD to the game
 	bool contains_hud_object(std::string name); // Return if the game contains an HUD Object
+	virtual void load() {}; // Load the CLI after being selected as new current HUD
 	template <class O = HUD_Object> // Template for adding a type of HUD object
 	O* new_hud_object(std::string name, std::string texture_path = "", std::string vao_name = "hud"); // Create a new HUD Object into the game
 	void render(); // Render the HUD

@@ -3,11 +3,15 @@ d^base^Matix par Matt code
 d^font_size^0,04
 d^version^normal
 d^subversion^normal
+r^bad_path_cwd^Le répertoire "*" que vous essayez de mettre en répertoire de travail n'est pas un dossier.
 r^clear_command_help^La commande "clear" vide la CLI.
+r^cwd^Répertoire de travail actuel
+r^cwd_command_help^La commande "cwd" affiche le répertoire actuel de travail.
 r^get_command_help^La commande "get" permet d'obtenir la valeur d'une variable.
 r^get_datas^Voici les données de la CLI
-r^help^Voici les commandes disponibles :&clear&get&help
+r^help^Voici les commandes disponibles :&clear&cwd&get&help
 r^help_command_help^La commande "help" permet d'obtenir des informations sur chaques commandes.
 r^unknow_command^Commande "*" inconnue, tapez "help" pour avoir de l'aide.
+r^unknow_path_cwd^Le répertoire "*" que vous essayez de mettre en répertoire de travail n'existe pas.
 r^welcome^Bienvenue sur la CLI de Matix !
 v^leclerc^Le char Leclerc SXXI est un char de combat français développé par Nexter (anciennement GIAT).&Il est équippé par un canon de 120mm CN-120F qui peut tirer un obus APFSDS ou HEATFS.&Il est très rapide, avec 72km/h sur route.
