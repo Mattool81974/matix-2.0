@@ -123,6 +123,30 @@ Texture* Advanced_Struct::get_texture(std::string texture_path, bool texture_res
 	}
 }
 
+// Loads the HUD VAOs in the advanced struct
+void Advanced_Struct::load_hud_VAOs()
+{
+	// Create types
+	types["hud"] = "hud";
+
+	// Define attributes for VAOs
+	// Create base Shader_Program_Variable for the shader program
+	std::vector<Shader_Program_Variable> hud_attributes = std::vector<Shader_Program_Variable>();
+	Shader_Program_Variable v1 = Shader_Program_Variable();
+	Shader_Program_Variable v2 = Shader_Program_Variable();
+	v1.vector_size = 3;
+	v2.vector_size = 2;
+	hud_attributes.push_back(v1);
+	hud_attributes.push_back(v2);
+
+	// Create VAOs
+	all_vaos["default_font"] = new Font_VAO();
+	all_vaos["hud"] = new VAO("../shaders/hud", hud_attributes, "0");
+
+	// Create base texture
+	textures["../fonts/default.png"] = new Font_Texture("../fonts/consolas.png");
+}
+
 // Loads the VAOs in the advanced struct
 void Advanced_Struct::load_VAOs()
 {
@@ -131,7 +155,6 @@ void Advanced_Struct::load_VAOs()
 	types["circle"] = "circle";
 	types["cube"] = "cube";
 	types["cylinder"] = "cylinder";
-	types["hud"] = "hud";
 	types["one_faced_cube"] = "one_faced_cube";
 	types["player"] = "cube";
 	types["square"] = "triangle";
@@ -161,14 +184,11 @@ void Advanced_Struct::load_VAOs()
 	all_vaos["circle"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon50.vbo");
 	all_vaos["cylinder"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon_3d50.vbo");
 	all_vaos["cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/cube.vbo");
-	all_vaos["default_font"] = new Font_VAO();
-	all_vaos["hud"] = new VAO("../shaders/hud", hud_attributes, "0");
 	all_vaos["one_faced_cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/one_faced_cube.vbo");
 	all_vaos["table"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/table.vbo");
 	all_vaos["triangle"] = new VAO("../shaders/default", base_3d_attributes, "0");
 
-	// Create base texture
-	textures["../fonts/default.png"] = new Font_Texture("../fonts/consolas.png");
+	load_hud_VAOs();
 }
 
 // Create a new VAO into the game

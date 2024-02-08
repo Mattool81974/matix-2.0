@@ -298,6 +298,10 @@ std::string to_uppercase(std::string str)
 		{
 			result = ".";
 		}
+		else if (chr == ':')
+		{
+			result = "/";
+		}
 		else
 		{
 			result += chr;

@@ -1,5 +1,34 @@
 #include "test.h"
 
+// For school project, calcul de l'inverse modulaire
+int inverse_modulaire(int a, int b)
+{
+    for (int i = 1; i < b; i++)
+    {
+        if (((a % b) * (i % b)) % b == 1)
+        {
+            return i;
+        }
+    }
+}
+
+// For school project, calcul d'un modulo d'exposant d'un très grand nombre
+long long puissance_modulaire(long long nombre, long long exposant, long long modulo) {
+    nombre %= modulo;
+    long long resultat = 1;
+    while (exposant > 0)
+    {
+        if (exposant & 1)
+        {
+            resultat = (resultat * nombre) % modulo;
+        }
+
+        nombre = (nombre * nombre) % modulo;
+        exposant >>= 1;
+    }
+    return resultat;
+}
+
 // Entity constructor
 Entity::Entity(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
@@ -670,7 +699,7 @@ void HUD_CLI::new_line(std::string actual_user, std::string line_text)
     user->set_text(actual_user + " : ");
 
     // Configurate the text HUD
-    std::string input_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789";
+    std::string input_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789:/._";
     text->set_background_color(glm::vec4(0, 0, 0, 1));
     text->set_cursor_character("|");
     text->set_focused(true);
@@ -678,7 +707,7 @@ void HUD_CLI::new_line(std::string actual_user, std::string line_text)
     text->set_font_size(get_font_size());
     text->set_input(true);
     text->set_input_text(input_text);
-    text->set_position(glm::vec3(-0.775, next_y_position(), 0));
+    text->set_position(glm::vec3(-0.975 + get_font_size() * ((user->get_text().size() / 2.0) * (9.0 / 11.0)), next_y_position(), 0));
     text->set_scale(glm::vec3(1, 1, 1));
     text->set_text(line_text);
     text->set_use_cursor(true);

@@ -174,11 +174,6 @@ int main(int argc, char* argv[])
 
     while (game->run())
     {
-        if (game->get_key_state_frame("tab") == Key_State::Pressed)
-        {
-            std::cout << player->get_attached_transform()->get_absolute_position()[0] << " " << player->get_attached_transform()->get_absolute_position()[1] << " " << player->get_attached_transform()->get_absolute_position()[2] << std::endl;
-        }
-
         game->update_event();
 
         texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game->get_delta_time())) + ".";

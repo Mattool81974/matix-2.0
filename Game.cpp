@@ -102,7 +102,7 @@ HUD::~HUD()
 }
 
 // Game constructor
-Game::Game(int a_window_width, int a_window_height, std::string a_exec_path): Advanced_Struct(global_mouse_x, global_mouse_y, a_exec_path), window_height(a_window_height), window_width(a_window_width)
+Game::Game(int a_window_width, int a_window_height, std::string a_exec_path, bool load_vaos): Advanced_Struct(global_mouse_x, global_mouse_y, a_exec_path), window_height(a_window_height), window_width(a_window_width)
 {
     load_keys();
     // Configurate base_struct
@@ -143,7 +143,10 @@ Game::Game(int a_window_width, int a_window_height, std::string a_exec_path): Ad
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    load_VAOs();
+    if (load_vaos)
+    {
+        load_VAOs();
+    }
 }
 
 // Add an existing HUD to the game
@@ -226,6 +229,8 @@ void Game::load_keys()
     keys["9"] = GLFW_KEY_KP_9;
 
     // Poncutation
+    keys["_"] = GLFW_KEY_8;
+    keys[":"] = GLFW_KEY_PERIOD;
     keys[";"] = GLFW_KEY_COMMA;
 
     // Other

@@ -43,7 +43,7 @@ class Game: public Advanced_Struct
 {
 	// Class representing the game
 public:
-	Game(int a_window_width, int a_window_height, std::string a_exec_path); // Game constructor
+	Game(int a_window_width, int a_window_height, std::string a_exec_path, bool load_vaos = true); // Game constructor
 	void add_hud(std::string name, HUD* object); // Add an existing HUD to the game
 	void add_scene(std::string name, Scene* scene); // Add an existing scene to the game
 	bool contains_hud(std::string name); // Return if the game contains an HUD Object
