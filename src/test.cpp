@@ -1,34 +1,5 @@
 #include "../headers/test.h"
 
-// For school project, calcul de l'inverse modulaire
-int inverse_modulaire(int a, int b)
-{
-    for (int i = 1; i < b; i++)
-    {
-        if (((a % b) * (i % b)) % b == 1)
-        {
-            return i;
-        }
-    }
-}
-
-// For school project, calcul d'un modulo d'exposant d'un très grand nombre
-long long puissance_modulaire(long long nombre, long long exposant, long long modulo) {
-    nombre %= modulo;
-    long long resultat = 1;
-    while (exposant > 0)
-    {
-        if (exposant & 1)
-        {
-            resultat = (resultat * nombre) % modulo;
-        }
-
-        nombre = (nombre * nombre) % modulo;
-        exposant >>= 1;
-    }
-    return resultat;
-}
-
 // Entity constructor
 Entity::Entity(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
 {
@@ -404,6 +375,8 @@ void Door::after_loading()
 
         if (other_door != 0)
         {
+            other_door->other_door = this;
+
             set_map_pos(get_attached_transform()->get_absolute_position());
             other_door->set_map_pos(other_door->get_attached_transform()->get_absolute_position());
 
@@ -509,6 +482,21 @@ void Door::close()
     }
 }
 
+// Interact with the door
+void Door::interact()
+{
+    if (is_opened())
+    {
+        close();
+        if(other_door != 0) other_door->close();
+    }
+    else
+    {
+        open();
+        if (other_door != 0) other_door->open();
+    }
+}
+
 // Open the door
 void Door::open()
 {
@@ -533,9 +521,6 @@ void Door::open()
 // Update the door
 void Door::update()
 {
-    if (game->get_key_state("e")) open();
-    else close();
-
     Object::update();
 }
 
@@ -687,8 +672,8 @@ void HUD_CLI::new_error(std::string error)
 void HUD_CLI::new_line(std::string actual_user, std::string line_text)
 {
     // Create each part
-    HUD_Text* user = new_hud_object<HUD_Text>("user" + std::to_string(user_text.size()), "../fonts/default.png", "default_font");
-    HUD_Text* text = new_hud_object<HUD_Text>("text" + std::to_string(text_hud.size()), "../fonts/default.png", "default_font");
+    HUD_Text* user = new_hud_object<HUD_Text>("user" + std::to_string(user_text.size()), game->get_assets_directory_path() + "fonts/default.png", "default_font");
+    HUD_Text* text = new_hud_object<HUD_Text>("text" + std::to_string(text_hud.size()), game->get_assets_directory_path() + "fonts/default.png", "default_font");
 
     // Configurate the user HUD
     user->set_background_color(glm::vec4(0, 0, 0, 1));
@@ -784,12 +769,14 @@ void HUD_CLI::start()
 // Update the CLI
 void HUD_CLI::update()
 {
+    current_command = "";
     update_object();
 
     if (get_advanced_struct()->get_key_state_frame("enter") == Key_State::Pressed)
     {
         if (text_hud.size() > 0)
         {
+            current_command = text_hud[text_hud.size() - 1]->get_text();
             execute_command(text_hud[text_hud.size() - 1]->get_text());
         }
         new_line();

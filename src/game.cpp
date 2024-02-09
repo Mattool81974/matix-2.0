@@ -73,7 +73,6 @@ void HUD::sort_objects()
 void HUD::update()
 {
     update_object();
-    render();
 }
 
 // Update all the objects in the HUD
@@ -288,6 +287,36 @@ Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode 
     return new_scene;
 }
 
+// Render the scene
+void Game::render()
+{
+    // Clear OpenGL window
+    glClearColor(get_background_color()[0], get_background_color()[1], get_background_color()[2], get_background_color()[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (get_current_scene_name() != "" && contains_scene(get_current_scene_name()))
+    {
+        Scene* scene = get_current_scene();
+        if (scene != 0)
+        {
+            scene->render();
+        }
+    }
+
+    if (get_current_hud_name() != "" && contains_hud(get_current_hud_name()))
+    {
+        HUD* hud = get_current_hud();
+        if (hud != 0)
+        {
+            hud->render();
+        }
+    }
+
+    // Update OpenGL
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
 // Properly resize the window
 void Game::resize(unsigned int width, unsigned int height)
 {
@@ -343,27 +372,25 @@ void Game::update()
     if (get_current_scene_name() != "" && contains_scene(get_current_scene_name()))
     {
         Scene* scene = get_current_scene();
-        if(scene != 0) scene->update();
+        if (scene != 0)
+        {
+            scene->update();
+        }
     }
 
     if (get_current_hud_name() != "" && contains_hud(get_current_hud_name()))
     {
         HUD* hud = get_current_hud();
-        if (hud != 0) hud->update();
+        if (hud != 0)
+        {
+            hud->update();
+        }
     }
-
-    // Update OpenGL
-    glfwSwapBuffers(window);
-    glfwPollEvents();
 }
 
 // Update the event of the game during this frame
 void Game::update_event()
 {
-    // Clear OpenGL window
-    glClearColor(get_background_color()[0], get_background_color()[1], get_background_color()[2], get_background_color()[3]);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Calculate delta time
     set_delta_time(glfwGetTime() - last_frame_time);
     last_frame_time = glfwGetTime();

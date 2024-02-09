@@ -311,7 +311,7 @@ std::vector<glm::vec3> Object::get_all_map_pos(glm::vec3 movement_use, bool add_
 
 	glm::vec3 map_pos = get_map_pos() - glm::vec3(0.5, 0.5, 0.5);
 
-	if (!use_physic() || !get_attached_physic_object()->use_collision()) { return positions; }
+	if (!use_physic()) { return positions; }
 	float scale0 = get_attached_physic_object()->get_collision()->get_width();
 	float scale1 = get_attached_physic_object()->get_collision()->get_height();
 	float scale2 = get_attached_physic_object()->get_collision()->get_length();

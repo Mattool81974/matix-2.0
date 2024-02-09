@@ -19,22 +19,28 @@ void load_warehouse()
     Camera* camera = game->get_camera();
     game->new_vao(game->get_assets_directory_path() + "vbos/famas.vbo", "famas");
     game->new_vao(game->get_assets_directory_path() + "vbos/shell.vbo", "ammo");
+    Part* computer = game->new_part(7, "cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/computer.png");
     Part* floor_exterior = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/floor_exterior.png");
     Part* floor_interior = game->new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/floor_interior.png");
     Part* door = game->new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), game->get_assets_directory_path() + "textures/warehouse/door.png");
     Part* package = game->new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/package.png");
     Part* glass = game->new_part(5, "one_faced_cube", glm::vec3(0.0, 0.0, 0.0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/glass.png");
+    Part* table = game->new_part(6, "table", glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0), game->get_assets_directory_path() + "textures/table.png");
     Part* wall_exterior = game->new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/wall_exterior.png");
 
     // Configurate parts
-    door->set_description("2");
+    computer->set_description("computer");
+    door->set_description("door");
     door->set_resize_texture(false);
     door->set_use_collection(false);
+    glass->set_description("glass");
     glass->set_is_transparent(true);
     glass->set_resize_texture(false);
-    floor_exterior->set_description("4");
-    floor_interior->set_description("5");
-    wall_exterior->set_description("3");
+    floor_exterior->set_description("exterior floor");
+    floor_interior->set_description("interior floor");
+    package->set_description("package");
+    table->set_resize_texture(false);
+    wall_exterior->set_description("wall");
     wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
@@ -169,6 +175,8 @@ int main(int argc, char* argv[])
     game->set_current_hud("base");
     game->set_current_scene("warehouse");
 
+    Camera* camera = game->get_camera();
+    HUD_CLI* cli = (HUD_CLI*)game->get_hud("cli");
     HUD_Text* fps = (HUD_Text*)game->get_hud("base")->get_hud_object("fps");
     Player* player = (Player*)game->get_scene("warehouse")->get_object("player");
     Scene* warehouse = game->get_scene("warehouse");
@@ -179,11 +187,46 @@ int main(int argc, char* argv[])
     while (game->run())
     {
         game->update_event();
-
-        texte_fps = "FPS : " + std::to_string((int)glm::round(1.0/game->get_delta_time())) + ".";
-        fps->set_text(texte_fps);
-
         game->update();
+
+        if (!current_is_cli && game->get_key_state_frame("e") == Key_State::Pressed)
+        {
+            One_Raycast rc = warehouse->get_physic_scene()->raycast(camera->get_absolute_position(), game->get_camera()->get_forward());
+            if (rc.touched_object != 0)
+            {
+                if (((Object*)(rc.touched_object))->get_type() == "door")
+                {
+                    ((Door*)(rc.touched_object))->interact();
+                }
+                else if (((Object*)(rc.touched_object))->get_description() == "computer")
+                {
+                    current_is_cli = true;
+                    game->set_background_color(glm::vec4(0, 0, 0, 1));
+                    game->set_current_hud("cli");
+                    warehouse->set_use_graphic(false);
+                }
+            }
+        }
+
+        if (!current_is_cli)
+        {
+            texte_fps = "FPS : " + std::to_string((int)glm::round(1.0 / game->get_delta_time())) + ".";
+            fps->set_text(texte_fps);
+        }
+        else
+        {
+            std::string current_command = cli->get_current_command();
+            if (current_command == "return")
+            {
+                current_is_cli = false;
+                game->set_background_color(glm::vec4(0.0f, (1.0f / 255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f));
+                game->set_current_hud("base");
+                cli->set_current_command("");
+                warehouse->set_use_graphic(true);
+            }
+        }
+
+        game->render();
     }
 
     delete game;

@@ -53,6 +53,7 @@ public:
 	template <class O = HUD> // Template for adding a type of HUD
 	O* new_hud(std::string name); // Create a new HUD into the game
 	Scene* new_scene(std::string name, std::string map_path = "", Map_Opening_Mode mode = Map_Opening_Mode::Simple, bool use_graphic = true, bool use_physic = true); // Create a scene into the game and return it
+	void render(); // Render the scene
 	void resize(unsigned int width, unsigned int height); // Properly resize the window
 	bool run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game

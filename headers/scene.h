@@ -92,6 +92,7 @@ public:
 	Collision_Result check_collision(Object* object, glm::vec3 direction = glm::vec3(1, 1, 1), bool apply_to_target = true); // Check the collision of an object
 	void early_update(); // Update before everything
 	Physic_Object* new_object(std::string name, Transform_Object& transform, bool static_object = true); // Create a new object into the scene and return it
+	One_Raycast raycast(glm::vec3 start, glm::vec3 direction); // Do a raycast in a direction in the 3D map
 	void update(); // Update the objects in the scene
 	~Physic_Scene(); // Physic_Scene destructor
 
@@ -172,6 +173,7 @@ public:
 	template <class O = Object> // Template for adding a type of object
 	O *new_object(std::string name, std::string type, Transform_Object* parent = 0, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(1, 1, 1), bool static_object = true, std::string texture_path = "", bool texture_resize = true, bool use_graphic_object = true, bool use_physic_object = true, void* clone = 0); // Create a new object into the scene and return it
 	std::string objects_map_to_string(int y = 0); // Return the objects map to string to debug
+	void render(); // Render the scene
 	void update(); // Update the scene
 	~Scene(); // Scene destructor
 
@@ -186,6 +188,8 @@ public:
 	inline Physic_Scene* get_physic_scene() { return physic_scene; };
 	inline glm::vec3 get_total_size() { return total_size; };
 	inline std::vector<std::map<std::string, Object*>::iterator>* get_to_destroy() { return &to_destroy; };
+	inline void set_use_graphic(bool new_graphic) { graphic = new_graphic; };
+	inline void set_use_physic(bool new_physic) { physic = new_physic; };
 	inline bool use_graphic() { return graphic; };
 	inline bool use_physic() { return physic; };
 private:

@@ -132,6 +132,7 @@ public:
     void after_loading(); // Function called after the loading of the scene
     void* clone(Advanced_Struct* a_game_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Clone the door
     void close(); // Close the door
+    void interact(); // Interact with the door
     void open(); // Open the door
     void update(); // Update the door
     ~Door(); // Door destructor
@@ -204,6 +205,7 @@ public:
 
     // Getters and setters
     inline std::map<std::string, CLI_Command>* get_commands_name() { return &commands_name; };
+    inline std::string get_current_command() { return current_command; };
     inline std::string get_current_user() { return current_user; };
     inline std::string get_current_working_directory() { return current_working_directory; };
     inline float get_font_size() { return font_size; };
@@ -213,6 +215,7 @@ public:
         std::vector<std::string> cutted = cut_string(response["unknow_command"], cut);
         return cutted[0] + command + cutted[1];
     };
+    inline void set_current_command(std::string new_current_command) { current_command = new_current_command; };
     inline void set_current_working_directory(std::string new_cwd)
     {
         if (file_exists(new_cwd))
@@ -240,6 +243,7 @@ public:
         new_line();
     };
 private:
+    std::string current_command = ""; // Currently used command
     std::string current_user = "User"; // Name of the current user
     std::string current_working_directory = ""; // Current working directory of the CLI
     float font_size = 0.04; // Size of the font of the CLI

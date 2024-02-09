@@ -87,12 +87,20 @@ private:
 
 struct One_Collision
 {
-	// Struct representing data about a collision
+	// Struct representing datas about a collision
 	glm::vec3 axis_multiplier = glm::vec3(0, 0, 0); // Multiplier for each axis
 	bool collide = true; // If there is a collision or not
 	void* object1 = 0; // Pointer to the first object
 	void* object2 = 0; // Pointer to the second object
 	glm::vec3 position = glm::vec3(0, 0, 0); // Position of the collision
+};
+
+struct One_Raycast
+{
+	// Struct representing datas about a raycast
+	char axis = '0'; // Axis of the raycast
+	glm::vec3 contact_pos = glm::vec3(0, 0, 0); // Exact position of the contact
+	void* touched_object = 0; // Object touched
 };
 
 class Collision_Result

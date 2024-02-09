@@ -168,7 +168,7 @@ Collision_Result Physic_Scene::check_collision(Object* object, glm::vec3 directi
 				{
 					float z = position[2];
 					Object* target = (*get_objects_map())[x][y][z];
-					if (target != 0 && object != target)
+					if (target != 0 && object != target && target->get_attached_physic_object()->use_collision())
 					{
 						One_Collision result = target->collides_with(object);
 						if (result.collide) // If the object collides with the target
@@ -202,6 +202,107 @@ Physic_Object* Physic_Scene::new_object(std::string name, Transform_Object& tran
 	object->get_collision()->set_height(transform.get_scale()[1]);
 	object->get_collision()->set_length(transform.get_scale()[2]);
 	return object;
+}
+
+// Do a raycast in a direction in the 3D map
+One_Raycast Physic_Scene::raycast(glm::vec3 start, glm::vec3 direction)
+{
+	direction = glm::normalize(direction);
+
+	float x_direction_x_multiplier = 1; // Calcule the X multiplier of the x direction of the raycast
+	int x_direction_x = glm::ceil(start[0]); // Calculate the X value of the x direction of the raycast
+	float x_direction_z_value = 0; // Calculate the Z value of the x direction of the raycast
+	if (direction[0] != 0) { x_direction_z_value = direction[2] / direction[0]; }
+	if (direction[0] < 0)
+	{
+		x_direction_x = glm::floor(start[0]);
+		x_direction_x_multiplier = -1;
+		x_direction_z_value *= -1;
+	}
+
+	float z_direction_z_multiplier = 1; // Calcule the Z multiplier of the z direction of the raycast
+	float z_direction_z = glm::ceil(start[2]);
+	float z_direction_x_value = 0; // Calculate the X value of the z direction of the raycast
+	if (direction[2] != 0) { z_direction_x_value = direction[0] / direction[2]; }
+	if (direction[2] < 0)
+	{
+		z_direction_z = glm::floor(start[2]);
+		z_direction_z_multiplier = -1;
+		z_direction_x_value *= -1;
+	}
+
+	One_Raycast x_raycast;
+	x_raycast.axis = 'x';
+	float x_direction_y = glm::floor(start[1]);
+	float x_direction_z = start[2] + (x_direction_z_value * glm::abs(start[2] - glm::floor(start[2])));
+	while (x_direction_x >= 0 && x_direction_x < objects_map.size() && x_direction_y >= 0 && x_direction_y < objects_map[x_direction_x].size() && x_direction_z >= 0 && x_direction_z < objects_map[x_direction_x][x_direction_y].size())
+	{
+		// Raycast in the X direction
+		int x_direction_y_int = glm::floor(x_direction_y);
+		int x_direction_z_int = glm::floor(x_direction_z);
+		if (direction[2] < 0)
+		{
+			x_direction_z_int = glm::ceil(x_direction_z);
+		}
+
+		if (objects_map[x_direction_x][x_direction_y_int][x_direction_z_int] != 0)
+		{
+			x_raycast.contact_pos = glm::vec3(x_direction_x, x_direction_y, x_direction_z);
+			x_raycast.touched_object = objects_map[x_direction_x][x_direction_y_int][x_direction_z_int];
+			break;
+		}
+
+		x_direction_x += x_direction_x_multiplier;
+		x_direction_z += x_direction_z_value;
+	}
+
+	One_Raycast z_raycast;
+	z_raycast.axis = 'z';
+	float z_direction_y = glm::floor(start[1]);
+	float z_direction_x = start[0] + (z_direction_x_value * glm::abs(start[0] - glm::floor(start[0])));
+	while (z_direction_x >= 0 && z_direction_x < objects_map.size() && z_direction_y >= 0 && z_direction_y < objects_map[z_direction_x].size() && z_direction_z >= 0 && z_direction_z < objects_map[z_direction_x][z_direction_y].size())
+	{
+		// Raycast in the X direction
+		int z_direction_y_int = glm::floor(z_direction_y);
+		int z_direction_x_int = glm::floor(z_direction_x);
+		if (direction[0] < 0)
+		{
+			z_direction_x_int = glm::ceil(z_direction_x);
+		}
+
+		if (objects_map[z_direction_x_int][z_direction_y_int][z_direction_z] != 0)
+		{
+			z_raycast.contact_pos = glm::vec3(z_direction_x, z_direction_y, z_direction_z);
+			z_raycast.touched_object = objects_map[z_direction_x_int][z_direction_y_int][z_direction_z];
+			break;
+		}
+
+		z_direction_z += z_direction_z_multiplier;
+		z_direction_x += z_direction_x_value;
+	}
+
+	One_Raycast final_raycast; // Calculate the final raycast
+	if (x_raycast.touched_object != 0 && z_raycast.touched_object == 0)
+	{
+		final_raycast = x_raycast;
+	}
+	else if (x_raycast.touched_object == 0 && z_raycast.touched_object != 0)
+	{
+		final_raycast = z_raycast;
+	}
+	else if (x_raycast.touched_object != 0 && z_raycast.touched_object != 0)
+	{
+		float distance_x = glm::distance(start, x_raycast.contact_pos);
+		float distance_z = glm::distance(start, z_raycast.contact_pos);
+
+		final_raycast = x_raycast;
+		if (distance_x > distance_z)
+		{
+			final_raycast = z_raycast;
+		}
+	}
+
+	return final_raycast;
 }
 
 // Update the Physic_Scene
@@ -704,6 +805,40 @@ std::string Scene::objects_map_to_string(int y)
 	return result;
 }
 
+// Render the scene
+void Scene::render()
+{
+	std::map<std::string, Object*>* objects_to_update = get_objects();
+	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->last_update(); // Last update every objects
+	}
+
+	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
+	{
+		it->second->get_attached_transform()->soft_reset(); // Reset every objects
+		if (it->second->can_reset_map_pos())it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
+	}
+
+	if (use_graphic()) // Update graphic scene
+	{
+		get_graphic_scene()->update();
+		get_graphic_scene()->render();
+	}
+
+	for (int i = 0; i < get_to_destroy()->size(); i++) // Destroyed all needed objects
+	{
+		std::map<std::string, Object*>::iterator it = (*get_to_destroy())[i];
+		if (it->second != 0)
+		{
+			delete it->second;
+			it->second = 0;
+		}
+		objects_to_update->erase(it);
+	}
+	get_to_destroy()->clear();
+}
+
 // Update the scene
 void Scene::update()
 {
@@ -746,35 +881,6 @@ void Scene::update()
 		get_physic_scene()->update();
 		get_physic_scene()->check_collisions();
 	}
-
-	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
-	{
-		it->second->last_update(); // Last update every objects
-	}
-
-	for (std::map<std::string, Object*>::iterator it = objects_to_update->begin(); it != objects_to_update->end(); it++)
-	{
-		it->second->get_attached_transform()->soft_reset(); // Reset every objects
-		if(it->second->can_reset_map_pos())it->second->set_map_pos(it->second->get_attached_transform()->get_absolute_position());
-	}
-
-	if (use_graphic()) // Update graphic scene
-	{
-		get_graphic_scene()->update();
-		get_graphic_scene()->render();
-	}
-
-	for (int i = 0; i < get_to_destroy()->size(); i++) // Destroyed all needed objects
-	{
-		std::map<std::string, Object*>::iterator it = (*get_to_destroy())[i];
-		if (it->second != 0)
-		{
-			delete it->second;
-			it->second = 0;
-		}
-		objects_to_update->erase(it);
-	}
-	get_to_destroy()->clear();
 }
 
 // Scene destructor
