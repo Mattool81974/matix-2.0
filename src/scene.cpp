@@ -61,12 +61,27 @@ void Graphic_Scene::render()
 {
 	std::map<std::string, Object*>* objects = get_objects();
 
+	std::vector<Object*> transparent_objects = std::vector<Object*>();
+
 	for (std::map<std::string, Object*>::iterator it = objects->begin(); it != objects->end(); it++)
 	{
 		if (it->second->use_graphic())
 		{
-			it->second->get_attached_graphic_object()->render(); // Render each object
+			if (it->second->get_attached_graphic_object()->is_transparent())
+			{
+				transparent_objects.push_back(it->second);
+			}
+			else
+			{
+				it->second->get_attached_graphic_object()->render(); // Render each object
+			}
 		}
+	}
+
+	// Render transparents objects
+	for (int i = 0;i<transparent_objects.size();i++)
+	{
+		transparent_objects[i]->get_attached_graphic_object()->render();
 	}
 }
 
@@ -477,6 +492,7 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 			std::string name = "level" + std::to_string(collection.get_level()->id) + ";w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 
 			Object* object = new_object(name, part->get_type(), collection.get_level()->map_level_object->get_attached_transform(), glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
+			object->get_attached_graphic_object()->set_is_transparent(part->is_transparent());
 			assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
 			object->set_description(part->get_description());
 		}

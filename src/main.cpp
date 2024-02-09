@@ -23,12 +23,15 @@ void load_warehouse()
     Part* floor_interior = game->new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/floor_interior.png");
     Part* door = game->new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), game->get_assets_directory_path() + "textures/warehouse/door.png");
     Part* package = game->new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/package.png");
+    Part* glass = game->new_part(5, "one_faced_cube", glm::vec3(0.0, 0.0, 0.0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/glass.png");
     Part* wall_exterior = game->new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/wall_exterior.png");
 
     // Configurate parts
     door->set_description("2");
     door->set_resize_texture(false);
     door->set_use_collection(false);
+    glass->set_is_transparent(true);
+    glass->set_resize_texture(false);
     floor_exterior->set_description("4");
     floor_interior->set_description("5");
     wall_exterior->set_description("3");

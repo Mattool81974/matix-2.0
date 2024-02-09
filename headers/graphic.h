@@ -15,8 +15,12 @@ public:
 	// Getters and setters
 	inline Base_Struct* get_base_struct() { return base_struct; };
 	inline Texture* get_texture() { return texture; };
+	inline bool is_transparent() { return transparent; };
+	inline void set_is_transparent(bool new_transparent) { transparent = new_transparent; };
 	inline void set_texture(Texture* a_texture) { texture = a_texture; };
 private:
+	bool transparent = false; // If the object use transparency or not
+
 	Transform_Object& attached_transform; // Reference to the attached transform object
 	Base_Struct* base_struct = 0; // Pointer to the base struct in the game
 	VAO* vao = 0; // Pointer to the VAO used to render the object

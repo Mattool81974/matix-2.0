@@ -23,7 +23,9 @@ public:
 	inline glm::vec3 get_scale_level_multiplier() { return scale_level_multiplier; };
 	inline std::string get_texture_path() { return texture_path; };
 	inline std::string get_type() { return type; };
+	inline bool is_transparent() { return transparent; };
 	inline void set_description(std::string a_description) { description = a_description; };
+	inline void set_is_transparent(bool new_transparent) { transparent = new_transparent; };
 	inline void set_resize_texture(bool a_resize_texture) { resize_texture = a_resize_texture; };
 	inline void set_scale_level_multiplier(glm::vec3 a_scale_level_multiplier) { scale_level_multiplier = a_scale_level_multiplier; };
 	inline void set_use_collection(bool a_use_collection) { collection = a_use_collection; };
@@ -32,6 +34,7 @@ private:
 	std::string description = "1"; // Little description of the object, usefull for debug
 	bool resize_texture = true; // If the texture should be resized or not
 	bool collection = true; // If the part can use collection
+	bool transparent = false; // If the part use transparency
 
 	void* base_object = 0; // Pointer to a buffer for the base object
 	glm::vec3 position; // Position of the part
