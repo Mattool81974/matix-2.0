@@ -82,10 +82,10 @@ def create_cube(path: str, final_path: str) -> None:
     
     file1 = im.open(path + "/1.png").resize((500, 500))
     file2 = im.open(path + "/2.png").resize((500, 500))
-    file3 = im.open(path + "/3.png").resize((500, 500))
-    file4 = im.open(path + "/4.png").resize((500, 500))
-    file5 = im.open(path + "/5.png").resize((500, 500))
-    file6 = im.open(path + "/6.png").resize((500, 500))
+    file3 = im.open(path + "/1.png").resize((500, 500))
+    file4 = im.open(path + "/2.png").resize((500, 500))
+    file5 = im.open(path + "/1.png").resize((500, 500))
+    file6 = im.open(path + "/1.png").resize((500, 500))
 
     w, h = 1500, 2000
     cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
@@ -245,4 +245,5 @@ pg.display.set_mode((1, 1))
 #create_famas("textures/famas_dir", "textures/famas.png")
 #create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
 #create_shell("textures/shell_dir", "textures/shell.png")
-create_font("fonts/consolas.png", "Consolas", final_size = (1050, 2000))
+create_cube("screen_dir", "screen.png")
+#create_font("fonts/consolas.png", "Consolas", final_size = (1050, 2000))

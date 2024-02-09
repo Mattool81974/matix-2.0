@@ -790,3 +790,30 @@ HUD_CLI::~HUD_CLI()
 {
     unload();
 }
+
+// Robot constructor
+Robot::Robot(Advanced_Struct* a_advanced_struct, std::string a_name, std::string a_scene_name, Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic): Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
+{
+    game = (Game*)a_advanced_struct;
+}
+
+// Create each robot part
+void Robot::create()
+{
+    Scene* scene = game->get_scene(get_scene_name());
+
+    glm::vec3 axis_scale = glm::vec3(0.3, 0.3, 0.9);
+    glm::vec3 screen_scale = glm::vec3(0.1, 1.0, 1.0);
+    float screen_y = 1.35f;
+    glm::vec3 support_scale = glm::vec3(0.4, 1.0, 0.4);
+    float support_y = 0.35f;
+    float wheel_offset = 0.4;
+    float wheel_y = 0;
+    glm::vec3 wheel_scale = glm::vec3(0.5, 0.5, 0.2);
+
+    Object* wheel0 = scene->new_object(get_name() + ";wheel0", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+    Object* wheel1 = scene->new_object(get_name() + ";wheel1", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, -wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+    Object* axis = scene->new_object(get_name() + ";axis", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, 0), glm::vec3(0, 0, 0), axis_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+    Object* support = scene->new_object(get_name() + ";support", "one_faced_cube", get_attached_transform(), glm::vec3(0, support_y, 0), glm::vec3(0, 0, 0), support_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/support.png", false, true, false);
+    Object* screen = scene->new_object(get_name() + ";screen", "cube", get_attached_transform(), glm::vec3(0, screen_y, 0), glm::vec3(0, 0, 0), screen_scale, false, get_screen_texture(), false, true, false);
+}

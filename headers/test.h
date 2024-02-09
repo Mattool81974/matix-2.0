@@ -256,3 +256,19 @@ private:
     std::vector<HUD_Text*> user_text = std::vector< HUD_Text*>(); // Every user text
     std::map<std::string, std::string> variables = std::map<std::string, std::string>(); // Variable in the CLI
 };
+
+class Robot : public Object
+{
+    // Class representing a simple robot for the warehouse
+public:
+    Robot(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Door constructor
+    void create(); // Create each robot part
+
+    // Getters and setters
+    inline std::string get_screen_texture() { return screen_texture; };
+    inline void set_screen_texture(std::string new_screen_texture) { screen_texture = new_screen_texture; };
+private:
+    std::string screen_texture = ""; // Texture of the screen
+
+    Game* game = 0; // Pointer to the game
+};

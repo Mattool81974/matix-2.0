@@ -126,23 +126,6 @@ def form_informations(points: list) -> None:
     print("Informations : ")
     print("Minus/max x :", minus_x, max_x, "| minus/max y :", minus_y, max_y, "| minus/max z:", minus_z, max_z)
 
-def rotate(points: list, rotation: tuple) -> list:
-    """Take a list of point and rotate it
-    """
-    if rotation[1] != 0:
-        for point in points:
-            difference_position = point.get_point()
-            difference_normalized = glm.normalize(difference_position)
-            difference_multiplier_x = difference_position[0] / difference_normalized[0]
-            difference_multiplier_z = difference_position[1] / difference_normalized[1]
-                
-            angle = glm.asin(difference_normalized[1] / glm.distance(glm.vec2(0, 0), difference_position))
-
-            final_angle = angle + glm.radians(rotation[1])
-            final_position = glm.vec3(glm.cos(final_angle) * difference_multiplier_x, 0, glm.sin(final_angle) * difference_multiplier_z)
-
-            point.set_point(final_position)
-
 def scale(points: list, scaling: tuple) -> list:
     """Take a list of point and scale it
     """

@@ -52,12 +52,16 @@ void load_warehouse()
 
     // Construct the HUD
     HUD* hud = game->new_hud("base");
+    HUD_Object* cross = hud->new_hud_object("cross", game->get_assets_directory_path() + "textures/cross.png");
     HUD_Text* fps = hud->new_hud_object<HUD_Text>("fps", game->get_assets_directory_path() + "fonts/default.png", "default_font");
     HUD_Object* watermark = hud->new_hud_object("watermark", game->get_assets_directory_path() + "textures/watermark.png");
 
     // Configurate some objects in the scene
+    float cross_width = 0.01;
     camera->set_parent(player->get_attached_transform());
     camera->set_position(glm::vec3(0, 0.75, 0));
+    cross->set_position(glm::vec3(0, 0, 0));
+    cross->set_scale(glm::vec3(cross_width, cross_width * (16.0/9.0), 1));
     famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
     famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
     player->get_attached_physic_object()->set_use_collision(true);
@@ -73,6 +77,14 @@ void load_warehouse()
     fps->set_text(texte_fps);
     watermark->set_position(glm::vec3(-0.6, 0.76, 0.9));
     watermark->set_scale(glm::vec3(0.4, 0.24, 1));
+
+    // Create robot
+    Robot* robot1 = scene->new_object<Robot>("robot1", "", 0, glm::vec3(20, 1, 20), glm::vec3(0, 90, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
+    Robot* robot2 = scene->new_object<Robot>("robot2", "", 0, glm::vec3(22, 1, 20), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
+    robot1->set_screen_texture(game->get_assets_directory_path() + "textures/warehouse/robot/screen.png");
+    robot2->set_screen_texture(game->get_assets_directory_path() + "textures/warehouse/robot/screen.png");
+    robot1->create();
+    robot2->create();
 }
 
 void level0()
