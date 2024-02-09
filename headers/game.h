@@ -1,9 +1,9 @@
 #pragma once
 
-#include "advanced_struct.h"
-#include "base_struct.h"
-#include "model.h"
-#include "scene.h"
+#include "../headers/advanced_struct.h"
+#include "../headers/base_struct.h"
+#include "../headers/model.h"
+#include "../headers/scene.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // Callback function for window resizing
 void mouse_callback(GLFWwindow* window, double xpos, double ypos); // Callback function for mouse moving
@@ -49,9 +49,11 @@ public:
 	bool contains_hud(std::string name); // Return if the game contains an HUD Object
 	bool contains_scene(std::string name); // Returns if the game contains a scene
 	void load_keys(); // Load the keys in the game
+	void load_from_config_file(std::string path); // Load the game from a config file
 	template <class O = HUD> // Template for adding a type of HUD
 	O* new_hud(std::string name); // Create a new HUD into the game
 	Scene* new_scene(std::string name, std::string map_path = "", Map_Opening_Mode mode = Map_Opening_Mode::Simple, bool use_graphic = true, bool use_physic = true); // Create a scene into the game and return it
+	void resize(unsigned int width, unsigned int height); // Properly resize the window
 	bool run(); // Run the game by doing multiples call to update
 	void update(); // Update one frame of the game
 	void update_event(); // Update the event of the game during this frame
@@ -86,8 +88,8 @@ private:
 	std::string current_scene = ""; // Name of the current scene loaded
 	bool is_running = true; // If the game should continue running or not
 	float last_frame_time = 0; // Time when the last frame occurs, for calculating delta_time and FPS
-	int window_height = 0; // Height of the graphic window
-	int window_width = 0; // Widt of the graphic window
+	int& window_height; // Height of the graphic window
+	int& window_width; // Widt of the graphic window
 
 	glm::vec4 background_color = glm::vec4(0.0f, (1.0f/255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f); // Background color of the game
 	std::map < std::string, HUD*> huds = std::map < std::string, HUD*>(); // Each HUD, with their name as key, in the game

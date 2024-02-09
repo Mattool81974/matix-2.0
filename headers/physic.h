@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base_struct.h"
+#include "../headers/base_struct.h"
 
 class Collision
 {

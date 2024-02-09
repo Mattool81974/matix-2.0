@@ -1,4 +1,4 @@
-#include "base_struct.h"
+#include "../headers/base_struct.h"
 
 // To avoid a bug with std::codecvt_utf8<char>, go in the project setting > C/C++ > General > SDL Check and disable it
 
@@ -122,6 +122,12 @@ bool file_exists(std::string path)
 	bool result = (stat(path.c_str(), &sb) == 0);
 
 	return result;
+}
+
+// Returns if a path is a directory or not
+bool path_is_directory(std::string path)
+{
+	return ((file_datas(path).st_mode & S_IFDIR) == S_IFDIR);
 }
 
 // Normalize a rotation and return it
@@ -567,6 +573,43 @@ Camera::~Camera()
 Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path): exec_path(a_exec_path), mouse_x(a_mouse_x), mouse_y(a_mouse_y), last_mouse_x(a_mouse_x), last_mouse_y(a_mouse_y)
 {
 	
+}
+
+// Cout an error in the program
+void Base_Struct::error(std::string thrower, std::string error_content)
+{
+	std::cout << thrower << " : error ! " << error_content << std::endl;
+}
+
+// Return if a file formatted with the struct context
+std::string Base_Struct::file_formatted(std::string path)
+{
+	std::string access = cut_string(path, "/")[0];
+	std::string current_path = (std::filesystem::current_path().string());
+	std::vector<std::string> cutted_path = cut_string(current_path, "\\");
+	unsigned short point_count = 0;
+	unsigned short size_to_delete = 0;
+
+	for (int i = 1; i < path.size(); i++) // Count the . in the path
+	{
+		if (path[i] == '.')
+		{
+			point_count++;
+			size_to_delete += cutted_path[cutted_path.size() - (i + 1)].size() + 1;
+		}
+		else
+		{
+			if (path[i] == '/' || path[i] == '\\')
+			{
+				point_count += 1;
+			}
+			break;
+		}
+	}
+
+	path = current_path.substr(0, current_path.size() - size_to_delete) + "/" + path.substr(point_count, path.size() - point_count);
+
+	return path;
 }
 
 // Return the projection matrix

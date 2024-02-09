@@ -1,9 +1,10 @@
-#include "Game.h"
-#include "model.h"
-#include "matix/stb_image.h"
+#include "../headers/game.h"
+#include "../headers/model.h"
 
 double global_mouse_x = 500; // Global variable representing the X pos of the mouse
 double global_mouse_y = 500; // Global variable representing the Y pos of the mouse
+int global_screen_width = 1280; // Global variable representing the width of the screen
+int global_screen_height = 720; // Global variable representing the height of the screen
 std::map<std::string, unsigned int> keys = std::map<std::string, unsigned int>(); // Map of each keys in the game
 
 // Compare the 2 objects with their depths
@@ -16,6 +17,8 @@ bool compare_depht_hud_object(HUD_Object* a, HUD_Object* b)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    global_screen_height = height;
+    global_screen_width = width;
 }
 
 // Callback function for mouse moving
@@ -102,8 +105,12 @@ HUD::~HUD()
 }
 
 // Game constructor
-Game::Game(int a_window_width, int a_window_height, std::string a_exec_path, bool load_vaos): Advanced_Struct(global_mouse_x, global_mouse_y, a_exec_path), window_height(a_window_height), window_width(a_window_width)
+Game::Game(int a_window_width, int a_window_height, std::string a_exec_path, bool load_vaos): Advanced_Struct(global_mouse_x, global_mouse_y, a_exec_path), window_height(global_screen_height), window_width(global_screen_width)
 {
+    // Set the screen size
+    window_height = a_window_height;
+    window_width = a_window_width;
+
     load_keys();
     // Configurate base_struct
     get_camera()->set_position(glm::vec3(0.0, 0.0, 0.0));
@@ -242,6 +249,35 @@ void Game::load_keys()
     keys["tab"] = GLFW_KEY_TAB;
 }
 
+// Load the game from a config file
+void Game::load_from_config_file(std::string path)
+{
+    std::string last_config_file_path = get_config_file_path();
+    set_config_file_path(path);
+
+    if (last_config_file_path != get_config_file_path()) // If the path is correct
+    {
+        std::vector<std::string> content = cut_string(read_file(get_config_file_path()), "\n");
+
+        for (int i = 0; i < content.size(); i++) // Analyze each lines
+        {
+            std::vector<std::string> line = cut_string(content[i], ":");
+            std::string all_variables = "";
+            for (int j = 1; j < line.size(); j++) { all_variables += line[j]; }
+
+            if (line[0] == "screen_size") // If the line represents the size of the screen
+            {
+                std::vector<std::string> variables = cut_string(all_variables, ";");
+                resize(std::stoi(variables[0]), std::stoi(variables[1]));
+            }
+            else if (line[0] == "assets_path_directory") // If the line represents the assets path
+            {
+                set_assets_directory_path(all_variables);
+            }
+        }
+    }
+}
+
 // Create a scene into the game and return it
 Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode mode, bool use_graphic, bool use_physic)
 {
@@ -250,6 +286,12 @@ Scene* Game::new_scene(std::string name, std::string map_path, Map_Opening_Mode 
     Scene* new_scene = new Scene(this, name, map_path, use_graphic, use_physic, mode);
     add_scene(name, new_scene);
     return new_scene;
+}
+
+// Properly resize the window
+void Game::resize(unsigned int width, unsigned int height)
+{
+    glfwSetWindowSize(window, width, height);
 }
 
 // Run the game by doing multiples call to update

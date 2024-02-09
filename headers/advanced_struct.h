@@ -1,9 +1,9 @@
 #pragma once
 
-#include "base_struct.h"
-#include "graphic.h"
-#include "model.h"
-#include "physic.h"
+#include "../headers/base_struct.h"
+#include "../headers/graphic.h"
+#include "../headers/model.h"
+#include "../headers/physic.h"
 
 class Part
 {
@@ -60,7 +60,7 @@ public:
 	void load_VAOs(); // Loads the VAOs in the advanced struct
 	template <class O = Object> // Template for adding a type of object
 	Part* new_part(unsigned int number, std::string type, glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 rotation = glm::vec3(0, 0, 0), glm::vec3 scale = glm::vec3(0, 0, 0), std::string texture_path = ""); // Create a new part into the struct and return it
-	VAO* new_vao(std::string path, std::string type, std::string shader_path = "../shaders/default"); // Create a new VAO into the game
+	VAO* new_vao(std::string path, std::string type, std::string shader_path = "-1"); // Create a new VAO into the game
 	void unload_fonts(); // Unload all the textures
 	void unload_textures(); // Unload all the textures
 	~Advanced_Struct(); // Advanced_Struct destructor

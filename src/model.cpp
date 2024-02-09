@@ -1,16 +1,4 @@
-#include "model.h"
-#include "base_struct.h"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <cstring>
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <cmath>
-#include <map>
-#include <string>
-#include <vector>
-#include "matix/stb_image.h"
+#include "../headers/model.h"
 
 // Shader_Program constructor
 Shader_Program::Shader_Program(std::string a_vertex_shader, std::string a_fragment_shader): fragment_shader(a_fragment_shader), vertex_shader(a_vertex_shader)
@@ -376,7 +364,7 @@ VAO::~VAO()
 }
 
 // Font_Vao constructor
-Font_VAO::Font_VAO(): VAO("../shaders/font", get_base_attributes(), "0")
+Font_VAO::Font_VAO(std::string shader_path): VAO(shader_path, get_base_attributes(), "0")
 {
 	
 }
@@ -500,7 +488,11 @@ short Font_Texture::get_character_place(char character)
 glm::vec4 Font_Texture::get_character_rect(char character)
 {
 	short place = get_character_place(character);
-	if (place == -1) { std::cout << "Matix game : error ! The character \"" << character << "\" doesn't exists in the font \"" << get_texture_path() << "\"." << std::endl; return glm::vec4(0, 0, 0, 0); }
+	if (place == -1)
+	{
+		std::cout << "Matix game : error ! The character \"" << character << "\" doesn't exists in the font \"" << get_texture_path() << "\"." << std::endl;
+		return glm::vec4(0, 0, 0, 0);
+	}
 
 	glm::vec4 result = glm::vec4((place % (int)glm::round(get_texture_size()[0] / get_character_size()[0])) * get_character_size()[0], glm::floor(place / (get_texture_size()[1] / get_character_size()[1])) * get_character_size()[1], get_character_size()[0], get_character_size()[1]);
 	result /= glm::vec4(get_texture_size()[0], get_texture_size()[1], get_texture_size()[0], get_texture_size()[1]);

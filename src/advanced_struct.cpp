@@ -1,4 +1,4 @@
-#include "advanced_struct.h"
+#include "../headers/advanced_struct.h"
 
 // Part constructor
 Part::Part(glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale, std::string a_type, std::string a_texture_path, void* a_base_object) : position(a_position), rotation(a_rotation), scale(a_scale), type(a_type), texture_path(a_texture_path), base_object(a_base_object)
@@ -140,11 +140,11 @@ void Advanced_Struct::load_hud_VAOs()
 	hud_attributes.push_back(v2);
 
 	// Create VAOs
-	all_vaos["default_font"] = new Font_VAO();
-	all_vaos["hud"] = new VAO("../shaders/hud", hud_attributes, "0");
+	all_vaos["default_font"] = new Font_VAO(get_assets_directory_path() + "shaders/font");
+	all_vaos["hud"] = new VAO(get_assets_directory_path() + "shaders/hud", hud_attributes, "0");
 
 	// Create base texture
-	textures["../fonts/default.png"] = new Font_Texture("../fonts/consolas.png");
+	textures[get_assets_directory_path() + "fonts/default.png"] = new Font_Texture(get_assets_directory_path() + "fonts/consolas.png");
 }
 
 // Loads the VAOs in the advanced struct
@@ -180,13 +180,13 @@ void Advanced_Struct::load_VAOs()
 	hud_attributes.push_back(v2);
 
 	// Create VAOs
-	all_vaos["chair"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/chair.vbo");
-	all_vaos["circle"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon50.vbo");
-	all_vaos["cylinder"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/polygon_3d50.vbo");
-	all_vaos["cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/cube.vbo");
-	all_vaos["one_faced_cube"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/one_faced_cube.vbo");
-	all_vaos["table"] = new VAO("../shaders/default", base_3d_attributes, "../vbos/table.vbo");
-	all_vaos["triangle"] = new VAO("../shaders/default", base_3d_attributes, "0");
+	all_vaos["chair"] = new VAO(get_assets_directory_path() +  "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/chair.vbo");
+	all_vaos["circle"] = new VAO(get_assets_directory_path() +  "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/polygon50.vbo");
+	all_vaos["cylinder"] = new VAO(get_assets_directory_path() + "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/polygon_3d50.vbo");
+	all_vaos["cube"] = new VAO(get_assets_directory_path() +  "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/cube.vbo");
+	all_vaos["one_faced_cube"] = new VAO(get_assets_directory_path() + "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/one_faced_cube.vbo");
+	all_vaos["table"] = new VAO(get_assets_directory_path() +  "shaders/default", base_3d_attributes, get_assets_directory_path() + "vbos/table.vbo");
+	all_vaos["triangle"] = new VAO(get_assets_directory_path() +  "shaders/default", base_3d_attributes, "0");
 
 	load_hud_VAOs();
 }
@@ -194,6 +194,11 @@ void Advanced_Struct::load_VAOs()
 // Create a new VAO into the game
 VAO* Advanced_Struct::new_vao(std::string path, std::string type, std::string shader_path)
 {
+	if (shader_path == "-1")
+	{
+		shader_path = get_assets_directory_path() + "shaders/default";
+	}
+
 	if (contains_vao(path)) { std::cout << "Matrix game : error ! The \"" << type << "\" VAO already exists." << std::endl; return 0; }
 
 	// Create base Shader_Program_Variable for the shader program

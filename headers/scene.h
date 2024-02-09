@@ -1,9 +1,9 @@
 #pragma once
 
-#include "advanced_struct.h"
-#include "graphic.h"
-#include "model.h"
-#include "physic.h"
+#include "../headers/advanced_struct.h"
+#include "../headers/graphic.h"
+#include "../headers/model.h"
+#include "../headers/physic.h"
 
 struct Map_Level {
 	// Struct representing a level of a map

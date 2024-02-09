@@ -1,6 +1,6 @@
-#include "base_struct.h"
-#include "graphic.h"
-#include "model.h"
+#include "../headers/base_struct.h"
+#include "../headers/graphic.h"
+#include "../headers/model.h"
 
 // Graphic_Object contructor
 Graphic_Object::Graphic_Object(Base_Struct* a_base_struct, Transform_Object& a_attached_transform, Texture *a_texture, VAO* a_vao) : base_struct(a_base_struct), attached_transform(a_attached_transform), texture(a_texture), vao(a_vao)

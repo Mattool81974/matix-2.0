@@ -1,4 +1,4 @@
-#include "test.h"
+#include "../headers/test.h"
 
 // For school project, calcul de l'inverse modulaire
 int inverse_modulaire(int a, int b)
@@ -175,7 +175,7 @@ void Famas::shoot()
 
     // Create the ammo
     float ammo_speed = get_ammo_speed();
-    Ammo* ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, false, "../textures/shell.png", false);
+    Ammo* ammo = scene->new_object<Ammo>("ammo-" + std::to_string(ammo_shooted), "ammo", 0, position, rotation, scale, false, game->get_assets_directory_path() + "textures/shell.png", false);
     ammo->get_tags()->push_back("ammo");
     ammo->get_attached_physic_object()->get_collision()->set_height(0.1);
     ammo->get_attached_physic_object()->get_collision()->set_width(0.1);

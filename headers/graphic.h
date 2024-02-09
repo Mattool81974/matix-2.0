@@ -1,7 +1,7 @@
 #pragma once
 
-#include "base_struct.h"
-#include "model.h"
+#include "../headers/base_struct.h"
+#include "../headers/model.h"
 
 class Graphic_Object
 {

@@ -1,11 +1,6 @@
 #pragma once
 
-#include "base_struct.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <string>
-#include <vector>
+#include "../headers/base_struct.h"
 
 struct Shader_Program_Variable
 {
@@ -217,7 +212,7 @@ class Font_VAO: public VAO
 {
 	// Class representing a VAO of a font
 public:
-	Font_VAO(); // Font_VAO constructor
+	Font_VAO(std::string shader_path); // Font_VAO constructor
 	void bind(glm::vec4 rect); // Bind the font VAO into the GPU memory
 	void render(glm::vec4 rect); // Render the Font_VAO
 	~Font_VAO(); // Font_VAO constructor

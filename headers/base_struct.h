@@ -14,6 +14,7 @@
 #include <locale>
 #include <map>
 #include <random>
+#include <stb_image.h>
 #include <string>
 #include <sstream>
 #include <sys/stat.h>
@@ -25,6 +26,7 @@ std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool
 std::vector<std::string> directory_content(std::string path); // Return the content of a directory
 struct stat file_datas(std::string path); // Return the datas about a file
 bool file_exists(std::string path); // Returns if a file exists
+bool path_is_directory(std::string path); // Returns if a path is a directory or not
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file content
 std::string replace(std::string str, std::string to_replace, std::string new_str); // Replace a string in an another string
@@ -204,11 +206,15 @@ class Base_Struct
 {
 public:
 	Base_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exec_path); // Base_Struct constructor
+	void error(std::string thrower, std::string error_content); // Cout an error in the program
+	std::string file_formatted(std::string path); // Return if a file formatted with the struct context
 	glm::mat4 get_projection(); // Return the projection matrix
 	~Base_Struct(); // Base_Struct destructor
 
 	// Getters and setters
+	inline std::string get_assets_directory_path() { return assets_directory_path; };
 	inline Camera* get_camera() { return &camera; };
+	inline std::string get_config_file_path() { return config_file_path; };
 	inline float get_delta_time() { return delta_time; };
 	inline std::string get_exec_path() { return exec_path; };
 	inline glm::vec3 get_gravity_force() { return gravity_force; };
@@ -228,6 +234,44 @@ public:
 	inline unsigned short get_right_mouse_button_state() { return right_mouse_button_state; };
 	inline int get_window_height() { return window_height; };
 	inline int get_window_width() { return window_width; };
+	inline void set_assets_directory_path(std::string new_assets_directory_path)
+	{
+		new_assets_directory_path = file_formatted(new_assets_directory_path);
+		if (file_exists(new_assets_directory_path))
+		{
+			if (path_is_directory(new_assets_directory_path))
+			{
+				assets_directory_path = new_assets_directory_path;
+			}
+			else
+			{
+				error("Matix game", "The path \"" + new_assets_directory_path + "\" you want to set as the game assets directory is not a directory.");
+			}
+		}
+		else
+		{
+			error("Matix game", "The path \"" + new_assets_directory_path + "\" you want to set as the game assets directory does not exist.");
+		}
+	}
+	inline void set_config_file_path(std::string new_config_file_path)
+	{
+		new_config_file_path = file_formatted(new_config_file_path);
+		if (file_exists(new_config_file_path))
+		{
+			if (!path_is_directory(new_config_file_path))
+			{
+				config_file_path = new_config_file_path;
+			}
+			else
+			{
+				error("Matix game", "The path \"" + new_config_file_path + "\" you want to set as the game config file is a directory.");
+			}
+		}
+		else
+		{
+			error("Matix game", "The path \"" + new_config_file_path + "\" you want to set as the game config file does not exist.");
+		}
+	}
 	inline void set_delta_time(float new_delta_time) { delta_time = new_delta_time; };
 	inline void set_gravity_force(glm::vec3 a_gravity_force) { gravity_force = a_gravity_force; };
 	inline void set_last_mouse_x(double a_last_mouse_x) { last_mouse_x = a_last_mouse_x; };
@@ -239,6 +283,8 @@ public:
 	inline void set_window_height(int height) { window_height = height; };
 	inline void set_window_width(int width) { window_width = width; };
 private:
+	std::string assets_directory_path = ""; // Path through the assert path file
+	std::string config_file_path = ""; // Path through the config path file
 	float delta_time = 0; // Time since the last frame of the game
 	const std::string exec_path = ""; // Path of the game exe
 	double last_mouse_x = 0; // Last X position of the mouse

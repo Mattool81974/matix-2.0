@@ -1,6 +1,5 @@
-#include "game.h"
-#include <iostream>
-#include "test.h"
+#include "../headers/game.h"
+#include "../headers/test.h"
 
 Game* game = 0;
 
@@ -10,7 +9,7 @@ void load_cli()
 
     // Construct the HUD
     HUD_CLI* hud = game->new_hud<HUD_CLI>("cli");
-    hud->load_from_file("../cli/normal_fr.cli");
+    hud->load_from_file(game->get_assets_directory_path() + "cli/normal_fr.cli");
 }
 
 void load_warehouse()
@@ -18,13 +17,13 @@ void load_warehouse()
     // Construct game
     game->set_background_color(glm::vec4(0.0f, (1.0f / 255.0f) * 204.0f, (1.0f / 255.0f) * 204.0f, 1.0f));
     Camera* camera = game->get_camera();
-    game->new_vao("../vbos/famas.vbo", "famas");
-    game->new_vao("../vbos/shell.vbo", "ammo");
-    Part* floor_exterior = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_exterior.png");
-    Part* floor_interior = game->new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/floor_interior.png");
-    Part* door = game->new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), "../textures/warehouse/door.png");
-    Part* package = game->new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/package.png");
-    Part* wall_exterior = game->new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), "../textures/warehouse/wall_exterior.png");
+    game->new_vao(game->get_assets_directory_path() + "vbos/famas.vbo", "famas");
+    game->new_vao(game->get_assets_directory_path() + "vbos/shell.vbo", "ammo");
+    Part* floor_exterior = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/floor_exterior.png");
+    Part* floor_interior = game->new_part(2, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/floor_interior.png");
+    Part* door = game->new_part<Door>(3, "cube", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(0.1, 2, 1), game->get_assets_directory_path() + "textures/warehouse/door.png");
+    Part* package = game->new_part(4, "cube", glm::vec3(0, 1.0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/package.png");
+    Part* wall_exterior = game->new_part(10, "one_faced_cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/warehouse/wall_exterior.png");
 
     // Configurate parts
     door->set_description("2");
@@ -36,16 +35,16 @@ void load_warehouse()
     wall_exterior->set_scale_level_multiplier(glm::vec3(0, 1, 0));
 
     // Construct scene
-    Scene* scene = game->new_scene("warehouse", "../maps/warehouse.wad", Map_Opening_Mode::Complex);
+    Scene* scene = game->new_scene("warehouse", game->get_assets_directory_path() + "maps/warehouse.wad", Map_Opening_Mode::Complex);
 
     // Construct objects for testing
     Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(13, 3, 53), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
-    Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
+    Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, game->get_assets_directory_path() + "textures/famas.png", false, true, false);
 
     // Construct the HUD
     HUD* hud = game->new_hud("base");
-    HUD_Text* fps = hud->new_hud_object<HUD_Text>("fps", "../fonts/default.png", "default_font");
-    HUD_Object* watermark = hud->new_hud_object("watermark", "../textures/watermark.png");
+    HUD_Text* fps = hud->new_hud_object<HUD_Text>("fps", game->get_assets_directory_path() + "fonts/default.png", "default_font");
+    HUD_Object* watermark = hud->new_hud_object("watermark", game->get_assets_directory_path() + "textures/watermark.png");
 
     // Configurate some objects in the scene
     camera->set_parent(player->get_attached_transform());
@@ -157,7 +156,9 @@ int main(int argc, char* argv[])
 {
     srand(time(0));
 
-    game = new Game(1600, 900, argv[0]);
+    game = new Game(1600, 900, argv[0], false);
+    game->load_from_config_file("../matix_config.cfg");
+    game->load_VAOs();
 
     load_cli();
     load_warehouse();
