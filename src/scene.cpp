@@ -652,6 +652,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 
 				for (int j = 1; j < lines.size(); j++) // Construct each collections
 				{
+					if (lines[j][0] == '#') { continue; } // In-map comment support
 					std::vector<std::string> cutted = cut_string(lines[j], ";");
 
 					Map_Level_Collection collection = Map_Level_Collection();
