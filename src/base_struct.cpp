@@ -5,6 +5,9 @@
 std::string float_character = "";
 std::string non_float_character = "";
 
+// Return the size of a number
+float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
+
 // Cut a string where there are the "cut"
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank)
 {
@@ -234,6 +237,11 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 
 		float angle = glm::atan(opposite / adjacent);
 
+		if (adjacent < 0)
+		{
+			angle = 3.1415 - angle;
+		}
+
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(rotation[1] * rotation_multiplier[1]);
 		glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
@@ -268,9 +276,6 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 
 	return to_return;
 }
-
-// Return the size of a number
-float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
 
 // Convert a string to a float
 float string_to_float(std::string str)
@@ -404,7 +409,6 @@ void Transform_Object::apply_parent_rotation()
 	rotation_offset_parent = parent->get_absolute_rotation();
 	position_offset_parent = -(rotate_vector(-get_position(), rotation_offset_parent * glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	position_offset_parent[1] = get_position()[1];
-	std::cout << "A " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << " " << position_offset_parent[0] << " " << position_offset_parent[2] << std::endl;
 	calculate_direction();
 }
 

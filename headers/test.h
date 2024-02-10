@@ -274,7 +274,9 @@ public:
     inline void set_wheel_speed(float new_wheel_speed) { wheel_speed = new_wheel_speed; };
 private:
     std::string screen_texture = ""; // Texture of the screen
-    float wheel_speed = 10.0f; // Speed of the wheel of the robot
+    float screen_y_rotation = 90.0f; // Y rotation of the screen
+    float turning_multiplicator = 0.5f; // Multipàlicator for turning the robot
+    float wheel_speed = 3.0f; // Speed of the wheel of the robot
 
     Game* game = 0; // Pointer to the game
 

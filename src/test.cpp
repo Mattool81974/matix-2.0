@@ -824,12 +824,12 @@ void Robot::forward(float forward_multiplicator)
 {
     // Calculate the movement to apply
     glm::vec3 forward = glm::normalize(get_attached_transform()->get_forward() * glm::vec3(forward_multiplicator, forward_multiplicator, forward_multiplicator));
-    glm::vec3 movement = forward * glm::vec3(get_wheel_speed(), get_wheel_speed(), get_wheel_speed());
+    glm::vec3 movement = forward * glm::vec3(-get_wheel_speed(), get_wheel_speed(), get_wheel_speed());
     get_attached_transform()->move(movement * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time()));
 
     // Calculate the wheel movement
     float wheel_diameter = (wheel_scale[1]) * 3.1415;
-    float angle = get_wheel_speed() / wheel_diameter * forward_multiplicator;
+    float angle = (get_wheel_speed() / wheel_diameter * forward_multiplicator) * 2.0;
     wheel0->get_attached_transform()->rotate(glm::vec3(0, 0, angle));
     wheel1->get_attached_transform()->rotate(glm::vec3(0, 0, angle));
 }
@@ -837,11 +837,9 @@ void Robot::forward(float forward_multiplicator)
 // Update the robot
 void Robot::update()
 {
+    glm::vec3 screen_rotation = screen->get_attached_transform()->get_rotation();
+    screen->get_attached_transform()->set_rotation(glm::vec3(screen_rotation[0], screen_y_rotation, screen_rotation[2]));
     Object::update();
-    glm::vec3 p = wheel0->get_attached_transform()->get_position();
-    glm::vec3 p1 = wheel1->get_attached_transform()->get_position();
-    std::cout << "W0 AP " << p[0] << " " << p[1] << " " << p[2] << std::endl;
-    std::cout << "W1 AP " << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
 }
 
 // Turn the robot on himself
@@ -849,12 +847,12 @@ void Robot::turn(float turn_multiplicator)
 {
     // Calculate the rotation of the robot
     glm::vec3 rotation = glm::vec3(0, turn_multiplicator * 3.1415, 0) * glm::vec3(get_wheel_speed(), get_wheel_speed(), get_wheel_speed());
-    rotation *= glm::vec3(2, 2, 2);
+    rotation *= glm::vec3(4 * turning_multiplicator, 4 * turning_multiplicator, 4 * turning_multiplicator);
     glm::vec3 final_rotation = rotation * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time());
     get_attached_transform()->rotate(final_rotation);
 
     // Turn the wheels
     final_rotation *= glm::vec3(3.1415, 3.1415, 3.1415);
-    wheel0->get_attached_transform()->rotate(glm::vec3(0, 0, -final_rotation[1]));
-    wheel1->get_attached_transform()->rotate(glm::vec3(0, 0, final_rotation[1]));
+    wheel0->get_attached_transform()->rotate(glm::vec3(0, 0, final_rotation[1]));
+    wheel1->get_attached_transform()->rotate(glm::vec3(0, 0, -final_rotation[1]));
 }
