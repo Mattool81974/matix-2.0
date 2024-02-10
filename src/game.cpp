@@ -241,11 +241,15 @@ void Game::load_keys()
 
     // Other
     keys["backspace"] = GLFW_KEY_BACKSPACE;
+    keys["down arrow"] = GLFW_KEY_DOWN;
     keys["enter"] = GLFW_KEY_ENTER;
+    keys["left arrow"] = GLFW_KEY_LEFT;
     keys["left shift"] = GLFW_KEY_LEFT_SHIFT;
+    keys["right arrow"] = GLFW_KEY_RIGHT;
     keys["right shift"] = GLFW_KEY_RIGHT_SHIFT;
     keys["space"] = GLFW_KEY_SPACE;
     keys["tab"] = GLFW_KEY_TAB;
+    keys["up arrow"] = GLFW_KEY_UP;
 }
 
 // Load the game from a config file

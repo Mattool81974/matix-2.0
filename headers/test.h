@@ -263,12 +263,28 @@ class Robot : public Object
 public:
     Robot(Advanced_Struct* a_advanced_struct = 0, std::string a_name = "", std::string a_scene_name = "", Transform_Object* a_attached_transform = 0, Graphic_Object* a_attached_graphic = 0, Physic_Object* a_attached_physic = 0); // Door constructor
     void create(); // Create each robot part
+    void forward(float forward_multiplicator = 1); // Go forward with the robot
+    void update(); // Update the robot
+    void turn(float turn_multiplicator = 1); // Turn the robot on himself
 
     // Getters and setters
     inline std::string get_screen_texture() { return screen_texture; };
+    inline float get_wheel_speed() { return wheel_speed; };
     inline void set_screen_texture(std::string new_screen_texture) { screen_texture = new_screen_texture; };
+    inline void set_wheel_speed(float new_wheel_speed) { wheel_speed = new_wheel_speed; };
 private:
     std::string screen_texture = ""; // Texture of the screen
+    float wheel_speed = 10.0f; // Speed of the wheel of the robot
 
     Game* game = 0; // Pointer to the game
+
+    // Robot parts datas
+    glm::vec3 wheel_scale = glm::vec3(0.5, 0.5, 0.2);
+
+    // Robot parts
+    Object* axis = 0;
+    Object* screen = 0;
+    Object* support = 0;
+    Object* wheel0 = 0;
+    Object* wheel1 = 0;
 };

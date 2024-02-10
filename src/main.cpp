@@ -47,8 +47,8 @@ void load_warehouse()
     Scene* scene = game->new_scene("warehouse", game->get_assets_directory_path() + "maps/warehouse.wad", Map_Opening_Mode::Complex);
 
     // Construct objects for testing
-    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(13, 3, 53), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
-    Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, game->get_assets_directory_path() + "textures/famas.png", false, true, false);
+    Player* player = scene->new_object<Player>("player", "player", 0, glm::vec3(15, 3, 20), glm::vec3(0, 0, 0), glm::vec3(1.3, 1.75, 1.3), false, "", false, false, true);
+    // Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, game->get_assets_directory_path() + "textures/famas.png", false, true, false);
 
     // Construct the HUD
     HUD* hud = game->new_hud("base");
@@ -62,8 +62,8 @@ void load_warehouse()
     camera->set_position(glm::vec3(0, 0.75, 0));
     cross->set_position(glm::vec3(0, 0, 0));
     cross->set_scale(glm::vec3(cross_width, cross_width * (16.0/9.0), 1));
-    famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
-    famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
+    // famas->get_attached_transform()->set_anchored_position(glm::vec3(-0.5, 0.15, 0.3));
+    // famas->get_attached_transform()->set_parent_rotation_multiplier(glm::vec3(1.0f, -1.0f, 1.0f));
     player->get_attached_physic_object()->set_use_collision(true);
     player->get_attached_physic_object()->set_elasticity(0.0f);
     player->set_map_pos(glm::vec3(2, 1, 2));
@@ -79,8 +79,8 @@ void load_warehouse()
     watermark->set_scale(glm::vec3(0.4, 0.24, 1));
 
     // Create robot
-    Robot* robot1 = scene->new_object<Robot>("robot1", "", 0, glm::vec3(20, 1, 20), glm::vec3(0, 90, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
-    Robot* robot2 = scene->new_object<Robot>("robot2", "", 0, glm::vec3(22, 1, 20), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
+    Robot* robot1 = scene->new_object<Robot>("robot1", "", 0, glm::vec3(20, 1, 20), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
+    Robot* robot2 = scene->new_object<Robot>("robot2", "", 0, glm::vec3(22, 1, 20), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
     robot1->set_screen_texture(game->get_assets_directory_path() + "textures/warehouse/robot/screen.png");
     robot2->set_screen_texture(game->get_assets_directory_path() + "textures/warehouse/robot/screen.png");
     robot1->create();
@@ -104,7 +104,7 @@ void level0()
     Object* chair = scene->new_object("chair", "chair", 0, glm::vec3(9, 0.5, 14), glm::vec3(0, 90, 0), glm::vec3(1, 1, 1), true, "../textures/chair.png", false, true, false);
     Object* clock = scene->new_object("clock", "circle", 0, glm::vec3(10.49, 2, 11.5), glm::vec3(0, 90, 0), glm::vec3(1, 1, 1), true, "../textures/clock.png", false, true, false);
     Object* computer = scene->new_object("computer", "cube", 0, glm::vec3(10, 1.5, 14), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, "../textures/computer.png", false, true, false);
-    Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(0, 0, 0), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
+    Famas* famas = scene->new_object<Famas>("famas", "famas", camera, glm::vec3(-0.3, -0.15f, -0.45), glm::vec3(0, 270, 0), glm::vec3(1, 1, 1), true, "../textures/famas.png", false, true, false);
     Object* player = scene->new_object("player", "player", 0, glm::vec3(2, 1, 2), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
     Object* floor = scene->new_object("floor", "square", 0, glm::vec3(20, 0, 20), glm::vec3(90, 0, 0), glm::vec3(50, 50, 1), true, "../textures/floor.png");
     Object* locker = scene->new_object("locker", "cube", 0, glm::vec3(10, 1, 10), glm::vec3(0, 0, 0), glm::vec3(1, 2, 1), true, "../textures/locker.png", false, true, false);
@@ -194,12 +194,34 @@ int main(int argc, char* argv[])
     Scene* warehouse = game->get_scene("warehouse");
     std::string texte_fps = "FPS : 0.";
 
+    Robot* robot1 = (Robot*)warehouse->get_object("robot1");
+
     bool current_is_cli = false;
 
     while (game->run())
     {
         game->update_event();
         game->update();
+
+        if (game->get_key_state("left arrow") == Key_State::Pressed)
+        {
+            robot1->turn(1);
+        }
+
+        if (game->get_key_state("right arrow") == Key_State::Pressed)
+        {
+            robot1->turn(-1);
+        }
+
+        if (game->get_key_state("up arrow") == Key_State::Pressed)
+        {
+            robot1->forward(1);
+        }
+
+        if (game->get_key_state("down arrow") == Key_State::Pressed)
+        {
+            robot1->forward(-1);
+        }
 
         if (!current_is_cli && game->get_key_state_frame("e") == Key_State::Pressed)
         {

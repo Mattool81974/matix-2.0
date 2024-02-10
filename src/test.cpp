@@ -809,11 +809,52 @@ void Robot::create()
     float support_y = 0.35f;
     float wheel_offset = 0.4;
     float wheel_y = 0;
-    glm::vec3 wheel_scale = glm::vec3(0.5, 0.5, 0.2);
+    
+    // Create each robot part
+    axis = scene->new_object(get_name() + ";axis", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, 0), glm::vec3(0, 0, 0), axis_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+    support = scene->new_object(get_name() + ";support", "one_faced_cube", get_attached_transform(), glm::vec3(0, support_y, 0), glm::vec3(0, 0, 0), support_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/support.png", false, true, false);
+    screen = scene->new_object(get_name() + ";screen", "cube", get_attached_transform(), glm::vec3(0, screen_y, 0), glm::vec3(0, 0, 0), screen_scale, false, get_screen_texture(), false, true, false);
 
-    Object* wheel0 = scene->new_object(get_name() + ";wheel0", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
-    Object* wheel1 = scene->new_object(get_name() + ";wheel1", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, -wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
-    Object* axis = scene->new_object(get_name() + ";axis", "cylinder", get_attached_transform(), glm::vec3(0, wheel_y, 0), glm::vec3(0, 0, 0), axis_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
-    Object* support = scene->new_object(get_name() + ";support", "one_faced_cube", get_attached_transform(), glm::vec3(0, support_y, 0), glm::vec3(0, 0, 0), support_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/support.png", false, true, false);
-    Object* screen = scene->new_object(get_name() + ";screen", "cube", get_attached_transform(), glm::vec3(0, screen_y, 0), glm::vec3(0, 0, 0), screen_scale, false, get_screen_texture(), false, true, false);
+    wheel0 = scene->new_object(get_name() + ";wheel0", "cylinder", axis->get_attached_transform(), glm::vec3(0, 0, -wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+    wheel1 = scene->new_object(get_name() + ";wheel1", "cylinder", axis->get_attached_transform(), glm::vec3(0, 0, wheel_offset), glm::vec3(0, 0, 0), wheel_scale, false, game->get_assets_directory_path() + "textures/warehouse/robot/wheel.png", false, true, false);
+}
+
+// Go forward with the robot 
+void Robot::forward(float forward_multiplicator)
+{
+    // Calculate the movement to apply
+    glm::vec3 forward = glm::normalize(get_attached_transform()->get_forward() * glm::vec3(forward_multiplicator, forward_multiplicator, forward_multiplicator));
+    glm::vec3 movement = forward * glm::vec3(get_wheel_speed(), get_wheel_speed(), get_wheel_speed());
+    get_attached_transform()->move(movement * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time()));
+
+    // Calculate the wheel movement
+    float wheel_diameter = (wheel_scale[1]) * 3.1415;
+    float angle = get_wheel_speed() / wheel_diameter * forward_multiplicator;
+    wheel0->get_attached_transform()->rotate(glm::vec3(0, 0, angle));
+    wheel1->get_attached_transform()->rotate(glm::vec3(0, 0, angle));
+}
+
+// Update the robot
+void Robot::update()
+{
+    Object::update();
+    glm::vec3 p = wheel0->get_attached_transform()->get_position();
+    glm::vec3 p1 = wheel1->get_attached_transform()->get_position();
+    std::cout << "W0 AP " << p[0] << " " << p[1] << " " << p[2] << std::endl;
+    std::cout << "W1 AP " << p1[0] << " " << p1[1] << " " << p1[2] << std::endl;
+}
+
+// Turn the robot on himself
+void Robot::turn(float turn_multiplicator)
+{
+    // Calculate the rotation of the robot
+    glm::vec3 rotation = glm::vec3(0, turn_multiplicator * 3.1415, 0) * glm::vec3(get_wheel_speed(), get_wheel_speed(), get_wheel_speed());
+    rotation *= glm::vec3(2, 2, 2);
+    glm::vec3 final_rotation = rotation * glm::vec3(game->get_delta_time(), game->get_delta_time(), game->get_delta_time());
+    get_attached_transform()->rotate(final_rotation);
+
+    // Turn the wheels
+    final_rotation *= glm::vec3(3.1415, 3.1415, 3.1415);
+    wheel0->get_attached_transform()->rotate(glm::vec3(0, 0, -final_rotation[1]));
+    wheel1->get_attached_transform()->rotate(glm::vec3(0, 0, final_rotation[1]));
 }
