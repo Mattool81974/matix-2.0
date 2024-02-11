@@ -38,11 +38,11 @@ Graphic_Object* Graphic_Scene::new_object(std::string name, Transform_Object &tr
 	{
 		if ((*get_game_struct()->get_type())[type] == "cube")
 		{
-			texture_path = "../textures/unknow_cube.png";
+			texture_path = get_game_struct()->get_assets_directory_path() + "textures/unknow_cube.png";
 		}
 		else
 		{
-			texture_path = "../textures/unknow.png";
+			texture_path = get_game_struct()->get_assets_directory_path() + "textures/unknow.png";
 		}
 	}
 

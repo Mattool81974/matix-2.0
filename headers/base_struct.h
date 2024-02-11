@@ -168,6 +168,7 @@ public:
 	{
 		position = new_position;
 		if(parent != 0) apply_parent_rotation();
+		else { position_offset_parent = new_position; }
 	};
 	inline void set_position_animation(glm::vec3 new_position) { position_animation = new_position; };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
@@ -318,7 +319,7 @@ private:
 	int window_height = 0; // Height of the graphic window
 	int window_width = 0; // Width of the graphic window
 
-	Camera camera; // Camera of the game
+	Camera camera = Camera(); // Camera of the game
 	glm::vec3 gravity_force = glm::vec3(0, -9.80665, 0); // Value of the gravity
 	std::map<std::string, Key_State> keys_state = std::map<std::string, Key_State>(); // Current state of the key
 	std::map<std::string, Key_State> keys_state_frame = std::map<std::string, Key_State>(); // State of the key if changed during this frame

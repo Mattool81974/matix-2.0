@@ -2,6 +2,9 @@
 
 #include "../../headers/game.h"
 
+// Run the warehouse program
+void run_warehouse(std::string path);
+
 class Entity : public Object
 {
     // Class representing an entity
@@ -184,7 +187,7 @@ private:
     Door* other_door = 0; // Door linked with this door
 };
 
-enum CLI_Command {Quit, Clear_CLI, CWD, Datas, Get, Help}; // Every CLI command
+enum CLI_Command { Quit, Clear_CLI, CWD, Datas, Get, Help }; // Every CLI command
 class HUD_CLI : public HUD
 {
     // Class representing a CLI for the HUD
