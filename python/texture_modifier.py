@@ -80,12 +80,12 @@ def create_cube(path: str, final_path: str) -> None:
         print("Error : the path \"" + path + "\" does not exist.")
         return
     
-    file1 = im.open(path + "/1.png").resize((500, 500))
-    file2 = im.open(path + "/2.png").resize((500, 500))
-    file3 = im.open(path + "/1.png").resize((500, 500))
+    file1 = im.open(path + "/0.png").resize((500, 500))
+    file2 = im.open(path + "/0.png").resize((500, 500))
+    file3 = im.open(path + "/0.png").resize((500, 500))
     file4 = im.open(path + "/2.png").resize((500, 500))
-    file5 = im.open(path + "/1.png").resize((500, 500))
-    file6 = im.open(path + "/1.png").resize((500, 500))
+    file5 = im.open(path + "/0.png").resize((500, 500))
+    file6 = im.open(path + "/0.png").resize((500, 500))
 
     w, h = 1500, 2000
     cube = im.new("RGBA", (w, h), (255, 255, 255, 0))
@@ -237,13 +237,5 @@ def perfect_texture(path):
 pg.init()
 pg.display.set_mode((1, 1))
 
-#create_cube("textures/warehouse/package_dir", "textures/warehouse/package.png")
-#create_cube("textures/computer_dir", "textures/computer.png")
-#create_chair("textures/table_dir", "textures/table.png")
-#create_chair("textures/chair_dir", "textures/chair.png")
-#create_cylinder("textures/ammo_dir", "textures/ammo.png")
-#create_famas("textures/famas_dir", "textures/famas.png")
-#create_famas("textures/luxary_famas_dir", "textures/luxary_famas.png")
-#create_shell("textures/shell_dir", "textures/shell.png")
-create_cube("screen_dir", "screen.png")
-#create_font("fonts/consolas.png", "Consolas", final_size = (1050, 2000))
+path = "../assets/textures/lunar_rover/"
+create_cube(path + "rover/head_dir", path + "rover/head.png")

@@ -65,6 +65,7 @@ public:
 	void add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object with base transform
 	void add_position_animation(float duration, glm::vec3 base_position, glm::vec3 final_position); // Add an animation to the object with the position
 	void add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation); // Add an animation to the object with the rotation
+	void apply_anchor_rotation(); // Apply to the object the anchor rotation
 	void apply_parent_rotation(); // Apply to the object the parent rotation
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
@@ -86,9 +87,9 @@ public:
 	{
 		if (get_parent() != 0)
 		{
-			return get_parent()->get_absolute_position() + get_position_animation() + position_offset_parent +position_offset_anchor;
+			return get_parent()->get_absolute_position() + get_position_animation() + position_offset_parent + position_offset_anchor;
 		}
-		return get_position_animation() + position_offset_parent +position_offset_anchor;
+		return get_position_animation() + position_offset_parent + position_offset_anchor;
 	};
 	inline glm::vec3 get_absolute_rotation()
 	{
@@ -138,6 +139,7 @@ public:
 		return new_scale;
 	};
 	inline glm::vec3 get_forward() { return forward; };
+	glm::vec3 get_global_rotation_modifier();
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
 	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
@@ -154,7 +156,11 @@ public:
 	inline bool is_animation_playing() { return animation_playing; };
 
 	// Setters
-	inline void set_anchored_position(glm::vec3 a_anchored_position) { anchored_position = a_anchored_position; position_offset_anchor = -a_anchored_position; };
+	inline void set_anchored_position(glm::vec3 a_anchored_position)
+	{
+		anchored_position = a_anchored_position;
+		// position_offset_anchor = -a_anchored_position;
+	};
 	inline void set_parent(Transform_Object* new_parent)
 	{
 		if (get_parent() != 0)
