@@ -1,5 +1,5 @@
 #include "../headers/game.h"
-#include "../headers/test.h"
+#include "../mods/headers/test.h"
 
 Game* game = 0;
 

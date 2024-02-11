@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../headers/game.h"
+#include "../../headers/game.h"
 
 class Entity : public Object
 {
