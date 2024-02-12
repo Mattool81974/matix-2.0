@@ -48,6 +48,8 @@ struct Transform_Animation {
 	glm::vec3 final_rotation = glm::vec3(0, 0, 0);
 	glm::vec3 final_scale = glm::vec3(1, 1, 1);
 
+	bool change_plan_rotation = false;
+
 	bool modify_position = true;
 	bool modify_rotation = true;
 	bool modify_scale = true;
@@ -64,9 +66,9 @@ public:
 	void add_animation(float duration, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object
 	void add_animation(float duration, glm::vec3 base_position, glm::vec3 base_rotation, glm::vec3 base_scale, glm::vec3 final_position, glm::vec3 final_rotation, glm::vec3 final_scale); // Add an animation to the object with base transform
 	void add_position_animation(float duration, glm::vec3 base_position, glm::vec3 final_position); // Add an animation to the object with the position
-	void add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation); // Add an animation to the object with the rotation
+	void add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation, bool change_plan_rotation = false); // Add an animation to the object with the rotation
 	void apply_anchor_rotation(); // Apply to the object the anchor rotation
-	void apply_parent_rotation(); // Apply to the object the parent rotation
+	void apply_parent_plan_rotation(); // Apply to the object the parent plan rotation
 	void calculate_direction(); // Calculate the direction vector of the transform object
 	glm::mat4 get_model_matrix(); // Return the transformation matrix of the object
 	void move(glm::vec3 a_mouvement); // Move the object
@@ -76,24 +78,31 @@ public:
 	void reset_animation(bool reset_position = true); // Reset the animation of the object
 	virtual void rotate(glm::vec3 a_rotation, bool rotate_around = true); // Rotate the object
 	void rotate_around_anchor(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1)); // Rotate the object around the anchored point
-	void set_rotation(glm::vec3 a_rotation, glm::vec3 rotation_multiplier = glm::vec3(1, 1, 1), bool rotate_around = true); // Set the rotation around the anchord point
 	void soft_reset(); // Reset softly the object
 	virtual void update() { update_animation(); }; // Update the object
 	void update_animation(); // Update the animations for the object
 	~Transform_Object(); // Transform_Object destructor
 
 	// Getters
+	inline glm::vec3 get_absolute_plan_rotation()
+	{
+		if (get_parent() != 0)
+		{
+			return get_parent()->get_absolute_rotation() + get_plan_rotation();
+		}
+		return get_plan_rotation();
+	}
 	inline glm::vec3 get_absolute_position()
 	{
 		if (get_parent() != 0)
 		{
-			return get_parent()->get_absolute_position() + get_position_animation() + position_offset_parent + position_offset_anchor;
+			return get_parent()->get_absolute_position() + get_position_animation() + position_plan_offset_parent + position_offset_anchor;
 		}
-		return get_position_animation() + position_offset_parent + position_offset_anchor;
+		return get_position_animation() + position_plan_offset_parent + position_offset_anchor;
 	};
 	inline glm::vec3 get_absolute_rotation()
 	{
-		return get_rotation() + rotation_offset_parent;
+		return rotation_plan_offset_parent + get_plan_rotation();
 	};
 	inline glm::vec3 get_anchored_position() { return anchored_position; };
 	inline std::vector<Transform_Animation>* get_animations() { return &animations; };
@@ -143,14 +152,16 @@ public:
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
 	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
+	inline glm::vec3 get_plan_rotation() { return plan_rotation; };
+	inline glm::vec3 get_plan_rotation_offset_parent() { return plan_rotation_offset_parent; };
 	inline glm::vec3 get_position() { return position; };
 	inline glm::vec3 get_position_animation() { return position_animation; };
 	inline glm::vec3 get_position_move_multiplier() { return position_move_multiplier; };
 	inline glm::vec3 get_position_offset_anchor() { return position_offset_anchor; };
-	inline glm::vec3 get_position_offset_parent() { return position_offset_parent; };
+	inline glm::vec3 get_position_offset_parent() { return position_plan_offset_parent; };
 	inline glm::vec3 get_right() { return right; };
 	inline glm::vec3 get_rotation() { return rotation; };
-	inline glm::vec3 get_rotation_offset_parent() { return rotation_offset_parent; };
+	inline glm::vec3 get_rotation_offset_parent() { return rotation_plan_offset_parent; };
 	inline glm::vec3 get_scale() { return scale; };
 	inline glm::vec3 get_up() { return up; };
 	inline bool is_animation_playing() { return animation_playing; };
@@ -166,25 +177,39 @@ public:
 		if (get_parent() != 0)
 		{ get_parent()->remove_child(this); }
 		parent = new_parent;
-		if (new_parent != 0) { new_parent->get_children()->push_back(this); apply_parent_rotation(); }
+		if (new_parent != 0) { new_parent->get_children()->push_back(this); apply_parent_plan_rotation(); }
 	};
 	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
+	inline void set_plan_rotation(glm::vec3 new_plan_rotation)
+	{
+		plan_rotation = new_plan_rotation;
+		apply_anchor_rotation();
+
+		std::vector<Transform_Object*>* children = get_children();
+		for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
+		{
+			Transform_Object* child = (*children)[i];
+			child->apply_parent_plan_rotation();
+		}
+	};
 	inline void set_position(glm::vec3 new_position)
 	{
 		position = new_position;
-		if(parent != 0) apply_parent_rotation();
-		else { position_offset_parent = new_position; }
+		if ( parent != 0 ) apply_parent_plan_rotation();
+		else { position_plan_offset_parent = new_position; }
 	};
 	inline void set_position_animation(glm::vec3 new_position) { position_animation = new_position; };
 	inline void set_position_move_multipler(glm::vec3 a_position_move_multiplier) { position_move_multiplier = a_position_move_multiplier; };
+	inline void set_rotation(glm::vec3 new_rotation) { rotation = new_rotation; };
 	inline void set_scale(glm::vec3 new_scale) { scale = new_scale; };
 	inline void start_animation() { animation_playing = true; };
 	inline void stop_animation() { animation_playing = false; };
 protected:
+	glm::vec3 plan_rotation_offset_parent = glm::vec3(0, 0, 0); // Offset plan rotation of the object for the parent
 	glm::vec3 position_offset_anchor = glm::vec3(0.0f, 0.0f, 0.0f); // Offset position of the object for the anchor
-	glm::vec3 position_offset_parent = glm::vec3(0.0f, 0.0f, 0.0f); // Offset position of the object for the parent
-	glm::vec3 rotation_offset_parent = glm::vec3(0.0f, 0.0f, 0.0f); // Offset rotation of the object for the parent
+	glm::vec3 position_plan_offset_parent = glm::vec3(0.0f, 0.0f, 0.0f); // Offset position of the object for the parent
+	glm::vec3 rotation_plan_offset_parent = glm::vec3(0.0f, 0.0f, 0.0f); // Offset rotation of the object for the parent
 private:
 	bool animation_playing = false; // If the animation is playing or not
 	std::vector<Transform_Animation> animations = std::vector<Transform_Animation>(); // List of all the animations in the object
@@ -199,6 +224,7 @@ private:
 	glm::vec3 anchored_position = glm::vec3(0.0f, 0.0f, 0.0f); // Base position of the object
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f); // Movement of the object
 	glm::vec3 parent_rotation_multiplier = glm::vec3(1.0f, 1.0f, 1.0f); // Multiplier to apply to a rotation coming from a parent
+	glm::vec3 plan_rotation = glm::vec3(0, 0, 0); // Rotation of the plan of the local transform
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the object
 	glm::vec3 position_animation = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the animation of the object
 	glm::vec3 position_move_multiplier = glm::vec3(1.0, 1.0, 1.0); // Multiplier for the poisitions used in "move"

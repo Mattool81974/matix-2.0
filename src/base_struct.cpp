@@ -396,10 +396,11 @@ void Transform_Object::add_position_animation(float duration, glm::vec3 base_pos
 }
 
 // Add an animation to the object with the  rotation
-void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation)
+void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rotation, glm::vec3 final_rotation, bool change_plan_rotation)
 {
 	Transform_Animation animation;
 	animation.base_rotation = base_rotation;
+	animation.change_plan_rotation = change_plan_rotation;
 	animation.duration = duration;
 	animation.final_rotation = final_rotation;
 	animation.modify_position = false;
@@ -410,30 +411,35 @@ void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rot
 // Apply to the object the anchor rotation
 void Transform_Object::apply_anchor_rotation()
 {
-	position_offset_anchor = (rotate_vector(-get_anchored_position(), get_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	position_offset_anchor = (rotate_vector(-get_anchored_position(), get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	position_offset_anchor += get_anchored_position();
 	calculate_direction();
 }
 
-// Apply to the object the parent rotation
-void Transform_Object::apply_parent_rotation()
+// Apply to the object the parent plan rotation
+void Transform_Object::apply_parent_plan_rotation()
 {
-	rotation_offset_parent = parent->get_absolute_rotation();
-	position_offset_parent = (rotate_vector(get_position(), rotation_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	rotation_plan_offset_parent = parent->get_absolute_rotation();
+	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	calculate_direction();
 }
 
 // Calculate the direction vector of the transform object
 void Transform_Object::calculate_direction()
 {
-	glm::vec3 rotation = get_rotation();
-	float x = cos(glm::radians(rotation[1])) * (cos(glm::radians(rotation[0]))); // Use trigonometry to calculate forward direction
-	float y = sin(glm::radians(rotation[0]));
-	float z = sin(glm::radians(rotation[1])) * (cos(glm::radians(rotation[0])));
+	glm::vec3 rotation = get_absolute_plan_rotation();
+	float x = cos(glm::radians(rotation[1])) * cos(glm::radians(0.0f)); // Use trigonometry to calculate forward direction
+	float y = sin(glm::radians(0.0f));
+	float z = sin(glm::radians(rotation[1])) * cos(glm::radians(0.0f));
+
+	float yaw_add = 90; // Use trigonometry to calculate up direction
+	float x_r = cos(glm::radians(rotation[1])) * cos(glm::radians(0 + yaw_add));
+	float y_r = sin(glm::radians(yaw_add));
+	float z_r = sin(glm::radians(rotation[1])) * cos(glm::radians(0 + yaw_add));
 
 	forward = glm::normalize(glm::vec3(x, y, z));
-	right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward)); // Use vector calcul to calculate right and up direction
-	up = glm::normalize(glm::cross(forward, right));
+	up = glm::normalize(glm::vec3(x_r, y_r, z_r));
+	right = glm::normalize(glm::cross(forward, up)); // Use vector calcul to calculate right and up direction
 }
 
 // Return the global up to apply rotation
@@ -463,11 +469,17 @@ glm::mat4 Transform_Object::get_model_matrix()
 	// Move matrix
 	matrix = glm::translate(matrix, get_absolute_position());
 
-	// Rotate matrix
+	// Rotate matrix from the plan
 	glm::vec3 rotation = get_absolute_rotation();
-	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
+	matrix = glm::rotate(matrix, glm::radians(rotation[1]), glm::vec3(0, 1, 0));
 	matrix = glm::rotate(matrix, glm::radians(rotation[0]), glm::vec3(1, 0, 0));
 	matrix = glm::rotate(matrix, glm::radians(rotation[2]), glm::vec3(0, 0, 1));
+
+	// Rotate matrix
+	rotation = get_rotation();
+	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
+	matrix = glm::rotate(matrix, glm::radians(rotation[0]), forward);
+	matrix = glm::rotate(matrix, glm::radians(rotation[2]), right);
 
 	// Scale matrix
 	matrix = glm::scale(matrix, get_scale());
@@ -484,7 +496,7 @@ void Transform_Object::move(glm::vec3 a_movement)
 // Rotate the object as a parent
 void Transform_Object::_parent_rotate(glm::vec3 a_rotation)
 {
-	apply_parent_rotation();
+	apply_parent_plan_rotation();
 
 	std::vector<Transform_Object*>* children = get_children();
 	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
@@ -523,7 +535,7 @@ void Transform_Object::reset_animation(bool reset_position)
 // Rotate the object
 void Transform_Object::rotate(glm::vec3 a_rotation, bool rotate_around)
 {
-	set_rotation(get_rotation() + a_rotation, glm::vec3(1, 1, 1), false);
+	set_rotation(get_rotation() + a_rotation);
 
 	std::vector<Transform_Object*>* children = get_children();
 	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
@@ -532,20 +544,6 @@ void Transform_Object::rotate(glm::vec3 a_rotation, bool rotate_around)
 		child->_parent_rotate(a_rotation);
 	}
 }
-
-// Set the rotation
-void Transform_Object::set_rotation(glm::vec3 new_rotation, glm::vec3 rotation_multiplier, bool rotate_around)
-{
-	if (rotation_multiplier[0] == 1)
-		rotation[0] = new_rotation[0];
-	if (rotation_multiplier[1] == 1)
-		rotation[1] = new_rotation[1];
-	if (rotation_multiplier[2] == 1)
-		rotation[2] = new_rotation[2];
-
-	apply_anchor_rotation();
-	calculate_direction();
-};
 
 // Reset softly the object
 void Transform_Object::soft_reset()
@@ -562,7 +560,17 @@ void Transform_Object::update_animation()
 		Transform_Animation* animation = get_current_animation();
 
 		if (animation->modify_position) set_position_animation(get_current_animation_position());
-		if (animation->modify_rotation) set_rotation(get_current_animation_rotation());
+		if (animation->modify_rotation)
+		{
+			if (get_current_animation()->change_plan_rotation)
+			{
+				set_plan_rotation(get_current_animation_rotation());
+			}
+			else
+			{
+				set_rotation(get_current_animation_rotation());
+			}
+		}
 		if (animation->modify_scale) set_scale(get_current_animation_scale());
 
 		// Calculate new transform

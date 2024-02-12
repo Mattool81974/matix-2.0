@@ -106,8 +106,8 @@ namespace Lunar_Rover
             // Calculate final transformation
             float deployment_time = 5.0f;
             float neck_deployment = deployment_time;
-            glm::vec3 neck_base_rotation = glm::vec3(90, 0, 0);
-            glm::vec3 neck_final_rotation = glm::vec3(0, 0, 0);
+            glm::vec3 neck_base_rotation = glm::vec3(0, 0, 0);
+            glm::vec3 neck_final_rotation = glm::vec3(90, 0, 0);
 
             neck->get_attached_transform()->start_animation();
             if (instant) // Apply the transformation
@@ -123,7 +123,7 @@ namespace Lunar_Rover
                     state = neck->get_attached_transform()->get_current_animation()->state / neck->get_attached_transform()->get_current_animation()->duration;
                 }
                 neck->get_attached_transform()->reset_animation();
-                neck->get_attached_transform()->add_rotation_animation(neck_deployment, neck_base_rotation, neck_final_rotation);
+                neck->get_attached_transform()->add_rotation_animation(neck_deployment, neck_base_rotation, neck_final_rotation, true);
                 neck->get_attached_transform()->get_current_animation()->state = (1.0 - state) * neck_deployment;
             }
         }
@@ -151,7 +151,7 @@ namespace Lunar_Rover
 
         // Turn the head
         neck->get_attached_transform()->rotate(glm::vec3(0, speed, 0));
-        std::cout << "A " << neck->get_attached_transform()->get_up()[0] << " " << neck->get_attached_transform()->get_up()[1] << " " << neck->get_attached_transform()->get_up()[2] << std::endl;
+        head->get_attached_transform()->rotate(glm::vec3(0, speed, 0));
     }
 
     // Undeploy the rover
@@ -163,8 +163,8 @@ namespace Lunar_Rover
 
             // Calculate final transformation
             float undeployment_time = 5.0f;
-            glm::vec3 neck_base_rotation = glm::vec3(0, 0, 0);
-            glm::vec3 neck_final_rotation = glm::vec3(90, 0, 0);
+            glm::vec3 neck_base_rotation = glm::vec3(90, 0, 0);
+            glm::vec3 neck_final_rotation = glm::vec3(0, 0, 0);
             float neck_undeployment = undeployment_time;
 
             if (instant)
@@ -180,7 +180,7 @@ namespace Lunar_Rover
                     state = neck->get_attached_transform()->get_current_animation()->state / neck->get_attached_transform()->get_current_animation()->duration;
                 }
                 neck->get_attached_transform()->reset_animation();
-                neck->get_attached_transform()->add_rotation_animation(neck_undeployment, neck_base_rotation, neck_final_rotation);
+                neck->get_attached_transform()->add_rotation_animation(neck_undeployment, neck_base_rotation, neck_final_rotation, true);
                 neck->get_attached_transform()->get_current_animation()->state = (1.0 - state) * neck_undeployment;
             }
         }
