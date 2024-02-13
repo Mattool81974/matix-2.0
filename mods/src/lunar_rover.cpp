@@ -18,6 +18,7 @@ namespace Lunar_Rover
     {
         // Create main variables for creation
         Scene* scene = game->get_scene(get_scene_name());
+        std::string texture_arm = game->get_assets_directory_path() + "textures/lunar_rover/rover/wheel_support.png";
         std::string texture_head = game->get_assets_directory_path() + "textures/lunar_rover/rover/head.png";
         std::string texture_neck = game->get_assets_directory_path() + "textures/lunar_rover/rover/neck.png";
         std::string texture_support = game->get_assets_directory_path() + "textures/lunar_rover/rover/support.png";
@@ -41,6 +42,32 @@ namespace Lunar_Rover
         glm::vec3 head_position = glm::vec3(0.0, 0.95, 0.0);
         glm::vec3 head_scale = glm::vec3(0.2, 0.4, 0.8);
         head = scene->new_object(get_name() + ";head", "cube", neck->get_attached_transform(), head_position, glm::vec3(0, 0, 0), head_scale, false, texture_head, false, true, false);
+
+        // Create the arm
+        glm::vec3 first_part_position = glm::vec3(0, 2.25, 0);
+        Transform_Object* last_part = get_attached_transform();
+        unsigned short part_number = 4;
+        glm::vec3 part_scale = glm::vec3(0.1, 1.0, 0.1);
+        for (int i = 0; i < part_number; i++)
+        {
+            // Create the variables for create
+            glm::vec3 anchored_position = glm::vec3(0, part_scale[1] / 2.0, 0);
+            glm::vec3 parent_rotation_multiplier = glm::vec3(-1, 1, 1);
+            glm::vec3 position = glm::vec3(part_scale[0], 0, 0);
+            if (i == 0) position = first_part_position;
+            glm::vec3 rotation = glm::vec3(0, 0, 0);
+            if (i % 2 == 0)
+            {
+                anchored_position = glm::vec3(0, -part_scale[1] / 2.0, 0);
+                parent_rotation_multiplier = glm::vec3(1, 1, 1);
+            }
+
+            Object* arm = scene->new_object(get_name() + ";arm" + std::to_string(i), "one_faced_cube", last_part, position, rotation, part_scale, false, texture_arm, false, true, false);
+            arm->get_attached_transform()->set_anchored_position(anchored_position);
+            arm->get_attached_transform()->set_parent_rotation_multiplier(parent_rotation_multiplier);
+            last_part = arm->get_attached_transform();
+            arm_parts.push_back(arm);
+        }
 
         // Create the wheels
         float wheel_separation = 3.0f;
@@ -80,28 +107,18 @@ namespace Lunar_Rover
         }
     }
 
-    // Move the rover forward
-    void Rover::forward(float multiplier)
+    // Deploy the arm of the rover
+    void Rover::deploy_arm(bool instant)
     {
-        // Move the transform
-        float speed = 2.0f * game->get_delta_time();
-        get_attached_transform()->move(glm::vec3(speed * multiplier, 0, 0));
 
-        // Animate the wheels
-        for (int i = 0; i < wheels.size(); i++)
-        {
-            Object* wheel = wheels[i];
-            float speed = 180;
-            wheel->get_attached_transform()->rotate(glm::vec3(0, 0, speed * game->get_delta_time() * -multiplier));
-        }
     }
 
-    // Deploy the rover
-    void Rover::deploy(bool instant)
+    // Deploy the head of the rover
+    void Rover::deploy_head(bool instant)
     {
-        if (!is_deployed())
+        if (!is_head_deployed())
         {
-            deployed = true;
+            head_deployed = true;
 
             // Calculate final transformation
             float deployment_time = 5.0f;
@@ -129,11 +146,65 @@ namespace Lunar_Rover
         }
     }
 
+    // Move the rover forward
+    void Rover::forward(float multiplier)
+    {
+        // Move the transform
+        float speed = 2.0f * game->get_delta_time();
+        get_attached_transform()->move(glm::vec3(speed * multiplier, 0, 0));
+
+        // Animate the wheels
+        for (int i = 0; i < wheels.size(); i++)
+        {
+            Object* wheel = wheels[i];
+            float speed = 180;
+            wheel->get_attached_transform()->rotate(glm::vec3(0, 0, speed * game->get_delta_time() * -multiplier));
+        }
+    }
+
+    // Move the arm forward
+    void Rover::turn_arm(glm::vec3 rotation)
+    {
+        // Rotate each arm parts
+        for (int i = 0; i < arm_parts.size(); i++)
+        {
+            // Calculate the variables for the rotation
+            Object* part = arm_parts[i];
+            float speed = 45.0 * game->get_delta_time();
+            // if (i % 2 == 1) speed = -speed;
+
+            // Rotate the part
+            part->get_attached_transform()->rotate_plan(rotation * glm::vec3(speed, speed, speed));
+
+            /*std::cout << "Arm " << i << " part absolute plan rotation : " << part->get_attached_transform()->get_absolute_plan_rotation()[0] << " " << part->get_attached_transform()->get_plan_rotation()[1] << " " << part->get_attached_transform()->get_plan_rotation()[2] << std::endl;
+            std::cout << "Arm " << i << " part absolute position : " << part->get_attached_transform()->get_absolute_position()[0] << " " << part->get_attached_transform()->get_absolute_position()[1] << " " << part->get_attached_transform()->get_absolute_position()[2] << std::endl;
+            std::cout << "Arm " << i << " part anchored position : " << part->get_attached_transform()->get_anchored_position()[0] << " " << part->get_attached_transform()->get_anchored_position()[1] << " " << part->get_attached_transform()->get_anchored_position()[2] << std::endl;
+            std::cout << "Arm " << i << " part anchored position offset : " << part->get_attached_transform()->get_anchor_position_offset()[0] << " " << part->get_attached_transform()->get_anchor_position_offset()[1] << " " << part->get_attached_transform()->get_anchor_position_offset()[2] << std::endl;
+            std::cout << "Arm " << i << " part d[0] offset anchored position : " << part->get_attached_transform()->get_position_offset_anchor()[0] << " " << part->get_attached_transform()->get_position_offset_anchor()[1] << " " << part->get_attached_transform()->get_position_offset_anchor()[2] << std::endl;
+            std::cout << "Arm " << i << " part d[0] offset parent position : " << part->get_attached_transform()->get_position_offset_parent()[0] << " " << part->get_attached_transform()->get_position_offset_parent()[1] << " " << part->get_attached_transform()->get_position_offset_parent()[2] << std::endl;
+            std::cout << "Arm " << i << " part parent : " << part->get_attached_transform()->get_parent()->get_absolute_position()[0] << " " << part->get_attached_transform()->get_parent()->get_absolute_position()[1] << " " << part->get_attached_transform()->get_parent()->get_absolute_position()[2] << std::endl;
+            std::cout << "Arm " << i << " part plan rotation : " << part->get_attached_transform()->get_plan_rotation()[0] << " " << part->get_attached_transform()->get_plan_rotation()[1] << " " << part->get_attached_transform()->get_plan_rotation()[2] << std::endl;
+            std::cout << "Arm " << i << " rotation multiplier : " << part->get_attached_transform()->get_parent_rotation_multiplier()[0] << " " << part->get_attached_transform()->get_parent_rotation_multiplier()[1] << " " << part->get_attached_transform()->get_parent_rotation_multiplier()[0] << std::endl;
+            std::cout << "Arm " << i << " part rotation offset parent : " << part->get_attached_transform()->get_rotation_plan_offset_parent()[0] << " " << part->get_attached_transform()->get_rotation_plan_offset_parent()[1] << " " << part->get_attached_transform()->get_rotation_plan_offset_parent()[2] << std::endl;
+            std::cout << "Arm " << i << " difference : " << part->get_attached_transform()->get_position_offset_parent()[2] + part->get_attached_transform()->get_position_offset_anchor()[2] << std::endl << std::endl;
+            part = arm_parts[i + 1];
+            std::cout << "Arm " << i + 1 << " part absolute position : " << part->get_attached_transform()->get_absolute_position()[0] << " " << part->get_attached_transform()->get_absolute_position()[1] << " " << part->get_attached_transform()->get_absolute_position()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part anchored position : " << part->get_attached_transform()->get_anchored_position()[0] << " " << part->get_attached_transform()->get_anchored_position()[1] << " " << part->get_attached_transform()->get_anchored_position()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part anchored position offset : " << part->get_attached_transform()->get_anchor_position_offset()[0] << " " << part->get_attached_transform()->get_anchor_position_offset()[1] << " " << part->get_attached_transform()->get_anchor_position_offset()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part offset anchored position : " << part->get_attached_transform()->get_position_offset_anchor()[0] << " " << part->get_attached_transform()->get_position_offset_anchor()[1] << " " << part->get_attached_transform()->get_position_offset_anchor()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part offset parent position : " << part->get_attached_transform()->get_position_offset_parent()[0] << " " << part->get_attached_transform()->get_position_offset_parent()[1] << " " << part->get_attached_transform()->get_position_offset_parent()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part plan rotation : " << part->get_attached_transform()->get_plan_rotation()[0] << " " << part->get_attached_transform()->get_plan_rotation()[1] << " " << part->get_attached_transform()->get_plan_rotation()[2] << std::endl;
+            std::cout << "Arm " << i + 1 << " part rotation offset parent : " << part->get_attached_transform()->get_rotation_plan_offset_parent()[0] << " " << part->get_attached_transform()->get_rotation_plan_offset_parent()[1] << " " << part->get_attached_transform()->get_rotation_plan_offset_parent()[2] << std::endl << std::endl;
+            //*/
+        }
+    }
+
     // Set the back view for the camera
     void Rover::set_back_view()
     {
         camera->set_parent(get_attached_transform());
         camera->set_position(get_camera_back_view_offset());
+        camera->set_plan_rotation(get_camera_back_view_rotation_offset());
     }
 
     // Set the ehad view for the camera
@@ -141,6 +212,15 @@ namespace Lunar_Rover
     {
         camera->set_parent(head->get_attached_transform());
         camera->set_position(get_camera_head_view_offset());
+        camera->set_plan_rotation(get_camera_head_view_rotation_offset());
+    }
+
+    // Set the right view for the camera
+    void Rover::set_right_view()
+    {
+        camera->set_parent(get_attached_transform());
+        camera->set_position(get_camera_right_view_offset());
+        camera->set_plan_rotation(get_camera_right_view_rotation_offset());
     }
 
     // Turn the head of the rover
@@ -154,12 +234,18 @@ namespace Lunar_Rover
         head->get_attached_transform()->rotate(glm::vec3(0, speed, 0));
     }
 
-    // Undeploy the rover
-    void Rover::undeploy(bool instant)
+    // Undeploy the arm fothe rover
+    void Rover::undeploy_arm(bool instant)
     {
-        if (is_deployed())
+
+    }
+
+    // Undeploy the head of the rover
+    void Rover::undeploy_head(bool instant)
+    {
+        if (is_head_deployed())
         {
-            deployed = false;
+            head_deployed = false;
 
             // Calculate final transformation
             float undeployment_time = 5.0f;
@@ -198,6 +284,24 @@ namespace Lunar_Rover
             forward(-1);
         }
 
+        // Control the arm
+        if (game->get_key_state_frame("8"))
+        {
+            turn_arm();
+        }
+        if (game->get_key_state_frame("2"))
+        {
+            turn_arm(glm::vec3(-1, 0, 0));
+        }
+        if (game->get_key_state_frame("4"))
+        {
+            turn_arm(glm::vec3(0, 1, 0));
+        }
+        if (game->get_key_state_frame("6"))
+        {
+            turn_arm(glm::vec3(0, -1, 0));
+        }
+
         // Control the head
         if (game->get_key_state_frame("left arrow"))
         {
@@ -211,11 +315,25 @@ namespace Lunar_Rover
         // Control the deployment
         if (game->get_key_state_frame("l"))
         {
-            undeploy();
+            undeploy_head();
         }
         if (game->get_key_state_frame("o"))
         {
-            deploy();
+            deploy_head();
+        }
+
+        // Control the camera view
+        if (game->get_key_state_frame("t") == Key_State::Pressed)
+        {
+            set_back_view();
+        }
+        if (game->get_key_state_frame("g") == Key_State::Pressed)
+        {
+            set_head_view();
+        }
+        if (game->get_key_state_frame("b") == Key_State::Pressed)
+        {
+            set_right_view();
         }
 
         Object::update();
@@ -265,16 +383,6 @@ namespace Lunar_Rover
         {
             game->update_event();
             game->update();
-
-            if (game->get_key_state_frame("p") == Key_State::Pressed)
-            {
-                rover->set_back_view();
-            }
-
-            if (game->get_key_state_frame("m") == Key_State::Pressed)
-            {
-                rover->set_head_view();
-            }
 
             game->render();
         }

@@ -217,39 +217,59 @@ std::string replace(std::string str, std::string to_replace, std::string new_str
 	return final.substr(0, final.size() - new_str.size());
 }
 
+// Rotate a vector on the y axus
+glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
+{
+	glm::vec3 to_return = vector;
+
+	if (rotation == 0) { return vector; }
+
+	// Calculate the angle in a local XZ circle with Y angle
+	glm::vec2 difference_position = glm::vec2(vector[0], vector[2]);
+	
+	// Calculate the angle of the position
+	float opposite = difference_position[0];
+	float adjacent = difference_position[1];
+	float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
+	glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
+
+	float angle = glm::atan(opposite / adjacent);
+	if (adjacent == 0 && opposite == 0) angle = 0;
+	else if (adjacent == 0) angle = 3.1415;
+
+	if (adjacent < 0 && opposite > 0)
+	{
+		angle = 3.1415 + angle;
+	}
+	else if (adjacent < 0 && opposite < 0)
+	{
+		angle = 3.1415 - angle;
+	}
+	else if (opposite < 0)
+	{
+		angle = 3.1415 - angle;
+	}
+
+	// Calculate the position in the local circle
+	float final_angle = angle + glm::radians(rotation);
+	glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
+
+	// Calculate the final position
+	to_return[0] = final_position[0];
+	to_return[2] = final_position[1];
+
+	return to_return;
+}
+
 // Rotate a vector around a rotating point
 glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier, bool protection)
 {
 	if (protection && rotation == glm::vec3(0, 0, 0)) { return vector; }
 
 	vector -= position;
-	glm::vec3 to_return = vector;
-
-	// Calculate the angle in a local XZ circle with Y angle
+	rotation = normalize_rotation(rotation);
 	glm::vec2 difference_position = glm::vec2(vector[0], vector[2]);
-	if (!(difference_position[0] == 0 and difference_position[1] == 0) and rotation_multiplier[1] != 0)
-	{
-		// Calculate the angle of the position
-		float opposite = difference_position[0];
-		float adjacent = difference_position[1];
-		float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
-		glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
-
-		float angle = glm::atan(opposite / adjacent);
-
-		if (adjacent < 0)
-		{
-			angle = 3.1415 - angle;
-		}
-
-		// Calculate the position in the local circle
-		float final_angle = angle + glm::radians(rotation[1] * rotation_multiplier[1]);
-		glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
-
-		// Calculate the final position
-		to_return[0] = final_position[0];
-		to_return[2] = final_position[1];
-	}
+	glm::vec3 to_return = rotate_vector_y(vector, rotation[1]);
 
 	// Calculate the angle in a local YZ circle with X angle
 	if (vector[1] != 0 && rotation_multiplier[0] == 1)
@@ -259,19 +279,32 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 		float hypothenus = glm::distance(glm::vec3(difference_position[0], vector[1] - position[1], difference_position[1]), glm::vec3(0, 0, 0));
 		glm::vec2 opposite_normalized = glm::normalize(difference_position);
 
-		float angle = glm::acos(adjacent / hypothenus);
-		if (vector[1] - position[1] < 0)
+		float angle = glm::acos(adjacent / (hypothenus + 0.001));
+		if (vector[0] - vector[2] > 0 && vector[1] - position[1] < 0)
 		{
-			angle = 3.1415 * 2 - glm::acos(adjacent / hypothenus);
+			angle = 3.1415 + glm::acos(adjacent / (hypothenus + 0.001));
+		}
+		else if (vector[0] - vector[2] > 0)
+		{
+			angle = 3.1415 - glm::acos(adjacent / (hypothenus + 0.001));
+		}
+		else if (vector[1] - position[1] < 0)
+		{
+			angle = 3.1415 * 2 - glm::acos(adjacent / (hypothenus + 0.001));
 		}
 
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(rotation[0]);
 
+		// std::cout << "O " << to_return[0] << " " << to_return[1] << " " << to_return[2] << std::endl;
+		// std::cout << "R " << rotation[0] << " " << rotation[1] << " " << rotation[2] << std::endl;
+
 		// Calculate the final position
 		if (to_return[0] == 0 && to_return[2] == 0)
 		{
-			to_return[2] = vector[1];
+			float other_angle = rotation[1];
+			to_return[0] = vector[1] * glm::sin(glm::radians(other_angle));
+			to_return[2] = vector[1] * glm::cos(glm::radians(other_angle));
 		}
 		to_return[1] = glm::sin(final_angle) * hypothenus;
 		to_return[0] *= -glm::cos(final_angle);
@@ -411,23 +444,77 @@ void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rot
 // Apply to the object the anchor rotation
 void Transform_Object::apply_anchor_rotation()
 {
-	position_offset_anchor = (rotate_vector(-get_anchored_position(), get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
-	position_offset_anchor += get_anchored_position();
+	glm::vec3 anchor = -get_anchor_position_offset();
+	position_offset_anchor = (rotate_vector(anchor, get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	position_offset_anchor -= anchor;
+	
 	calculate_direction();
+}
+
+// Apply to a child matrix the parent position model
+glm::mat4 Transform_Object::apply_parent_position_model_matrix(glm::mat4 matrix)
+{
+	// Apply parent position model matrix
+	if (get_parent() != 0) matrix = get_parent()->apply_parent_position_model_matrix(matrix);
+
+	// Move the matrix
+	matrix = glm::translate(matrix, get_position_offset_parent());
+	matrix = glm::translate(matrix, get_position_animation());
+	matrix = glm::translate(matrix, get_position_offset_anchor());
+
+	return matrix;
+}
+
+// Apply the parent position to a vector
+glm::vec3 Transform_Object::apply_parent_position_vector(glm::vec3 vector)
+{
+	// Apply parent position position
+	if (get_parent() != 0) vector = get_parent()->apply_parent_position_vector(vector);
+
+	// Move the vector
+	vector += get_position_offset_parent();
+	vector += get_position_animation();
+	vector += get_position_offset_anchor();
+
+	return vector;
+}
+
+// Apply to a child matrix the parent rotation model
+glm::mat4 Transform_Object::apply_parent_rotation_model_matrix(glm::mat4 matrix, Transform_Object* child)
+{
+	glm::vec3 up = glm::vec3(0, 1, 0);
+	glm::vec3 forward = glm::vec3(1, 0, 0);
+	glm::vec3 right = glm::vec3(0, 0, 1);
+
+	// Apply parent rotation model matrix
+	if (get_parent() != 0)
+	{
+		matrix = get_parent()->apply_parent_rotation_model_matrix(matrix);
+	}
+
+	// Rotate matrix from the plan
+	glm::vec3 rotation = get_plan_rotation(true);
+	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
+	matrix = glm::rotate(matrix, glm::radians(rotation[0]), forward);
+	matrix = glm::rotate(matrix, glm::radians(rotation[2]), right);
+
+	return matrix;
 }
 
 // Apply to the object the parent plan rotation
 void Transform_Object::apply_parent_plan_rotation()
 {
-	rotation_plan_offset_parent = parent->get_absolute_rotation();
+	rotation_plan_offset_parent = get_parent()->get_absolute_plan_rotation(true);
 	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	anchor_position_offset = (rotate_vector(get_anchored_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	apply_anchor_rotation();
 	calculate_direction();
 }
 
 // Calculate the direction vector of the transform object
 void Transform_Object::calculate_direction()
 {
-	glm::vec3 rotation = get_absolute_plan_rotation();
+	glm::vec3 rotation = get_absolute_plan_rotation(true);
 	float x = cos(glm::radians(rotation[1])) * cos(glm::radians(0.0f)); // Use trigonometry to calculate forward direction
 	float y = sin(glm::radians(0.0f));
 	float z = sin(glm::radians(rotation[1])) * cos(glm::radians(0.0f));
@@ -467,16 +554,11 @@ glm::mat4 Transform_Object::get_model_matrix()
 	glm::mat4 matrix = glm::mat4(1.0f);
 
 	// Move matrix
-	matrix = glm::translate(matrix, get_absolute_position());
+	matrix = apply_parent_position_model_matrix(matrix);
 
 	// Rotate matrix from the plan
-	glm::vec3 rotation = get_absolute_rotation();
-	matrix = glm::rotate(matrix, glm::radians(rotation[1]), glm::vec3(0, 1, 0));
-	matrix = glm::rotate(matrix, glm::radians(rotation[0]), glm::vec3(1, 0, 0));
-	matrix = glm::rotate(matrix, glm::radians(rotation[2]), glm::vec3(0, 0, 1));
-
-	// Rotate matrix
-	rotation = get_rotation();
+	matrix = apply_parent_rotation_model_matrix(matrix, this);
+	glm::vec3 rotation = get_rotation();
 	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
 	matrix = glm::rotate(matrix, glm::radians(rotation[0]), forward);
 	matrix = glm::rotate(matrix, glm::radians(rotation[2]), right);
@@ -491,19 +573,6 @@ glm::mat4 Transform_Object::get_model_matrix()
 void Transform_Object::move(glm::vec3 a_movement)
 {
 	movement = get_movement() + a_movement * get_position_move_multiplier();
-}
-
-// Rotate the object as a parent
-void Transform_Object::_parent_rotate(glm::vec3 a_rotation)
-{
-	apply_parent_plan_rotation();
-
-	std::vector<Transform_Object*>* children = get_children();
-	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
-	{
-		Transform_Object* child = (*children)[i];
-		child->_parent_rotate(a_rotation);
-	}
 }
 
 // Remove an object from the children
@@ -529,19 +598,6 @@ void Transform_Object::reset_animation(bool reset_position)
 	if (reset_position)
 	{
 		set_position_animation(glm::vec3(0, 0, 0));
-	}
-}
-
-// Rotate the object
-void Transform_Object::rotate(glm::vec3 a_rotation, bool rotate_around)
-{
-	set_rotation(get_rotation() + a_rotation);
-
-	std::vector<Transform_Object*>* children = get_children();
-	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
-	{
-		Transform_Object* child = (*children)[i];
-		child->_parent_rotate(a_rotation);
 	}
 }
 
