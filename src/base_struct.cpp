@@ -133,6 +133,14 @@ bool path_is_directory(std::string path)
 	return ((file_datas(path).st_mode & S_IFDIR) == S_IFDIR);
 }
 
+// Normalize an angle and return it
+float normalize_angle(float angle)
+{
+	while (angle < 0) angle += 360;
+	while (angle >= 360) angle -= 360;
+	return angle;
+}
+
 // Normalize a rotation and return it
 glm::vec3 normalize_rotation(glm::vec3 rotation)
 {
@@ -233,21 +241,27 @@ glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
 	float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
 	glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
 
-	float angle = glm::atan(opposite / adjacent);
+	float angle = glm::acos(adjacent / hypothenus);
 	if (adjacent == 0 && opposite == 0) angle = 0;
 	else if (adjacent == 0) angle = 3.1415;
 
+	std::cout << "G " << angle << " " << rotation << " " << vector[0] << " " << vector[1] << " " << vector[2] << std::endl;
+
 	if (adjacent < 0 && opposite > 0)
 	{
-		angle = 3.1415 + angle;
+		angle = 3.1415 * 0.5 - angle;
 	}
 	else if (adjacent < 0 && opposite < 0)
 	{
-		angle = 3.1415 - angle;
+		angle = 3.1415 + angle;
 	}
 	else if (opposite < 0)
 	{
-		angle = 3.1415 - angle;
+		angle = 3.1415 * 1.5 - angle;
+	}
+	else
+	{
+		angle = angle;
 	}
 
 	// Calculate the position in the local circle
@@ -257,6 +271,8 @@ glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
 	// Calculate the final position
 	to_return[0] = final_position[0];
 	to_return[2] = final_position[1];
+
+	std::cout << "H " << angle << " " << to_return[0] << " " << to_return[2] << std::endl;
 
 	return to_return;
 }
@@ -307,8 +323,8 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 			to_return[2] = vector[1] * glm::cos(glm::radians(other_angle));
 		}
 		to_return[1] = glm::sin(final_angle) * hypothenus;
-		to_return[0] *= -glm::cos(final_angle);
-		to_return[2] *= -glm::cos(final_angle);
+		to_return[0] *= -glm::cos(glm::radians(rotation[0]));
+		to_return[2] *= -glm::cos(glm::radians(rotation[0]));
 	}
 
 	return to_return;
@@ -382,11 +398,17 @@ void write_in_file(std::string path, std::string to_write, std::ios::openmode op
 	}
 }
 
+unsigned int Transform_Object::object_count = 0;
+
 // Transform_Object contructor
 Transform_Object::Transform_Object(Transform_Object *a_parent, glm::vec3 a_position, glm::vec3 a_rotation, glm::vec3 a_scale) : parent(0), position(a_position), rotation(a_rotation), scale(a_scale)
 {
 	set_parent(a_parent);
 	calculate_direction();
+
+	// Handle the id
+	id = Transform_Object::object_count;
+	Transform_Object::object_count++;
 }
 
 // Transform_Object copy constructor
@@ -504,11 +526,18 @@ glm::mat4 Transform_Object::apply_parent_rotation_model_matrix(glm::mat4 matrix,
 // Apply to the object the parent plan rotation
 void Transform_Object::apply_parent_plan_rotation()
 {
-	rotation_plan_offset_parent = get_parent()->get_absolute_plan_rotation(true);
+	rotation_plan_offset_parent = get_parent()->get_plan_rotation(true) * get_parent_rotation_multiplier();
 	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	anchor_position_offset = (rotate_vector(get_anchored_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	apply_anchor_rotation();
 	calculate_direction();
+
+	if (get_id() == 7)
+	{
+		std::cout << "7 " << rotation_plan_offset_parent[0] << " " << rotation_plan_offset_parent[1] << " " << rotation_plan_offset_parent[2] << std::endl;
+		std::cout << "  " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
+		std::cout << "  " << position_plan_offset_parent[0] << " " << position_plan_offset_parent[1] << " " << position_plan_offset_parent[2] << std::endl;
+	}
 }
 
 // Calculate the direction vector of the transform object
@@ -662,7 +691,7 @@ glm::mat4 Camera::get_projection(int window_height, int window_width)
 // Return the view matrix
 glm::mat4 Camera::get_view()
 {
-	return glm::lookAt(get_absolute_position(), get_absolute_position() + get_forward(), get_up());
+	return glm::lookAt(get_absolute_position(), get_looked_position(), get_up());
 }
 
 // Rotate the object

@@ -569,8 +569,6 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			std::cout << "K" << std::endl;
-
 			// Create the necessary variables for the part
 			float x = middle[0] + part->get_position()[0];
 			float y = middle[1] + part->get_position()[1];

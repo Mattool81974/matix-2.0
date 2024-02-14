@@ -27,6 +27,7 @@ std::vector<std::string> directory_content(std::string path); // Return the cont
 struct stat file_datas(std::string path); // Return the datas about a file
 bool file_exists(std::string path); // Returns if a file exists
 bool path_is_directory(std::string path); // Returns if a path is a directory or not
+float normalize_angle(float angle); // Normalize an angle and return it
 glm::vec3 normalize_rotation(glm::vec3 rotation); // Normalize a rotation and return it
 std::string read_file(std::string path, File_Type type = File_Type::Text); // Return the file content
 std::string replace(std::string str, std::string to_replace, std::string new_str); // Replace a string in an another string
@@ -164,10 +165,15 @@ public:
 	};
 	inline glm::vec3 get_forward() { return forward; };
 	glm::vec3 get_global_rotation_modifier();
+	inline unsigned int get_id() { return id; };
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
 	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
-	inline glm::vec3 get_plan_rotation(bool use_rotation_multiplier = false) { if (use_rotation_multiplier) return plan_rotation * get_parent_rotation_multiplier(); return plan_rotation; };
+	inline glm::vec3 get_plan_rotation(bool use_rotation_multiplier = false)
+	{
+		if (use_rotation_multiplier) return plan_rotation * get_parent_rotation_multiplier();
+		return plan_rotation;
+	};
 	inline glm::vec3 get_position() { return position; };
 	inline glm::vec3 get_position_animation() { return position_animation; };
 	inline glm::vec3 get_position_move_multiplier() { return position_move_multiplier; };
@@ -244,7 +250,11 @@ private:
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); // Up vector for the object
 
 	glm::vec3 anchored_position = glm::vec3(0.0f, 0.0f, 0.0f); // Base position of the object
+	// ID of the transform object
+	unsigned int id = 0;
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f); // Movement of the object
+	// Number of objects created
+	static unsigned int object_count;
 	glm::vec3 parent_rotation_multiplier = glm::vec3(1.0f, 1.0f, 1.0f); // Multiplier to apply to a rotation coming from a parent
 	glm::vec3 plan_rotation = glm::vec3(0, 0, 0); // Rotation of the plan of the local transform
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the object
@@ -267,12 +277,22 @@ public:
 	// Getter
 	inline float get_far() { return far; };
 	inline float get_fov() { return fov; };
+	inline glm::vec3 get_looked_position() { if (looks_forward()) return get_absolute_position() + get_forward(); return a_looked_position; };
 	inline float get_sensitivity() { return sensitivity; };
+	inline bool looks_forward() { return a_looks_forward; };
 	inline void set_fov(float a_fov) { fov = a_fov; };
+	inline void set_looked_position(glm::vec3 new_looked_position) { a_looked_position = new_looked_position; };
+	inline void set_looks_forward(bool new_looks_forward) { a_looks_forward = new_looks_forward; };
 private:
 	float far = 1000.0f; // Far projection for the camera
 	float fov = 45.0f; // Fov of the camera
 	float sensitivity = 30; // Sensitivity of the camera
+
+	// Position looked by the camera
+	glm::vec3 a_looked_position = glm::vec3(0, 0, 0);
+
+	// If the camera looks forward or not
+	bool a_looks_forward = true;
 };
 
 enum Key_State { Nothing, Pressed, Already_Pressed }; // Differents orientations for a map lev collection

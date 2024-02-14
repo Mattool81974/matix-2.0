@@ -3,19 +3,22 @@
 namespace Lunar_Rover
 {
     // Main game variables
-    Camera* camera = 0;
     Game* game = 0;
     Scene* lunar_scene = 0;
 
     // Rover constructor
     Rover::Rover(Advanced_Struct* a_advanced_struct, std::string a_name , std::string a_scene_name , Transform_Object* a_attached_transform, Graphic_Object* a_attached_graphic, Physic_Object* a_attached_physic) : Object(a_advanced_struct, a_name, a_scene_name, a_attached_transform, a_attached_graphic, a_attached_physic)
     {
-
+        a_game = (Game*)a_advanced_struct;
+        a_camera = lunar_scene->new_object<Player::Camera_Handler>("camera_handler", "", 0, glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, false);
+        a_camera->set_can_move(false);
     }
 
     // Create the rover part by part
     void Rover::create()
     {
+        get_attached_physic_object()->set_gravity_value(glm::vec3(0, 0, 0));
+
         // Create main variables for creation
         Scene* scene = game->get_scene(get_scene_name());
         std::string texture_arm = game->get_assets_directory_path() + "textures/lunar_rover/rover/wheel_support.png";
@@ -34,9 +37,11 @@ namespace Lunar_Rover
 
         // Create the neck of the rover
         glm::vec3 neck_position = glm::vec3(1.75, 1.0, -0.75);
+        glm::vec3 neck_rotation_multiplier = glm::vec3(1, 1, 1);
         glm::vec3 neck_scale = glm::vec3(0.2, 1.5, 0.2);
         neck = scene->new_object(get_name() + ";neck", "one_faced_cube", support->get_attached_transform(), neck_position, glm::vec3(0, 0, 0), neck_scale, false, texture_neck, false, true, false);
         neck->get_attached_transform()->set_anchored_position(glm::vec3(0, -0.75, 0));
+        neck->get_attached_transform()->set_parent_rotation_multiplier(neck_rotation_multiplier);
 
         // Create the head of the rover
         glm::vec3 head_position = glm::vec3(0.0, 0.95, 0.0);
@@ -149,15 +154,31 @@ namespace Lunar_Rover
     // Move the rover forward
     void Rover::forward(float multiplier)
     {
-        // Move the transform
+        // Calculate the necessary variables
+        glm::vec2 right_left_ratio = glm::vec2(get_wheels_turn_difference_left_right(), 1);
+        glm::vec3 rotation = glm::vec3(0, 0, 0);
+        if (get_wheels_turn_difference_left_right() > 1)
+        {
+            right_left_ratio = glm::vec2(1, 1/ get_wheels_turn_difference_left_right());
+            rotation = glm::vec3(0, -45 * game->get_delta_time(), 0);
+        }
+        else if (get_wheels_turn_difference_left_right() < 1)
+        {
+            rotation = glm::vec3(0, 45 * game->get_delta_time(), 0);
+        }
         float speed = 2.0f * game->get_delta_time();
-        get_attached_transform()->move(glm::vec3(speed * multiplier, 0, 0));
+
+        // Rotate the transform
+        support->get_attached_transform()->rotate_plan(rotation);
+
+        // Move the transform
+        get_attached_transform()->move(glm::vec3(speed * multiplier, speed * multiplier, speed * multiplier) * support->get_attached_transform()->get_forward());
 
         // Animate the wheels
         for (int i = 0; i < wheels.size(); i++)
         {
             Object* wheel = wheels[i];
-            float speed = 180;
+            float speed = 180 * right_left_ratio[i % 2];
             wheel->get_attached_transform()->rotate(glm::vec3(0, 0, speed * game->get_delta_time() * -multiplier));
         }
     }
@@ -200,27 +221,39 @@ namespace Lunar_Rover
     }
 
     // Set the back view for the camera
-    void Rover::set_back_view()
+    void Rover::set_around_view()
     {
-        camera->set_parent(get_attached_transform());
-        camera->set_position(get_camera_back_view_offset());
-        camera->set_plan_rotation(get_camera_back_view_rotation_offset());
+        a_current_view = "around";
+        a_camera->set_can_rotate(true);
+        a_camera->get_camera()->set_looks_forward(false);
+        a_camera->get_attached_transform()->set_anchored_position(-get_camera_back_view_offset());
+        a_camera->get_attached_transform()->set_parent(get_attached_transform());
+        a_camera->get_attached_transform()->set_position(get_camera_back_view_offset());
+        a_camera->get_attached_transform()->set_plan_rotation(get_camera_back_view_rotation_offset());
     }
 
     // Set the ehad view for the camera
     void Rover::set_head_view()
     {
-        camera->set_parent(head->get_attached_transform());
-        camera->set_position(get_camera_head_view_offset());
-        camera->set_plan_rotation(get_camera_head_view_rotation_offset());
+        a_current_view = "head";
+        a_camera->set_can_rotate(false);
+        a_camera->get_camera()->set_looks_forward(true);
+        a_camera->get_attached_transform()->set_anchored_position(glm::vec3(0, 0, 0));
+        a_camera->get_attached_transform()->set_parent(head->get_attached_transform());
+        a_camera->get_attached_transform()->set_position(get_camera_head_view_offset());
+        a_camera->get_attached_transform()->set_plan_rotation(get_camera_head_view_rotation_offset());
     }
 
     // Set the right view for the camera
     void Rover::set_right_view()
     {
-        camera->set_parent(get_attached_transform());
-        camera->set_position(get_camera_right_view_offset());
-        camera->set_plan_rotation(get_camera_right_view_rotation_offset());
+        a_current_view = "right";
+        a_camera->set_can_rotate(false);
+        a_camera->get_camera()->set_looks_forward(true);
+        a_camera->get_attached_transform()->set_anchored_position(glm::vec3(0, 0, 0));
+        a_camera->get_attached_transform()->set_parent(get_attached_transform());
+        a_camera->get_attached_transform()->set_position(get_camera_right_view_offset());
+        a_camera->get_attached_transform()->set_plan_rotation(get_camera_right_view_rotation_offset());
     }
 
     // Turn the head of the rover
@@ -275,6 +308,16 @@ namespace Lunar_Rover
     // Update the rover
     void Rover::update()
     {
+        // Move the rover
+        set_wheels_turn_difference_left_right(1);
+        if (game->get_key_state("q") == Key_State::Pressed)
+        {
+            set_wheels_turn_difference_left_right(2);
+        }
+        if (game->get_key_state("d") == Key_State::Pressed)
+        {
+            set_wheels_turn_difference_left_right(0.5f);
+        }
         if (game->get_key_state_frame("z"))
         {
             forward(1);
@@ -325,7 +368,7 @@ namespace Lunar_Rover
         // Control the camera view
         if (game->get_key_state_frame("t") == Key_State::Pressed)
         {
-            set_back_view();
+            set_around_view();
         }
         if (game->get_key_state_frame("g") == Key_State::Pressed)
         {
@@ -335,8 +378,22 @@ namespace Lunar_Rover
         {
             set_right_view();
         }
+        update_camera_view();
 
+        // std::cout << "Support id " << support->get_attached_transform()->get_id() << std::endl; // 6
+        // std::cout << "Neck id " << neck->get_attached_transform()->get_id() << std::endl; // 7
+        
         Object::update();
+    }
+
+    // Update the camera according to the current camera view
+    void Rover::update_camera_view()
+    {
+        if (get_current_view() == "around") // If the current view is the around rotation
+        {
+            glm::vec3 offset = glm::vec3(0, 2, 0);
+            a_camera->get_camera()->set_looked_position(get_attached_transform()->get_absolute_position() + offset);
+        }
     }
 
     // Advanced game variables
@@ -345,9 +402,6 @@ namespace Lunar_Rover
     // Load the lunar environment
     void load_lunar_environment()
     {
-        // Configure the game
-        camera = game->get_camera();
-
         // Add the needed parts
         Part* floor = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/lunar_rover/floor.png");
 
@@ -366,7 +420,7 @@ namespace Lunar_Rover
         // Set some game attributes
         game->set_background_color(glm::vec4(0, 0, 0, 1.0));
         game->set_current_scene("moon");
-        rover->set_back_view();
+        rover->set_around_view();
     }
 
     // Run the lunar rover game

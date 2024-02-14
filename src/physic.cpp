@@ -39,7 +39,7 @@ void Physic_Object::apply_force(glm::vec3 force, bool directly_apply)
 // Apply the gravity to the object
 void Physic_Object::apply_gravity(glm::vec3 gravity_force)
 {
-	apply_force(gravity_force, true);
+	apply_force(gravity_force * get_gravity_value(), true);
 }
 
 // Update the physic object

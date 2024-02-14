@@ -1,5 +1,6 @@
 #include "../headers/game.h"
 #include "../mods/headers/lunar_rover.h"
+#include "../mods/headers/player.h"
 
 int main(int argc, char* argv[])
 {
