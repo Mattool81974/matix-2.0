@@ -569,32 +569,48 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 			glm::vec3 difference = collection.get_difference();
 			glm::vec3 middle = collection.get_middle();
 
-			float x = middle[0] + collection.get_level()->sub_level_position[collection.get_level_count()][0] + part->get_position()[0];
-			float y = middle[1] + collection.get_level()->sub_level_position[collection.get_level_count()][1] + part->get_position()[1];
-			float z = middle[2] + collection.get_level()->sub_level_position[collection.get_level_count()][2] + part->get_position()[2];
+			std::cout << "K" << std::endl;
 
+			// Create the necessary variables for the part
+			float x = middle[0] + part->get_position()[0];
+			float y = middle[1] + part->get_position()[1];
+			float z = middle[2] + part->get_position()[2];
+			Map_Level* level = collection.get_level();
+			Transform_Object* parent = 0;
+			std::string name = "";
 			glm::vec3 scale = glm::vec3(part->get_scale()[0] * (difference[0] + 1), part->get_scale()[1] * (difference[1] + 1), part->get_scale()[2] * (difference[2] + 1));
-			if (part->get_scale_level_multiplier()[0] != 0)
+			if (level != 0)
 			{
-				scale[0] *= collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0];
-				x += (collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0]) / 2;
-			}
-			if (part->get_scale_level_multiplier()[1] != 0)
-			{
-				scale[1] *= collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1];
-				y += (collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1]) / 2;
-			}
-			if (part->get_scale_level_multiplier()[2] != 0)
-			{
-				scale[2] *= collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2];
-				z += (collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2]) / 2;
-			}
+				x += collection.get_level()->sub_level_position[collection.get_level_count()][0];
+				y += collection.get_level()->sub_level_position[collection.get_level_count()][1];
+				z += collection.get_level()->sub_level_position[collection.get_level_count()][2];
 
-			std::string name = "level" + std::to_string(collection.get_level()->id) + ";w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
-
-			Object* object = new_object(name, part->get_type(), collection.get_level()->map_level_object->get_attached_transform(), glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
+				if (part->get_scale_level_multiplier()[0] != 0)
+				{
+					scale[0] *= collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0];
+					x += (collection.get_level()->sub_level_scale[collection.get_level_count()][0] * part->get_scale_level_multiplier()[0]) / 2;
+				}
+				if (part->get_scale_level_multiplier()[1] != 0)
+				{
+					scale[1] *= collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1];
+					y += (collection.get_level()->sub_level_scale[collection.get_level_count()][1] * part->get_scale_level_multiplier()[1]) / 2;
+				}
+				if (part->get_scale_level_multiplier()[2] != 0)
+				{
+					scale[2] *= collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2];
+					z += (collection.get_level()->sub_level_scale[collection.get_level_count()][2] * part->get_scale_level_multiplier()[2]) / 2;
+				}
+				parent = collection.get_level()->map_level_object->get_attached_transform();
+				name = "level" + std::to_string(collection.get_level()->id) + ";w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+			}
+			else
+			{
+				name = "nolevel;w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
+			}
+			
+			Object* object = new_object(name, part->get_type(), parent, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
 			object->get_attached_graphic_object()->set_is_transparent(part->is_transparent());
-			assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
+			if(level != 0)assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
 			object->set_description(part->get_description());
 		}
 	}
@@ -659,6 +675,7 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 		std::vector<std::string> lines = cut_string(parts[0], "\n", true); // Check the first part
 		if(lines[0] != "l") { std::cout << "Scene \"" << get_name() << "\" : erreur ! The map you want to load is probably corrompted." << std::endl; return; }
 
+		// Load levels
 		levels = std::map<unsigned short, Map_Level>();
 		std::map<unsigned short, Object*> level_object = std::map<unsigned short, Object*>();
 		for (int i = 1; i < lines.size(); i++) // Check each levels of the map
@@ -734,7 +751,8 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 			std::vector<std::string> level_str = cut_string(lines[0], ";"); // Get the level id of the part
 			std::vector<std::string> level_id_str = cut_string(level_str[0], " ");
 			unsigned short level_id = std::stoi(level_id_str[1]);
-			Map_Level* level = &levels[level_id];
+			Map_Level* level = 0;
+			if(level_id != -1)&levels[level_id];
 
 			if (part_type == 'w') // Load each level count
 			{
@@ -759,8 +777,17 @@ void Scene::load_from_map(std::string map, Map_Opening_Mode mode)
 					Map_Level_Collection collection = Map_Level_Collection();
 					collection.set_base_position(glm::vec3(string_to_float(cutted[2]), string_to_float(cutted[3]), string_to_float(cutted[4])));
 					collection.set_final_position(glm::vec3(string_to_float(cutted[5]), string_to_float(cutted[6]), string_to_float(cutted[7])));
-					collection.set_level(level);
-					collection.set_level_count(std::stoi(cutted[1]));
+					unsigned short level_count = std::stoi(cutted[1]);
+					if (level_count == -1)
+					{
+						collection.set_level(0);
+						collection.set_level_count(-1);
+					}
+					else
+					{
+						collection.set_level(level);
+						collection.set_level_count(level_count);
+					}
 					collection.set_part(std::stoi(cutted[0]));
 					all.push_back(collection);
 				}

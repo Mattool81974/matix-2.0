@@ -400,6 +400,19 @@ void Game::update_event()
     last_frame_time = glfwGetTime();
 
     if (get_delta_time() > 0.1) set_delta_time(0);
+    
+    // FPS calculation
+    time_since_last_fps_calculation += get_delta_time();
+    if (time_since_last_fps_calculation >= 1)
+    {
+        std::cout << "FPS " << frame_count << std::endl;
+        frame_count = 0;
+        time_since_last_fps_calculation = 0;
+    }
+    else
+    {
+        frame_count++;
+    }
 
     // Calculate mouse move and button
     double mouse_move_x = get_mouse_x() - get_last_mouse_x();

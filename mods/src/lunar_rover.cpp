@@ -29,11 +29,11 @@ namespace Lunar_Rover
 
         // Create the support
         glm::vec3 support_position = glm::vec3(0.0, 1.5, 0.0);
-        glm::vec3 support_scale = glm::vec3(5.0, 0.5, 2.5);
+        glm::vec3 support_scale = glm::vec3(4.0, 0.5, 2.5);
         support = scene->new_object(get_name() + ";support", "cube", transform, support_position, glm::vec3(0, 0, 0), support_scale, false, texture_support, false, true, false);
 
         // Create the neck of the rover
-        glm::vec3 neck_position = glm::vec3(0.0, 1.0, -0.75);
+        glm::vec3 neck_position = glm::vec3(1.75, 1.0, -0.75);
         glm::vec3 neck_scale = glm::vec3(0.2, 1.5, 0.2);
         neck = scene->new_object(get_name() + ";neck", "one_faced_cube", support->get_attached_transform(), neck_position, glm::vec3(0, 0, 0), neck_scale, false, texture_neck, false, true, false);
         neck->get_attached_transform()->set_anchored_position(glm::vec3(0, -0.75, 0));
@@ -355,7 +355,7 @@ namespace Lunar_Rover
         lunar_scene = game->new_scene("moon", game->get_assets_directory_path() + "maps/moon.wad", Map_Opening_Mode::Complex);
 
         // Create the exterior objects
-        rover = lunar_scene->new_object<Rover>("rover", "", 0, glm::vec3(5, 2, 10), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+        rover = lunar_scene->new_object<Rover>("rover", "", 0, glm::vec3(0, 2, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
         rover->get_attached_physic_object()->set_elasticity(0);
         rover->create();
     }

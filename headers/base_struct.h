@@ -357,11 +357,20 @@ public:
 	inline void set_right_mouse_button_state(unsigned short new_state) { right_mouse_button_state = new_state; };
 	inline void set_window_height(int height) { window_height = height; };
 	inline void set_window_width(int width) { window_width = width; };
+protected:
+	// Number of frame during this second
+	unsigned short frame_count = 0;
+
+	// Time since the last FPS calculation
+	float time_since_last_fps_calculation = 0;
 private:
 	std::string assets_directory_path = ""; // Path through the assert path file
 	std::string config_file_path = ""; // Path through the config path file
 	float delta_time = 0; // Time since the last frame of the game
-	const std::string exec_path = ""; // Path of the game exe
+
+	// Path of the game executable
+	const std::string exec_path = "";
+
 	double last_mouse_x = 0; // Last X position of the mouse
 	double last_mouse_y = 0; // Last Y position of the mouse
 	unsigned short left_mouse_button_state = 0; // State of the left button mouse
@@ -370,6 +379,7 @@ private:
 	double mouse_move_y = 0; // Last Y move of the mouse
 	double& mouse_x; // Reference towards the mouse X pos
 	double& mouse_y; // Reference towards the mouse Y pos
+
 	int window_height = 0; // Height of the graphic window
 	int window_width = 0; // Width of the graphic window
 
