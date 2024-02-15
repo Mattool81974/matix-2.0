@@ -276,7 +276,6 @@ public:
 	Camera(glm::vec3 a_position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_rotation = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 a_scale = glm::vec3(1.0f, 1.0f, 1.0f)); // Camera constructor
 	glm::mat4 get_projection(int window_height, int window_width); // Return the projection matrix
 	glm::mat4 get_view(); // Return the view matrix
-	void rotate(glm::vec3 a_rotation); // Rotate the object
 	~Camera(); // Camera destructor
 
 	// Getter

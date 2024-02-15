@@ -29,12 +29,22 @@ public:
 	inline void set_resize_texture(bool a_resize_texture) { resize_texture = a_resize_texture; };
 	inline void set_scale_level_multiplier(glm::vec3 a_scale_level_multiplier) { scale_level_multiplier = a_scale_level_multiplier; };
 	inline void set_use_collection(bool a_use_collection) { collection = a_use_collection; };
+	inline void set_use_graphic(bool new_graphic) { a_graphic = new_graphic; };
+	inline void set_use_physic(bool new_physic) { a_physic = new_physic; };
 	inline bool use_collection() { return collection; };
+	inline bool use_graphic() { return a_graphic; };
+	inline bool use_physic() { return a_physic; };
 private:
 	std::string description = "1"; // Little description of the object, usefull for debug
 	bool resize_texture = true; // If the texture should be resized or not
 	bool collection = true; // If the part can use collection
 	bool transparent = false; // If the part use transparency
+
+	// If the part use graphic or not
+	bool a_graphic = true;
+
+	// If the part use physic or not
+	bool a_physic = true;
 
 	void* base_object = 0; // Pointer to a buffer for the base object
 	glm::vec3 position; // Position of the part

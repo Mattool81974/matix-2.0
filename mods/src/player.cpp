@@ -21,6 +21,22 @@ void Player::Camera_Handler::late_update()
     update_move();
 }
 
+// Rotate the plan in theCamera_Handler
+void Player::Camera_Handler::rotate_plan(glm::vec3 a_rotation)
+{
+    glm::vec3 rotation = a_rotation;
+    glm::vec3 final_rotation = normalize_rotation(get_attached_transform()->get_plan_rotation() + a_rotation);
+    if (final_rotation[0] > 89 and final_rotation[0] < 271) // Resize the position if necessary
+    {
+        if (rotation[0] > 0 && rotation[0] < 180)
+            rotation[0] = 89 - get_attached_transform()->get_plan_rotation()[0];
+        else
+            rotation[0] = 271 - get_attached_transform()->get_plan_rotation()[0];
+    }
+    get_attached_transform()->Transform_Object::rotate_plan(rotation);
+}
+
+
 // Update the moving of the camera handler
 void Player::Camera_Handler::update_move()
 {
@@ -32,9 +48,10 @@ void Player::Camera_Handler::update_move()
     if (can_rotate())
     {
         float rotate_speed = 45;
-        float sensitivity = -get_game_struct()->get_camera()->get_sensitivity();
-        get_attached_transform()->rotate_plan(glm::vec3(0.0, sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));
-        get_attached_transform()->rotate_plan(glm::vec3(sensitivity * get_game_struct()->get_delta_time() * get_game_struct()->get_mouse_move_y(), 0.0, 0.0));
+        float sensitivity = get_game_struct()->get_camera()->get_sensitivity();
+        float y_rotation = sensitivity * get_game_struct()->get_delta_time() * get_game_struct()->get_mouse_move_y();
+        rotate_plan(glm::vec3(0.0, -sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));
+        rotate_plan(glm::vec3(y_rotation, 0.0, 0.0));
     }
 
     // Move the Camera_Handler

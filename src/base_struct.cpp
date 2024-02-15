@@ -553,6 +553,13 @@ void Transform_Object::apply_parent_plan_rotation()
 	anchor_position_offset = (rotate_vector(get_anchored_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	apply_anchor_rotation();
 	calculate_direction();
+
+	std::vector<Transform_Object*>* children = get_children();
+	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
+	{
+		Transform_Object* child = (*children)[i];
+		child->apply_parent_plan_rotation();
+	}
 }
 
 // Calculate the direction vector of the transform object
@@ -707,21 +714,6 @@ glm::mat4 Camera::get_projection(int window_height, int window_width)
 glm::mat4 Camera::get_view()
 {
 	return glm::lookAt(get_absolute_position(), get_looked_position(), get_up());
-}
-
-// Rotate the object
-void Camera::rotate(glm::vec3 a_rotation)
-{
-	glm::vec3 rotation = a_rotation;
-	glm::vec3 final_rotation = normalize_rotation(get_rotation() + a_rotation);
-	if (final_rotation[0] > 89 and final_rotation[0] < 271) // Resize the position if necessary
-	{
-		if(rotation[0] > 0 && rotation[0] > 180)
-			rotation[0] = 89;
-		else
-			rotation[0] = 271;
-	}
-	Transform_Object::rotate(rotation);
 }
 
 // Camera destructor

@@ -606,7 +606,7 @@ void Scene::load_from_collection(std::vector<Map_Level_Collection> collections)
 				name = "nolevel;w;" + collection.get_name() + ";" + std::to_string(collection.get_level_count()) + ";" + std::to_string(x) + ";" + std::to_string(y) + ";" + std::to_string(z);
 			}
 			
-			Object* object = new_object(name, part->get_type(), parent, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), true, true, part->get_base_object()); // Create the object
+			Object* object = new_object(name, part->get_type(), parent, glm::vec3(x, y, z), part->get_rotation(), scale, true, part->get_texture_path(), part->get_resize_texture(), part->use_graphic(), part->use_physic(), part->get_base_object()); // Create the object
 			object->get_attached_graphic_object()->set_is_transparent(part->is_transparent());
 			if(level != 0)assign_map_pos(object->set_map_pos(glm::vec3(x, y, z)), object);
 			object->set_description(part->get_description());

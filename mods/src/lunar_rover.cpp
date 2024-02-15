@@ -182,11 +182,11 @@ namespace Lunar_Rover
     void Rover::forward(float multiplier)
     {
         // Calculate the necessary variables
-        glm::vec2 right_left_ratio = glm::vec2(get_wheels_turn_difference_left_right(), 1);
+        glm::vec2 right_left_ratio = glm::vec2(get_wheels_turn_difference_left_right() * 1.5, 1);
         glm::vec3 rotation = glm::vec3(0, 0, 0);
         if (get_wheels_turn_difference_left_right() > 1)
         {
-            right_left_ratio = glm::vec2(1, 1/ get_wheels_turn_difference_left_right());
+            right_left_ratio = glm::vec2(1, 1/ (get_wheels_turn_difference_left_right() * 1.5));
             rotation = glm::vec3(0, -20 * game->get_delta_time(), 0);
         }
         else if (get_wheels_turn_difference_left_right() < 1)
@@ -256,7 +256,7 @@ namespace Lunar_Rover
         a_camera->get_attached_transform()->set_anchored_position(get_camera_back_view_offset());
         a_camera->get_attached_transform()->set_parent(get_attached_transform());
         a_camera->get_attached_transform()->set_position(glm::vec3(0, 0, 0));
-        a_camera->get_attached_transform()->set_plan_rotation(get_camera_back_view_rotation_offset());
+        a_camera->set_plan_rotation(get_camera_back_view_rotation_offset());
     }
 
     // Set the ehad view for the camera
@@ -265,10 +265,10 @@ namespace Lunar_Rover
         a_current_view = "head";
         a_camera->set_can_rotate(false);
         a_camera->get_camera()->set_looks_forward(true);
-        a_camera->get_attached_transform()->set_anchored_position(glm::vec3(0, 0, 0));
         a_camera->get_attached_transform()->set_parent(head->get_attached_transform());
+        a_camera->get_attached_transform()->set_anchored_position(glm::vec3(0, 0, 0));
         a_camera->get_attached_transform()->set_position(get_camera_head_view_offset());
-        a_camera->get_attached_transform()->set_plan_rotation(get_camera_head_view_rotation_offset());
+        a_camera->set_plan_rotation(get_camera_head_view_rotation_offset());
     }
 
     // Set the right view for the camera
@@ -280,7 +280,7 @@ namespace Lunar_Rover
         a_camera->get_attached_transform()->set_anchored_position(glm::vec3(0, 0, 0));
         a_camera->get_attached_transform()->set_parent(get_attached_transform());
         a_camera->get_attached_transform()->set_position(get_camera_right_view_offset());
-        a_camera->get_attached_transform()->set_plan_rotation(get_camera_right_view_rotation_offset());
+        a_camera->set_plan_rotation(get_camera_right_view_rotation_offset());
     }
 
     // Turn the head of the rover
@@ -290,8 +290,7 @@ namespace Lunar_Rover
         float speed = turn_head_speed * multiplier * game->get_delta_time();
 
         // Turn the head
-        neck->get_attached_transform()->rotate(glm::vec3(0, speed, 0));
-        head->get_attached_transform()->rotate(glm::vec3(0, speed, 0));
+        neck->get_attached_transform()->rotate_plan(glm::vec3(0, -speed, 0));
     }
 
     // Undeploy the arm fothe rover
@@ -449,12 +448,13 @@ namespace Lunar_Rover
     {
         // Add the needed parts
         Part* floor = game->new_part(1, "one_faced_cube", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), game->get_assets_directory_path() + "textures/lunar_rover/floor.png");
+        floor->set_use_physic(false);
 
         // Create the lunar scene
         lunar_scene = game->new_scene("moon", game->get_assets_directory_path() + "maps/moon.wad", Map_Opening_Mode::Complex);
 
         // Create the exterior objects
-        rover = lunar_scene->new_object<Rover>("rover", "", 0, glm::vec3(0, 2, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
+        rover = lunar_scene->new_object<Rover>("dudule", "", 0, glm::vec3(0, 2, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), false, "", false, false, true);
         rover->get_attached_physic_object()->set_elasticity(0);
         rover->create();
     }
