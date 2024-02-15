@@ -32,9 +32,9 @@ void Player::Camera_Handler::update_move()
     if (can_rotate())
     {
         float rotate_speed = 45;
-        float sensitivity = get_game_struct()->get_camera()->get_sensitivity();
+        float sensitivity = -get_game_struct()->get_camera()->get_sensitivity();
         get_attached_transform()->rotate_plan(glm::vec3(0.0, sensitivity * delta_time * get_game_struct()->get_mouse_move_x(), 0.0));
-        get_attached_transform()->rotate_plan(glm::vec3(-sensitivity * get_game_struct()->get_delta_time() * get_game_struct()->get_mouse_move_y(), 0.0, 0.0));
+        get_attached_transform()->rotate_plan(glm::vec3(sensitivity * get_game_struct()->get_delta_time() * get_game_struct()->get_mouse_move_y(), 0.0, 0.0));
     }
 
     // Move the Camera_Handler

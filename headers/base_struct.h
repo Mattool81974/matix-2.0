@@ -21,6 +21,8 @@
 #include <vector>
 
 enum File_Type {Text}; // Every file type
+void cout(std::string type, std::string sender, std::string error); // Cout something from the game
+void cout_error(std::string sender, std::string error); // Cout an error in the Game
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank = false); // Cut a string where there are the "cut"
 std::vector<std::wstring> cut_string(std::wstring string, std::wstring cut, bool erase_blank = false); // Cut a wstring where there are the "cut"
 std::vector<std::string> directory_content(std::string path); // Return the content of a directory
@@ -168,6 +170,7 @@ public:
 	inline unsigned int get_id() { return id; };
 	inline glm::vec3 get_movement() { return movement; };
 	inline Transform_Object* get_parent() { return parent; }
+	inline glm::vec3 get_parent_rotation_adder() { return a_parent_rotation_adder; };
 	inline glm::vec3 get_parent_rotation_multiplier() { return parent_rotation_multiplier; };
 	inline glm::vec3 get_plan_rotation(bool use_rotation_multiplier = false)
 	{
@@ -200,6 +203,7 @@ public:
 		parent = new_parent;
 		if (new_parent != 0) { new_parent->get_children()->push_back(this); apply_parent_plan_rotation(); }
 	};
+	inline void set_parent_rotation_adder(glm::vec3 new_parent_rotation_adder) { a_parent_rotation_adder = new_parent_rotation_adder; };
 	inline void set_parent_rotation_multiplier(glm::vec3 a_parent_rotation_multiplier) { parent_rotation_multiplier = a_parent_rotation_multiplier; };
 	inline void set_movement(glm::vec3 new_movement) { movement = new_movement; };
 	inline void set_plan_rotation(glm::vec3 new_plan_rotation)
@@ -255,6 +259,7 @@ private:
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f); // Movement of the object
 	// Number of objects created
 	static unsigned int object_count;
+	glm::vec3 a_parent_rotation_adder = glm::vec3(0.0f, 0.0f, 0.0f); // Vector to add to a rotation coming from a parent
 	glm::vec3 parent_rotation_multiplier = glm::vec3(1.0f, 1.0f, 1.0f); // Multiplier to apply to a rotation coming from a parent
 	glm::vec3 plan_rotation = glm::vec3(0, 0, 0); // Rotation of the plan of the local transform
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f); // Position of the object

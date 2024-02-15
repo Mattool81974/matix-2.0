@@ -8,6 +8,18 @@ std::string non_float_character = "";
 // Return the size of a number
 float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
 
+// Cout something from the game
+void cout(std::string type, std::string sender, std::string error)
+{
+	if(false)std::cout << type << " from \"" << sender << "\" : " << error << std::endl;
+}
+
+// Cout an error in the Game
+void cout_error(std::string sender, std::string error)
+{
+	cout("Error", sender, error);
+}
+
 // Cut a string where there are the "cut"
 std::vector<std::string> cut_string(std::string string, std::string cut, bool erase_blank)
 {
@@ -230,7 +242,7 @@ glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
 {
 	glm::vec3 to_return = vector;
 
-	if (rotation == 0) { return vector; }
+	if (rotation == 0 || (vector[0] == 0 && vector[2] == 0)) { return vector; }
 
 	// Calculate the angle in a local XZ circle with Y angle
 	glm::vec2 difference_position = glm::vec2(vector[0], vector[2]);
@@ -241,38 +253,43 @@ glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
 	float hypothenus = glm::distance(difference_position, glm::vec2(0, 0));
 	glm::vec2 normalized = glm::normalize(glm::vec2(opposite, adjacent));
 
-	float angle = glm::acos(adjacent / hypothenus);
+	float angle = glm::acos(glm::abs(adjacent) / hypothenus);
 	if (adjacent == 0 && opposite == 0) angle = 0;
 	else if (adjacent == 0) angle = 3.1415;
 
-	std::cout << "G " << angle << " " << rotation << " " << vector[0] << " " << vector[1] << " " << vector[2] << std::endl;
+	if (rotation == 270)cout("Debug", "Wheel3", "G " + std::to_string(angle) + " " + std::to_string(rotation) + " opposite " + std::to_string(vector[0]) + " " + std::to_string(vector[1]) + " adjacent " + std::to_string(vector[2]));
 
-	if (adjacent < 0 && opposite > 0)
+	float multiplier = -1;
+	if (adjacent <= 0 && opposite >= 0)
 	{
-		angle = 3.1415 * 0.5 - angle;
+		angle = 3.1415 * 2.0 - angle;
+		if(rotation == 270)cout("Debug", "Wheel3", "A");
 	}
-	else if (adjacent < 0 && opposite < 0)
+	else if (adjacent <= 0 && opposite <= 0)
 	{
-		angle = 3.1415 + angle;
+		angle = angle;
+		if (rotation == 270)cout("Debug", "Wheel3", "B");
 	}
-	else if (opposite < 0)
+	else if (opposite <= 0)
 	{
-		angle = 3.1415 * 1.5 - angle;
+		angle = 3.1415 - angle;
+		if (rotation == 270)cout("Debug", "Wheel3", "C");
 	}
 	else
 	{
-		angle = angle;
+		angle = 3.1415 + angle;
+		if (rotation == 270)cout("Debug", "Wheel3", "D");
 	}
 
 	// Calculate the position in the local circle
 	float final_angle = angle + glm::radians(rotation);
-	glm::vec2 final_position = -glm::vec2(glm::cos(final_angle) * hypothenus, glm::sin(final_angle) * hypothenus);
+	glm::vec2 final_position = glm::vec2(glm::sin(final_angle) * hypothenus, glm::cos(final_angle) * hypothenus) * multiplier;
 
 	// Calculate the final position
 	to_return[0] = final_position[0];
 	to_return[2] = final_position[1];
 
-	std::cout << "H " << angle << " " << to_return[0] << " " << to_return[2] << std::endl;
+	if (rotation == 270)cout("Debug", "Wheel3", "H " + std::to_string(angle) + " " + std::to_string(final_angle) + " " + std::to_string(to_return[0]) + " " + std::to_string(to_return[2]) + " " + std::to_string(hypothenus));
 
 	return to_return;
 }
@@ -283,12 +300,11 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 	if (protection && rotation == glm::vec3(0, 0, 0)) { return vector; }
 
 	vector -= position;
-	rotation = normalize_rotation(rotation);
 	glm::vec2 difference_position = glm::vec2(vector[0], vector[2]);
 	glm::vec3 to_return = rotate_vector_y(vector, rotation[1]);
 
 	// Calculate the angle in a local YZ circle with X angle
-	if (vector[1] != 0 && rotation_multiplier[0] == 1)
+	if (vector[1] != 0 && rotation_multiplier[0] == 1 && rotation[0] != 0)
 	{
 		// Calculate the angle of the position
 		float adjacent = glm::distance(difference_position, glm::vec2(0, 0));
@@ -468,7 +484,6 @@ void Transform_Object::apply_anchor_rotation()
 {
 	glm::vec3 anchor = -get_anchor_position_offset();
 	position_offset_anchor = (rotate_vector(anchor, get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
-	position_offset_anchor -= anchor;
 	
 	calculate_direction();
 }
@@ -516,7 +531,14 @@ glm::mat4 Transform_Object::apply_parent_rotation_model_matrix(glm::mat4 matrix,
 
 	// Rotate matrix from the plan
 	glm::vec3 rotation = get_plan_rotation(true);
-	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
+	if (child == this)
+	{
+		matrix = glm::rotate(matrix, glm::radians(-rotation[1]), up);
+	}
+	else
+	{
+		matrix = glm::rotate(matrix, glm::radians(-rotation[1]), up);
+	}
 	matrix = glm::rotate(matrix, glm::radians(rotation[0]), forward);
 	matrix = glm::rotate(matrix, glm::radians(rotation[2]), right);
 
@@ -526,18 +548,11 @@ glm::mat4 Transform_Object::apply_parent_rotation_model_matrix(glm::mat4 matrix,
 // Apply to the object the parent plan rotation
 void Transform_Object::apply_parent_plan_rotation()
 {
-	rotation_plan_offset_parent = get_parent()->get_plan_rotation(true) * get_parent_rotation_multiplier();
+	rotation_plan_offset_parent = (get_parent()->get_absolute_plan_rotation(true) * get_parent_rotation_multiplier() * glm::vec3(1, -1, 1.001)) + get_parent_rotation_adder();
 	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	anchor_position_offset = (rotate_vector(get_anchored_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	apply_anchor_rotation();
 	calculate_direction();
-
-	if (get_id() == 7)
-	{
-		std::cout << "7 " << rotation_plan_offset_parent[0] << " " << rotation_plan_offset_parent[1] << " " << rotation_plan_offset_parent[2] << std::endl;
-		std::cout << "  " << get_position()[0] << " " << get_position()[1] << " " << get_position()[2] << std::endl;
-		std::cout << "  " << position_plan_offset_parent[0] << " " << position_plan_offset_parent[1] << " " << position_plan_offset_parent[2] << std::endl;
-	}
 }
 
 // Calculate the direction vector of the transform object
@@ -588,9 +603,9 @@ glm::mat4 Transform_Object::get_model_matrix()
 	// Rotate matrix from the plan
 	matrix = apply_parent_rotation_model_matrix(matrix, this);
 	glm::vec3 rotation = get_rotation();
-	matrix = glm::rotate(matrix, glm::radians(rotation[1]), up);
-	matrix = glm::rotate(matrix, glm::radians(rotation[0]), forward);
-	matrix = glm::rotate(matrix, glm::radians(rotation[2]), right);
+	matrix = glm::rotate(matrix, glm::radians(rotation[1]), glm::vec3(0, 1, 0));
+	matrix = glm::rotate(matrix, glm::radians(rotation[0]), glm::vec3(1, 0, 0));
+	matrix = glm::rotate(matrix, glm::radians(rotation[2]), glm::vec3(0, 0, 1));
 
 	// Scale matrix
 	matrix = glm::scale(matrix, get_scale());
@@ -701,10 +716,10 @@ void Camera::rotate(glm::vec3 a_rotation)
 	glm::vec3 final_rotation = normalize_rotation(get_rotation() + a_rotation);
 	if (final_rotation[0] > 89 and final_rotation[0] < 271) // Resize the position if necessary
 	{
-		if(rotation[0] > 0)
-			rotation[0] = 89 - normalize_rotation(get_rotation())[0];
+		if(rotation[0] > 0 && rotation[0] > 180)
+			rotation[0] = 89;
 		else
-			rotation[0] = 271 - normalize_rotation(get_rotation())[0];
+			rotation[0] = 271;
 	}
 	Transform_Object::rotate(rotation);
 }
@@ -724,7 +739,7 @@ Base_Struct::Base_Struct(double& a_mouse_x, double& a_mouse_y, std::string a_exe
 // Cout an error in the program
 void Base_Struct::error(std::string thrower, std::string error_content)
 {
-	std::cout << thrower << " : error ! " << error_content << std::endl;
+	cout_error(thrower, error_content);
 }
 
 // Return if a file formatted with the struct context

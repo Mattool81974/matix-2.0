@@ -59,14 +59,14 @@ namespace Lunar_Rover
 
 		std::vector<Object*> arm_parts = std::vector<Object*>(); // Parts of the arm of the rover
 		glm::vec3 camera_back_view_offset = glm::vec3(-7.5, 2, 0); // Offset of the camera for the back view
-		glm::vec3 camera_back_view_rotation_offset = glm::vec3(0.0, 0.0, 0.0); // Rotation offset of the camera for the back view
+		glm::vec3 camera_back_view_rotation_offset = glm::vec3(0.0, 270.0, 0.0); // Rotation offset of the camera for the back view
 
 		// Camera_Handler in the game
 		Player::Camera_Handler* a_camera = 0;
 		glm::vec3 camera_head_view_offset = glm::vec3(0.5, 0, 0); // Offset of the camera for the back view
 		glm::vec3 camera_head_view_rotation_offset = glm::vec3(0.0, 0.0, 0.0); // Rotation offset of the camera for the back view
 		glm::vec3 camera_right_view_offset = glm::vec3(0.0, 2, 8.0); // Offset of the camera for the right view
-		glm::vec3 camera_right_view_rotation_offset = glm::vec3(0.0, 270.0, 0.0); // Rotation offset of the camera for the back view
+		glm::vec3 camera_right_view_rotation_offset = glm::vec3(0.0, 0.0, 0.0); // Rotation offset of the camera for the back view
 		Game* a_game = 0; // Game
 		Object* head = 0; // Head of the rover
 		Object* neck = 0; // Neck of the rover
