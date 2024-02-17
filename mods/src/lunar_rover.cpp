@@ -59,7 +59,7 @@ namespace Lunar_Rover
         {
             // Create the variables for create
             glm::vec3 anchored_position = glm::vec3(0, part_scale[1] / 2.0, 0);
-            glm::vec3 parent_rotation_multiplier = glm::vec3(-1, 1, 1);
+            glm::vec3 parent_rotation_multiplier = glm::vec3(1, 1, 1);
             glm::vec3 position = glm::vec3(part_scale[0], 0, 0);
             if (i == 0) position = first_part_position;
             glm::vec3 rotation = glm::vec3(0, 0, 0);
@@ -68,6 +68,7 @@ namespace Lunar_Rover
                 anchored_position = glm::vec3(0, -part_scale[1] / 2.0, 0);
                 parent_rotation_multiplier = glm::vec3(1, 1, 1);
             }
+            position[1] += anchored_position[1];
 
             Object* arm = scene->new_object(get_name() + ";arm" + std::to_string(i), "one_faced_cube", last_part, position, rotation, part_scale, false, texture_arm, false, true, false);
             arm->get_attached_transform()->set_anchored_position(anchored_position);
@@ -420,6 +421,8 @@ namespace Lunar_Rover
         // cout("Debug", "Camera", "parent position offset x z -> " + std::to_string(a_camera->get_attached_transform()->get_position_offset_parent()[0]) + " " + std::to_string(a_camera->get_attached_transform()->get_position_offset_parent()[2]));
         cout("Debug", "Camera", std::to_string(a_camera->get_attached_transform()->get_plan_rotation()[1]));
 
+        // std::cout << "Arm 0 id " << arm_parts[0]->get_attached_transform()->get_id() << std::endl; // 9
+        // std::cout << "Arm 1 id " << arm_parts[1]->get_attached_transform()->get_id() << std::endl; // 10
         // std::cout << "Camera id " << a_camera->get_attached_transform()->get_id() << std::endl; // 5
         // std::cout << "Support id " << support->get_attached_transform()->get_id() << std::endl; // 6
         // std::cout << "Neck id " << neck->get_attached_transform()->get_id() << std::endl; // 7

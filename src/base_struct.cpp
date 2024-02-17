@@ -11,7 +11,7 @@ float sign(float number) { return number < 0 ? -1 : (number == 0 ? 0 : 1); }
 // Cout something from the game
 void cout(std::string type, std::string sender, std::string error)
 {
-	if(false)std::cout << type << " from \"" << sender << "\" : " << error << std::endl;
+	if(sender.substr(0, 3) == "Arm")std::cout << type << " from \"" << sender << "\" : " << error << std::endl;
 }
 
 // Cout an error in the Game
@@ -295,7 +295,7 @@ glm::vec3 rotate_vector_y(glm::vec3 vector, float rotation)
 }
 
 // Rotate a vector around a rotating point
-glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier, bool protection)
+glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position, glm::vec3 rotation_multiplier, bool protection, unsigned int id)
 {
 	if (protection && rotation == glm::vec3(0, 0, 0)) { return vector; }
 
@@ -328,7 +328,8 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 		// Calculate the position in the local circle
 		float final_angle = angle + glm::radians(rotation[0]);
 
-		// std::cout << "O " << to_return[0] << " " << to_return[1] << " " << to_return[2] << std::endl;
+		if (id == 10) cout("Debug", "Arm 1", "rotation -> " + std::to_string(rotation[0]) + " " + std::to_string(rotation[1]) + " " + std::to_string(rotation[2]));
+		if (id == 10) cout("Debug", "Arm 1", "to return before -> " + std::to_string(to_return[0]) + " " + std::to_string(to_return[1]) + " " + std::to_string(to_return[2]));
 		// std::cout << "R " << rotation[0] << " " << rotation[1] << " " << rotation[2] << std::endl;
 
 		// Calculate the final position
@@ -338,9 +339,11 @@ glm::vec3 rotate_vector(glm::vec3 vector, glm::vec3 rotation, glm::vec3 position
 			to_return[0] = vector[1] * glm::sin(glm::radians(other_angle));
 			to_return[2] = vector[1] * glm::cos(glm::radians(other_angle));
 		}
+		if (id == 10) cout("Debug", "Arm 1", "to return during -> " + std::to_string(to_return[0]) + " " + std::to_string(to_return[1]) + " " + std::to_string(to_return[2]));
 		to_return[1] = glm::sin(final_angle) * hypothenus;
-		to_return[0] *= -glm::cos(glm::radians(rotation[0]));
-		to_return[2] *= -glm::cos(glm::radians(rotation[0]));
+		to_return[0] *= glm::sin(glm::radians(rotation[0]));
+		to_return[2] *= glm::sin(glm::radians(rotation[0]));
+		if (id == 10) cout("Debug", "Arm 1", "to return after -> " + std::to_string(to_return[0]) + " " + std::to_string(to_return[1]) + " " + std::to_string(to_return[2]));
 	}
 
 	return to_return;
@@ -483,9 +486,15 @@ void Transform_Object::add_rotation_animation(float duration, glm::vec3 base_rot
 void Transform_Object::apply_anchor_rotation()
 {
 	glm::vec3 anchor = -get_anchor_position_offset();
-	position_offset_anchor = (rotate_vector(anchor, get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
-	
+	position_offset_anchor = (rotate_vector(anchor, get_plan_rotation(), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, get_id()));
+
 	calculate_direction();
+
+	// if (id == 9) cout("Debug", "Arm 0", "absolute position -> " + std::to_string(get_absolute_position()[0]) + " " + std::to_string(get_absolute_position()[1]) + " " + std::to_string(get_absolute_position()[2]));
+	// if (id == 9) cout("Debug", "Arm 0", "anchor -> " + std::to_string(anchor[0]) + " " + std::to_string(anchor[1]) + " " + std::to_string(anchor[2]));
+	// if (id == 9) cout("Debug", "Arm 0", "position -> " + std::to_string(position[0]) + " " + std::to_string(position[1]) + " " + std::to_string(position[2]));
+	// if (id == 9) cout("Debug", "Arm 0", "position_offset_anchor -> " + std::to_string(position_offset_anchor[0]) + " " + std::to_string(position_offset_anchor[1]) + " " + std::to_string(position_offset_anchor[2]));
+	// if (id == 9) cout("Debug", "Arm 0", "position_plan_offset_parent -> " + std::to_string(position_plan_offset_parent[0]) + " " + std::to_string(position_plan_offset_parent[1]) + " " + std::to_string(position_plan_offset_parent[2]));
 }
 
 // Apply to a child matrix the parent position model
@@ -494,6 +503,10 @@ glm::mat4 Transform_Object::apply_parent_position_model_matrix(glm::mat4 matrix)
 	// Apply parent position model matrix
 	if (get_parent() != 0) matrix = get_parent()->apply_parent_position_model_matrix(matrix);
 
+	if (id == 10) cout("Debug", "Arm 1", "get_position_offset_parent() -> " + std::to_string(get_position_offset_parent()[0]) + " " + std::to_string(get_position_offset_parent()[1]) + " " + std::to_string(get_position_offset_parent()[2]));
+	if (id == 10) cout("Debug", "Arm 1", "get_position_animation() -> " + std::to_string(get_position_animation()[0]) + " " + std::to_string(get_position_animation()[0]) + " " + std::to_string(get_position_animation()[2]));
+	if (id == 10) cout("Debug", "Arm 1", "get_position_offset_anchor() -> " + std::to_string(get_position_offset_anchor()[0]) + " " + std::to_string(get_position_offset_anchor()[1]) + " " + std::to_string(get_position_offset_anchor()[2]));
+	
 	// Move the matrix
 	matrix = glm::translate(matrix, get_position_offset_parent());
 	matrix = glm::translate(matrix, get_position_animation());
@@ -549,10 +562,12 @@ glm::mat4 Transform_Object::apply_parent_rotation_model_matrix(glm::mat4 matrix,
 void Transform_Object::apply_parent_plan_rotation()
 {
 	rotation_plan_offset_parent = (get_parent()->get_absolute_plan_rotation(true) * get_parent_rotation_multiplier() * glm::vec3(1, -1, 1.001)) + get_parent_rotation_adder();
-	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
+	position_plan_offset_parent = (rotate_vector(get_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), true, get_id()));
 	anchor_position_offset = (rotate_vector(get_anchored_position(), rotation_plan_offset_parent, glm::vec3(0, 0, 0), glm::vec3(1, 1, 1)));
 	apply_anchor_rotation();
 	calculate_direction();
+
+	if (id == 9) cout("Debug", "Arm 0", "position_plan_offset_parent edited -> " + std::to_string(position_plan_offset_parent[0]) + " " + std::to_string(position_plan_offset_parent[1]) + " " + std::to_string(position_plan_offset_parent[2]));
 
 	std::vector<Transform_Object*>* children = get_children();
 	for (int i = 0; i < children->size(); i++) // Apply the rotation to the children
