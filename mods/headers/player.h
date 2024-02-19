@@ -18,6 +18,7 @@ namespace Player
 		void* clone(Advanced_Struct* game_struct, std::string name, std::string scene_name, Transform_Object* attached_transform, Graphic_Object* attached_graphic = 0, Physic_Object* attached_physic = 0); // Clone the Camera_Handler
 		void late_update(); // Late update the Camera_Handler
 		void rotate_plan(glm::vec3 a_rotation); // Rotate the plan in theCamera_Handler
+		void set_anchored_position(glm::vec3 anchored_position); // Change the anchored position in the Camera_Handler
 		void update_move(); // Update the move in the Camera_Handler
 		~Camera_Handler(); // Camera_Handler destructor
 

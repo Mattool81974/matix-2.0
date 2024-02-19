@@ -58,7 +58,7 @@ namespace Lunar_Rover
 		float a_wheels_turn_difference_left_right = 1.0f;
 
 		std::vector<Object*> arm_parts = std::vector<Object*>(); // Parts of the arm of the rover
-		glm::vec3 camera_back_view_offset = glm::vec3(-7.5, 2, 0); // Offset of the camera for the back view
+		glm::vec3 camera_back_view_offset = glm::vec3(-7.5, 0, 0); // Offset of the camera for the back view
 		glm::vec3 camera_back_view_rotation_offset = glm::vec3(0.0, 270.0, 0.0); // Rotation offset of the camera for the back view
 
 		// Camera_Handler in the game
